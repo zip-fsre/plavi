@@ -1,6 +1,0 @@
-[submodule "plavi-frontend"]
-	path = plavi-frontend
-	url = git@github.com:tirkizni/plavi-frontend.git
-[submodule "plavi-backend"]
-	path = plavi-backend
-	url = git@github.com:tirkizni/plavi-backend.git
