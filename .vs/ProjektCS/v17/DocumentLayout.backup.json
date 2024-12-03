@@ -1,0 +1,207 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\User\\source\\repos\\ProjektCS\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|c:\\users\\user\\source\\repos\\projektcs\\projektcs\\views\\dogadjajs\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|solutionrelative:projektcs\\views\\dogadjajs\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|c:\\users\\user\\source\\repos\\projektcs\\projektcs\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|solutionrelative:projektcs\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|c:\\users\\user\\source\\repos\\projektcs\\projektcs\\data\\dogadjajcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|solutionrelative:projektcs\\data\\dogadjajcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|c:\\users\\user\\source\\repos\\projektcs\\projektcs\\controllers\\dogadjajscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|solutionrelative:projektcs\\controllers\\dogadjajscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|c:\\users\\user\\source\\repos\\projektcs\\projektcs\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|solutionrelative:projektcs\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|c:\\users\\user\\source\\repos\\projektcs\\projektcs\\models\\dogadjaj.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|solutionrelative:projektcs\\models\\dogadjaj.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|c:\\users\\user\\source\\repos\\projektcs\\projektcs\\models\\errorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|solutionrelative:projektcs\\models\\errorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|c:\\users\\user\\source\\repos\\projektcs\\projektcs\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{79073A25-EBEE-4898-BF82-81A73DA6A695}|ProjektCS\\ProjektCS.csproj|solutionrelative:projektcs\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|ViewDataWindow_MSSQL__/dosa.fer.hr_3000/PI_02/PI02/SqlTable/dbo.DOGADJAJ.sql||{0058A1F7-65F3-4DB9-B3D0-CA7E64DD73CD}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|ViewDataWindow_MSSQL__/dosa.fer.hr_3000/PI_02/PI02/SqlTable/dbo.CitacDogadjaja.sql||{0058A1F7-65F3-4DB9-B3D0-CA7E64DD73CD}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Controllers\\KlasaController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:ProjektCS\\Controllers\\KlasaController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Models\\Klasa.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:ProjektCS\\Models\\Klasa.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 100,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "DogadjajContext.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Data\\DogadjajContext.cs",
+              "RelativeDocumentMoniker": "ProjektCS\\Data\\DogadjajContext.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Data\\DogadjajContext.cs",
+              "RelativeToolTip": "ProjektCS\\Data\\DogadjajContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T12:44:53.325Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ErrorViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Models\\ErrorViewModel.cs",
+              "RelativeDocumentMoniker": "ProjektCS\\Models\\ErrorViewModel.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Models\\ErrorViewModel.cs",
+              "RelativeToolTip": "ProjektCS\\Models\\ErrorViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T12:40:36.827Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Views\\DOGADJAJs\\Index.cshtml",
+              "RelativeDocumentMoniker": "ProjektCS\\Views\\DOGADJAJs\\Index.cshtml",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Views\\DOGADJAJs\\Index.cshtml",
+              "RelativeToolTip": "ProjektCS\\Views\\DOGADJAJs\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-12-03T12:35:06.913Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "dbo.CitacDogadjaja.sql",
+              "DocumentMoniker": "ViewDataWindow_MSSQL__/dosa.fer.hr_3000/PI_02/PI02/SqlTable/dbo.CitacDogadjaja.sql",
+              "ToolTip": "ViewDataWindow_MSSQL__/dosa.fer.hr_3000/PI_02/PI02/SqlTable/dbo.CitacDogadjaja.sql",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2024-12-03T12:33:32.086Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "dbo.DOGADJAJ.sql",
+              "DocumentMoniker": "ViewDataWindow_MSSQL__/dosa.fer.hr_3000/PI_02/PI02/SqlTable/dbo.DOGADJAJ.sql",
+              "ToolTip": "ViewDataWindow_MSSQL__/dosa.fer.hr_3000/PI_02/PI02/SqlTable/dbo.DOGADJAJ.sql",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2024-12-03T12:33:03.973Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "DOGADJAJsController.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Controllers\\DOGADJAJsController.cs",
+              "RelativeDocumentMoniker": "ProjektCS\\Controllers\\DOGADJAJsController.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Controllers\\DOGADJAJsController.cs",
+              "RelativeToolTip": "ProjektCS\\Controllers\\DOGADJAJsController.cs",
+              "ViewState": "AgIAAIcAAAAAAAAAAAAqwJ0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T12:20:31.687Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "DOGADJAJ.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Models\\DOGADJAJ.cs",
+              "RelativeDocumentMoniker": "ProjektCS\\Models\\DOGADJAJ.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Models\\DOGADJAJ.cs",
+              "RelativeToolTip": "ProjektCS\\Models\\DOGADJAJ.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABAAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T12:15:06.173Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "KlasaController.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Controllers\\KlasaController.cs",
+              "RelativeDocumentMoniker": "ProjektCS\\Controllers\\KlasaController.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Controllers\\KlasaController.cs",
+              "RelativeToolTip": "ProjektCS\\Controllers\\KlasaController.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T10:09:45.783Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Program.cs",
+              "RelativeDocumentMoniker": "ProjektCS\\Program.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Program.cs",
+              "RelativeToolTip": "ProjektCS\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T09:55:32.566Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "ProjektCS\\Data\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "ProjektCS\\Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T09:54:05.002Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\appsettings.json",
+              "RelativeDocumentMoniker": "ProjektCS\\appsettings.json",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\appsettings.json",
+              "RelativeToolTip": "ProjektCS\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAACDAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-12-03T09:49:50.483Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Klasa.cs",
+              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Models\\Klasa.cs",
+              "RelativeDocumentMoniker": "ProjektCS\\Models\\Klasa.cs",
+              "ToolTip": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\Models\\Klasa.cs",
+              "RelativeToolTip": "ProjektCS\\Models\\Klasa.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-03T09:42:07.041Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
