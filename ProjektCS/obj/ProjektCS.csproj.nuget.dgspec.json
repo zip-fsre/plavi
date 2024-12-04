@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\ProjektCS.csproj": {}
+    "C:\\Users\\Manuela\\plavi\\ProjektCS\\ProjektCS.csproj": {}
   },
   "projects": {
-    "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\ProjektCS.csproj": {
+    "C:\\Users\\Manuela\\plavi\\ProjektCS\\ProjektCS.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\ProjektCS.csproj",
+        "projectUniqueName": "C:\\Users\\Manuela\\plavi\\ProjektCS\\ProjektCS.csproj",
         "projectName": "ProjektCS",
-        "projectPath": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\ProjektCS.csproj",
-        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\User\\source\\repos\\ProjektCS\\ProjektCS\\obj\\",
+        "projectPath": "C:\\Users\\Manuela\\plavi\\ProjektCS\\ProjektCS.csproj",
+        "packagesPath": "C:\\Users\\Manuela\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Manuela\\plavi\\ProjektCS\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Manuela\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
