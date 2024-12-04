@@ -13,5 +13,7 @@ namespace ProjektCS.Data
         public DbSet<ProjektCS.Models.DOGADJAJ> DOGADJAJ { get; set; } = default!;
         public DbSet<ProjektCS.Models.Partneri> Partneri { get; set; } = default!;
         public DbSet<ProjektCS.Models.Gost> Gost { get; set; } = default!;
+        public DbSet<ProjektCS.Models.Playlista> Playlista { get; set; } = default!;
+        public DbSet<ProjektCS.Models.Prostor> Prostor { get; set; } = default!;
     }
 }
