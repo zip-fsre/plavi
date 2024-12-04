@@ -10,22 +10,22 @@ using ProjektCS.Models;
 
 namespace ProjektCS.Controllers
 {
-    public class DOGADJAJsController : Controller
+    public class PartneriController : Controller
     {
         private readonly DefaultContext _context;
 
-        public DOGADJAJsController(DefaultContext context)
+        public PartneriController(DefaultContext context)
         {
             _context = context;
         }
 
-        // GET: DOGADJAJs
+        // GET: Partneri
         public async Task<IActionResult> Index()
         {
-            return View(await _context.DOGADJAJ.ToListAsync());
+            return View(await _context.Partneri.ToListAsync());
         }
 
-        // GET: DOGADJAJs/Details/5
+        // GET: Partneri/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,39 +33,39 @@ namespace ProjektCS.Controllers
                 return NotFound();
             }
 
-            var dOGADJAJ = await _context.DOGADJAJ
+            var partneri = await _context.Partneri
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (dOGADJAJ == null)
+            if (partneri == null)
             {
                 return NotFound();
             }
 
-            return View(dOGADJAJ);
+            return View(partneri);
         }
 
-        // GET: DOGADJAJs/Create
+        // GET: Partneri/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: DOGADJAJs/Create
+        // POST: Partneri/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,NAZIV,DATUM,LOKACIJA,SVRHA,IME_ORGANIZATORA,KONTAKT_ORGANIZATORA,BROJ_GOSTIJU")] DOGADJAJ dOGADJAJ)
+        public async Task<IActionResult> Create([Bind("ID,NAZIV,KONTAKT,EMAIL,TIP")] Partneri partneri)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(dOGADJAJ);
+                _context.Add(partneri);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(dOGADJAJ);
+            return View(partneri);
         }
 
-        // GET: DOGADJAJs/Edit/5
+        // GET: Partneri/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +73,22 @@ namespace ProjektCS.Controllers
                 return NotFound();
             }
 
-            var dOGADJAJ = await _context.DOGADJAJ.FindAsync(id);
-            if (dOGADJAJ == null)
+            var partneri = await _context.Partneri.FindAsync(id);
+            if (partneri == null)
             {
                 return NotFound();
             }
-            return View(dOGADJAJ);
+            return View(partneri);
         }
 
-        // POST: DOGADJAJs/Edit/5
+        // POST: Partneri/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,NAZIV,DATUM,LOKACIJA,SVRHA,IME_ORGANIZATORA,KONTAKT_ORGANIZATORA,BROJ_GOSTIJU")] DOGADJAJ dOGADJAJ)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,NAZIV,KONTAKT,EMAIL,TIP")] Partneri partneri)
         {
-            if (id != dOGADJAJ.ID)
+            if (id != partneri.ID)
             {
                 return NotFound();
             }
@@ -97,12 +97,12 @@ namespace ProjektCS.Controllers
             {
                 try
                 {
-                    _context.Update(dOGADJAJ);
+                    _context.Update(partneri);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DOGADJAJExists(dOGADJAJ.ID))
+                    if (!PartneriExists(partneri.ID))
                     {
                         return NotFound();
                     }
@@ -113,10 +113,10 @@ namespace ProjektCS.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(dOGADJAJ);
+            return View(partneri);
         }
 
-        // GET: DOGADJAJs/Delete/5
+        // GET: Partneri/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,34 +124,34 @@ namespace ProjektCS.Controllers
                 return NotFound();
             }
 
-            var dOGADJAJ = await _context.DOGADJAJ
+            var partneri = await _context.Partneri
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (dOGADJAJ == null)
+            if (partneri == null)
             {
                 return NotFound();
             }
 
-            return View(dOGADJAJ);
+            return View(partneri);
         }
 
-        // POST: DOGADJAJs/Delete/5
+        // POST: Partneri/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var dOGADJAJ = await _context.DOGADJAJ.FindAsync(id);
-            if (dOGADJAJ != null)
+            var partneri = await _context.Partneri.FindAsync(id);
+            if (partneri != null)
             {
-                _context.DOGADJAJ.Remove(dOGADJAJ);
+                _context.Partneri.Remove(partneri);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool DOGADJAJExists(int id)
+        private bool PartneriExists(int id)
         {
-            return _context.DOGADJAJ.Any(e => e.ID == id);
+            return _context.Partneri.Any(e => e.ID == id);
         }
     }
 }

@@ -7,19 +7,17 @@ using ProjektCS.Data;
 
 namespace ProjektCS.Models
 {
-    public class DOGADJAJ
+    public class Gost
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
-        public string? NAZIV { get; set; }
-        public DateTime? DATUM { get; set; }
-        public string? LOKACIJA { get; set; }
-        public string? SVRHA { get; set; }
-        public string? IME_ORGANIZATORA { get; set; }
-        public string? KONTAKT_ORGANIZATORA { get; set; }
-        public int? BROJ_GOSTIJU { get; set; }
+        public int? ID_DOGADJAJA { get; set; }
+        public string? IME_I_PREZIME { get; set; }
+        public int? BROJ_STOLA { get; set; }
+        public string? STATUS_GOSTA { get; set; }
+        public int? STATUS_DOLASKA { get; set; }
     }
 
-    
+
 }
