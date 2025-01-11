@@ -1,0 +1,44 @@
+﻿@model ProjektCS.Models.NARUCITELJ
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>NARUCITELJ</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ID" />
+            <div class="form-group">
+                <label asp-for="IME_I_PREZIME" class="control-label"></label>
+                <input asp-for="IME_I_PREZIME" class="form-control" />
+                <span asp-validation-for="IME_I_PREZIME" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="KONTAKT" class="control-label"></label>
+                <input asp-for="KONTAKT" class="form-control" />
+                <span asp-validation-for="KONTAKT" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EMAIL" class="control-label"></label>
+                <input asp-for="EMAIL" class="form-control" />
+                <span asp-validation-for="EMAIL" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
