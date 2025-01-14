@@ -16,7 +16,7 @@ export const RoutesProvider = ({ children }) => {
     Reports: { component: ReportsPage, options: { headerShown: false } },
   };
 
-  const [currentPage, setCurrentPage] = useState(pages['Partners']);
+  const [currentPage, setCurrentPage] = useState(pages['Home']);
   
 
   return (
