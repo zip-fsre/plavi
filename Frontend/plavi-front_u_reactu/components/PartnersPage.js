@@ -3,15 +3,15 @@ import { View, Text, StyleSheet } from 'react-native';
 import Pozadina from './ui/Pozadina';
 import HoverButton from './ui/Button'; 
 
-const HomePage = () => {
+const PartnersPage = () => {
   return (
     <Pozadina>
-      <View style={styles.container}>
-          <Text style={styles.title}>Planify</Text>
-          <Text style={styles.description}>
+        <View style={styles.container}>
+            <Text style={styles.title}>Partners</Text>
+            <Text style={styles.description}>
             Dobrodošli na Planify! Organizirajte svoje događaje na najbolji mogući način.
-          </Text>
-      </View>
+            </Text>
+        </View>
     </Pozadina>
   );
 };
@@ -51,4 +51,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomePage;
+export default PartnersPage;

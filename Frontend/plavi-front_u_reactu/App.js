@@ -1,12 +1,14 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import HomePage from './components/HomePage'; 
+import { StyleSheet } from 'react-native';
+
+import Layout from './components/Layout';
+import { RoutesProvider } from './Routes';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <HomePage /> {/* Pozivanje HomePage komponente */}
-    </View>
+    <RoutesProvider>
+      <Layout/>
+    </RoutesProvider>
   );
 }
 
