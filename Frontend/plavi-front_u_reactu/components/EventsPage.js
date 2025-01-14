@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Pozadina from './ui/Pozadina';
-import HoverButton from './ui/Button'; 
 
-const HomePage = () => {
+const EventsPage = () => {
   return (
     <Pozadina>
-      <View style={styles.container}>
-          <Text style={styles.title}>Planify</Text>
-          <Text style={styles.description}>
-            Dobrodošli na Planify! Organizirajte svoje događaje na najbolji mogući način.
-          </Text>
-      </View>
+    <View style={styles.container}>
+        <Text style={styles.title}>Events</Text>
+        <Text style={styles.description}>
+          Odlazite nam sa stranice! Organizirajte svoje događaje na najbolji mogući način.
+        </Text>
+    </View>
     </Pozadina>
   );
 };
@@ -51,4 +50,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomePage;
+export default EventsPage;
