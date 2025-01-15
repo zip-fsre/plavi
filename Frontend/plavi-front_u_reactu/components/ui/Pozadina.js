@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#e8c789',
-    fontFamily: "'Alex Brush', cursive",
+    fontFamily: 'Palace Script MT',
     fontSize: 68,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     color: '#e8c789',
     fontSize: 18,
     textAlign: 'center',
+    fontFamily: 'Monotype Corsiva',
     lineHeight: 24,
   },
 });
