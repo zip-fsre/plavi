@@ -17,15 +17,15 @@ const EventsPage = () => {
     <Pozadina>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>Partneri</Text> 
+            <Text style={styles.title}>Događaji</Text> 
           </View>
           <ScrollView style={styles.partneri}>
-            <Event onPress={handleEditEvent} naziv='Prvi događaj' vrsta='Maneken' opis='Nisam ja za ovoga...'/>
-            <Event onPress={handleEditEvent} naziv='Drugi događaj' vrsta='Sviralo' opis='Svira svirku, brine brigu...'/>
-            <Event onPress={handleEditEvent} naziv='Treci događaj' vrsta='Plesac' opis='Rekose da udarim po Trusi, nisu znali da mi se tako zove sestra...'/>
-            <Event onPress={handleEditEvent} naziv='Cetvrti događaj' vrsta='Fotograf' opis='Slikar sa posebnim potrebama (za aparatom)'/>
-            <Event onPress={handleEditEvent} naziv='Peti događaj' vrsta='Restoran' opis='Ja sam vise ovako za pojest, popit...'/>
-            <Event onPress={handleEditEvent} naziv='Sesti događaj' vrsta='Ketering' opis='Glupi autocorrect, mislio sam ketamin...'/>
+            <Event onPress={handleEditEvent} naziv='Prvi događaj' vrsta='Vjenčanje' opis='Ivan Matić - 063 223 321'/>
+            <Event onPress={handleEditEvent} naziv='Drugi događaj' vrsta='Vjenčanje' opis='Ana Marić - 063 654 455'/>
+            <Event onPress={handleEditEvent} naziv='Treci događaj' vrsta='Vjenčanje' opis='Ivan Galić - 063 232 321'/>
+            <Event onPress={handleEditEvent} naziv='Cetvrti događaj' vrsta='Matura' opis='Antonija Matić - 063 235 544'/>
+            <Event onPress={handleEditEvent} naziv='Peti događaj' vrsta='Vjenčanje' opis='Krešo Matić - 063 123 344'/>
+            <Event onPress={handleEditEvent} naziv='Sesti događaj' vrsta='Krizma' opis='Mate Matić - 063 444 321'/>
           </ScrollView>
         </View>
     </Pozadina>
@@ -35,11 +35,13 @@ const EventsPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignSelf: 'center',
+
     
   },
   title: {
     color: '#e8c789',
-    fontFamily: 'Palace Script MT',
+    fontFamily: 'Monotype Corsiva',
     fontSize: 140,
     textAlign: 'center',
     marginBottom: 10,
