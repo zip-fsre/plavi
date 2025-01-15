@@ -2,15 +2,15 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Pozadina from './ui/Pozadina';
 import Event from './ui/Event'
-
+import { ScrollView } from 'react-native';
 
 const EventsPage = () => {
 
   const handleAddEvent = () => {
-    console.log("Dodaj partnera!");
+    console.log("Dodaj događaj!");
   }
   const handleEditEvent = () => {
-    console.log("Uredi partnera!");
+    console.log("Uredi događaj!");
   }
 
   return (
@@ -18,15 +18,14 @@ const EventsPage = () => {
         <View style={styles.container}>
           <View style={styles.header}>
             <Text style={styles.title}>Partneri</Text> 
-            <SmallButton title="Novi" onPress={handleAddEvent}/>
           </View>
           <ScrollView style={styles.partneri}>
-            <Event onPress={handleEditEvent} naziv='Prvi partner' vrsta='Maneken' opis='Nisam ja za ovoga...'/>
-            <Event onPress={handleEditEvent} naziv='Drugi partner' vrsta='Sviralo' opis='Svira svirku, brine brigu...'/>
-            <Event onPress={handleEditEvent} naziv='Treci partner' vrsta='Plesac' opis='Rekose da udarim po Trusi, nisu znali da mi se tako zove sestra...'/>
-            <Event onPress={handleEditEvent} naziv='Cetvrti partner' vrsta='Fotograf' opis='Slikar sa posebnim potrebama (za aparatom)'/>
-            <Event onPress={handleEditEvent} naziv='Peti partner' vrsta='Restoran' opis='Ja sam vise ovako za pojest, popit...'/>
-            <Event onPress={handleEditEvent} naziv='Sesti partner' vrsta='Ketering' opis='Glupi autocorrect, mislio sam ketamin...'/>
+            <Event onPress={handleEditEvent} naziv='Prvi događaj' vrsta='Maneken' opis='Nisam ja za ovoga...'/>
+            <Event onPress={handleEditEvent} naziv='Drugi događaj' vrsta='Sviralo' opis='Svira svirku, brine brigu...'/>
+            <Event onPress={handleEditEvent} naziv='Treci događaj' vrsta='Plesac' opis='Rekose da udarim po Trusi, nisu znali da mi se tako zove sestra...'/>
+            <Event onPress={handleEditEvent} naziv='Cetvrti događaj' vrsta='Fotograf' opis='Slikar sa posebnim potrebama (za aparatom)'/>
+            <Event onPress={handleEditEvent} naziv='Peti događaj' vrsta='Restoran' opis='Ja sam vise ovako za pojest, popit...'/>
+            <Event onPress={handleEditEvent} naziv='Sesti događaj' vrsta='Ketering' opis='Glupi autocorrect, mislio sam ketamin...'/>
           </ScrollView>
         </View>
     </Pozadina>
@@ -36,6 +35,7 @@ const EventsPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    
   },
   title: {
     color: '#e8c789',
