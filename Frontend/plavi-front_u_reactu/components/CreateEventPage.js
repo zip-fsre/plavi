@@ -142,6 +142,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 15,
     backgroundColor: '#95997e',
+    opacity: 0.6,
     color: '#222c2b',
     marginBottom: 25,
     fontSize: 18,
@@ -149,12 +150,14 @@ const styles = StyleSheet.create({
   pickerContainer: {
     borderWidth: 1,
     borderColor: '#e8c789',
+    opacity: 0.6,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 25,
   },
   picker: {
     backgroundColor: '#95997e',
+    opacity: 0.6,
     color: '#222c2b',
   },
   noteInput: {
@@ -163,6 +166,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 15,
     backgroundColor: '#95997e',
+    opacity: 0.6,
     height: 150,
     textAlignVertical: 'top',
     color: '#222c2b',
@@ -171,6 +175,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#95997e',
+    opacity: 0.9,
     padding: 15,
     borderRadius: 30,
     alignItems: 'center',
