@@ -23,7 +23,7 @@ const ReportsPage = () => {
 
       <ScrollView style={styles.reportsList} >
         <Text style={styles.reportsTitle}>Nedavna izvješća:</Text>
-        {[...Array(8)].map((_, index) => (
+        {[...Array(12)].map((_, index) => (
           <View key={index} style={styles.reportContainer}>
             <Text style={styles.reportText}>Izvješće {index + 1}</Text>
           </View>
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   },
   reportsList: {
     flex: 1,
-    maxHeight:280,
+    maxHeight:400,
     paddingHorizontal: 15,
     width: '100%',
     overflowY: 'scroll',

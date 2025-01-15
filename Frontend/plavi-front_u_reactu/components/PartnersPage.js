@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   partneri: {
-    maxHeight: 400,
+    maxHeight: 800,
   },
   image: {
     height: 30,
