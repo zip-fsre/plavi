@@ -1,16 +1,33 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Pozadina from './ui/Pozadina';
-import HoverButton from './ui/Button'; 
+import SmallButton from './ui/SmallButton'; 
+import HoverButton from './ui/Button';
+import Partner from './ui/Partner'
 
 const PartnersPage = () => {
+  const handleAddPartner = () => {
+    console.log("Dodaj partnera!");
+  }
+  const handleEditPartner = () => {
+    console.log("Uredi partnera!");
+  }
+
   return (
     <Pozadina>
         <View style={styles.container}>
-            <Text style={styles.title}>Partners</Text>
-            <Text style={styles.description}>
-            Dobrodošli na Planify! Organizirajte svoje događaje na najbolji mogući način.
-            </Text>
+          <View style={styles.header}>
+            <Text style={styles.title}>Partneri</Text> 
+            <SmallButton title="Novi" onPress={handleAddPartner}/>
+          </View>
+          <ScrollView style={styles.partneri}>
+            <Partner onPress={handleEditPartner} naziv='Prvi partner' vrsta='Maneken' opis='Nisam ja za ovoga...'/>
+            <Partner onPress={handleEditPartner} naziv='Drugi partner' vrsta='Sviralo' opis='Svira svirku, brine brigu...'/>
+            <Partner onPress={handleEditPartner} naziv='Treci partner' vrsta='Plesac' opis='Rekose da udarim po Trusi, nisu znali da mi se tako zove sestra...'/>
+            <Partner onPress={handleEditPartner} naziv='Cetvrti partner' vrsta='Fotograf' opis='Slikar sa posebnim potrebama (za aparatom)'/>
+            <Partner onPress={handleEditPartner} naziv='Peti partner' vrsta='Restoran' opis='Ja sam vise ovako za pojest, popit...'/>
+            <Partner onPress={handleEditPartner} naziv='Sesti partner' vrsta='Ketering' opis='Glupi autocorrect, mislio sam ketamin...'/>
+          </ScrollView>
         </View>
     </Pozadina>
   );
@@ -19,12 +36,29 @@ const PartnersPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignSelf: 'center',
+  },
+  partneri: {
+    maxHeight: 400,
+  },
+  image: {
+    height: 30,
+    width: 30,
+  },
+  item: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 190,
   },
   title: {
     color: '#e8c789',
-    fontFamily: 'Palace Script MT',
-    fontSize: 140,
-    textAlign: 'center',
+    fontFamily: 'Monotype Corsiva',
+    fontSize: 70,
+    textAlign: 'left',
     marginBottom: 10,
     textShadowColor: 'black',
     textShadowOffset: { width: 2, height: 2 },
