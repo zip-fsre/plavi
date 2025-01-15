@@ -1,58 +1,92 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Pozadina from './ui/Pozadina';
-import HoverButton from './ui/Button'; 
-import { usePage } from '../Routes';
+import HoverButton from './ui/Button';
+import './ui/scrollbar.css';
 
 const ReportsPage = () => {
-    const {currentPage, setCurrentPage, pages} = usePage();
-
   return (
-    <Pozadina>
-        <View style={styles.container}>
-            <Text style={styles.title}>Reports</Text>
-            <Text style={styles.description}>
-            Dobrodošli na Planify! Organizirajte svoje događaje na najbolji mogući način.
-            </Text>
-            <HoverButton title="Partneri" onPress={() => setCurrentPage(pages['Partners'])} />
-        </View>
+    <Pozadina >
+    <View style={styles.container}>
+
+        <Text style={styles.title}>Izvješća</Text>
+      
+      {/* Gumb za kreiranje izvješća */}
+      <View style={styles.createButtonContainer}>
+        <HoverButton 
+          title="Kreiraj izvješće" 
+          onPress={() => console.log('Kreiranje izvješća')} 
+        />
+      </View>
+     
+      {/* Lista recent reports */}
+
+      <ScrollView style={styles.reportsList} >
+        <Text style={styles.reportsTitle}>Nedavna izvješća:</Text>
+        {[...Array(8)].map((_, index) => (
+          <View key={index} style={styles.reportContainer}>
+            <Text style={styles.reportText}>Izvješće {index + 1}</Text>
+          </View>
+        ))}
+      </ScrollView>
+    </View>
     </Pozadina>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    alignSelf: 'center',
+    width:'100%',
   },
   title: {
     color: '#e8c789',
-    fontFamily: 'Palace Script MT',
-    fontSize: 140,
+    fontFamily: 'Monotype Corsiva',
+    fontSize: 100,
     textAlign: 'center',
-    marginBottom: 10,
     textShadowColor: 'black',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 3,
-  },
-  description: {
-    color: '#e8c789',
-    fontSize: 18,
-    fontFamily: 'Monotype Corsiva',
-    textAlign: 'center',
-    lineHeight: 24,
     marginBottom: 20,
   },
-  menu: {
-    position: 'absolute',
+  createButtonContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  reportsList: {
     flex: 1,
-    bottom: 15,
-    left: '5%',
-    width: '90%',
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    maxHeight:280,
+    paddingHorizontal: 15,
+    width: '100%',
+    overflowY: 'scroll',
+  },
+  reportsTitle: {
+    fontSize: 25,
+    color: '#e8c789',
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+    width: '100%',
+    fontFamily: 'Monotype Corsiva',
+  },
+  reportContainer: {
+    backgroundColor: '#405352',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+    width: '60%',
+    alignSelf: 'center',
+  },
+  reportText: {
+    fontSize: 15,
+    color: '#e8c789',
+    fontFamily: 'Helvetica',
   },
 });
 
 export default ReportsPage;
+
