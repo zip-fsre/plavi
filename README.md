@@ -1,7 +1,16 @@
 # Tim Plavi Repozitorij
 
-Ovo je glavni repozitorij za tim Plavi.
+Back se pokrece funkcijom dotnet run
 
-U slucaju da zelite koristiti odvojene repozitorije za backend i frontend, mozete se promjeniti na branch `main_sa_git_submodulima`.
+Primjer funkcije koja sa fronta poziva back: 
 
-U tom branchu se nalaze Git Submoduli koji pokazuju na repozitorije `plavi-frontend` i `plavi-backend`. Za upute kako klonirati taj branch, procitajte README.md datoteku na tom branchu koristeci GitHub.
+const tester = async () => {
+    try {
+      const response = await fetch('http://localhost:5149/api/Dogadjaj/1');
+      const data = await response.json();
+      console.log(data);
+    }
+    catch (error) {
+      console.error(error);
+    }
+  }
