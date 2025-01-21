@@ -33,8 +33,6 @@ public partial class Pi02Context : DbContext
 
     public virtual DbSet<Dogadjaj> Dogadjajs { get; set; }
 
-    public virtual DbSet<Generalno> Generalnos { get; set; }
-
     public virtual DbSet<Gost> Gosts { get; set; }
 
     public virtual DbSet<Izvjesce> Izvjesces { get; set; }
@@ -58,9 +56,6 @@ public partial class Pi02Context : DbContext
 
             entity.ToTable("ARANZMAN");
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("ID");
             entity.Property(e => e.Cijena).HasColumnName("CIJENA");
             entity.Property(e => e.IdPartnera).HasColumnName("ID_PARTNERA");
             entity.Property(e => e.Opis)
@@ -145,22 +140,12 @@ public partial class Pi02Context : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.AspNetUserTokens).HasForeignKey(d => d.UserId);
         });
 
-        modelBuilder.Entity<CitacDogadjaja>(entity =>
-        {
-            entity.ToTable("CitacDogadjaja");
-
-            entity.Property(e => e.Id).HasColumnName("ID");
-        });
-
         modelBuilder.Entity<Dogadjaj>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__DOGADJAJ__3214EC27DBA79BB2");
 
             entity.ToTable("DOGADJAJ");
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("ID");
             entity.Property(e => e.Datum).HasColumnName("DATUM");
             entity.Property(e => e.Klijent)
                 .HasMaxLength(100)
@@ -188,109 +173,6 @@ public partial class Pi02Context : DbContext
                 .HasColumnName("SVRHA");
         });
 
-        modelBuilder.Entity<Generalno>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToView("Generalno");
-
-            entity.Property(e => e.BrojGostiju).HasColumnName("BROJ_GOSTIJU");
-            entity.Property(e => e.BrojMjestaPoStolu).HasColumnName("BROJ_MJESTA_PO_STOLU");
-            entity.Property(e => e.BrojStola).HasColumnName("BROJ_STOLA");
-            entity.Property(e => e.BrojStolova).HasColumnName("BROJ_STOLOVA");
-            entity.Property(e => e.CijenaAranzmana).HasColumnName("CIJENA_ARANZMANA");
-            entity.Property(e => e.Datum)
-                .HasColumnType("datetime")
-                .HasColumnName("DATUM");
-            entity.Property(e => e.Email)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("EMAIL");
-            entity.Property(e => e.Expr14)
-                .HasMaxLength(30)
-                .IsUnicode(false);
-            entity.Property(e => e.Expr19)
-                .HasMaxLength(30)
-                .IsUnicode(false);
-            entity.Property(e => e.Expr8)
-                .HasMaxLength(30)
-                .IsUnicode(false);
-            entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.IdAranzmana).HasColumnName("ID_ARANZMANA");
-            entity.Property(e => e.IdDogadjaja).HasColumnName("ID_DOGADJAJA");
-            entity.Property(e => e.IdJela).HasColumnName("ID_JELA");
-            entity.Property(e => e.IdMenija).HasColumnName("ID_MENIJA");
-            entity.Property(e => e.IdPartnera).HasColumnName("ID_PARTNERA");
-            entity.Property(e => e.IdPredloska).HasColumnName("ID_PREDLOSKA");
-            entity.Property(e => e.ImeIPrezime)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("IME_I_PREZIME");
-            entity.Property(e => e.ImeOrganizatora)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasColumnName("IME_ORGANIZATORA");
-            entity.Property(e => e.KonacnaCijena).HasColumnName("KONACNA_CIJENA");
-            entity.Property(e => e.KonacnaProvizija).HasColumnName("KONACNA_PROVIZIJA");
-            entity.Property(e => e.Kontakt)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasColumnName("KONTAKT");
-            entity.Property(e => e.KontaktOrganizatora)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasColumnName("KONTAKT_ORGANIZATORA");
-            entity.Property(e => e.Lokacija)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasColumnName("LOKACIJA");
-            entity.Property(e => e.Naziv)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasColumnName("NAZIV");
-            entity.Property(e => e.NazivAranzmana)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasColumnName("NAZIV_ARANZMANA");
-            entity.Property(e => e.NazivJela)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasColumnName("NAZIV_JELA");
-            entity.Property(e => e.NazivMenija)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasColumnName("NAZIV_MENIJA");
-            entity.Property(e => e.NazivPlayliste)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasColumnName("NAZIV_PLAYLISTE");
-            entity.Property(e => e.Opis)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("OPIS");
-            entity.Property(e => e.OpisAranzmana)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("OPIS_ARANZMANA");
-            entity.Property(e => e.ProvizijaAgencije).HasColumnName("PROVIZIJA_AGENCIJE");
-            entity.Property(e => e.StatusGosta)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasColumnName("STATUS_GOSTA");
-            entity.Property(e => e.StatusZauzetosti)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasColumnName("STATUS_ZAUZETOSTI");
-            entity.Property(e => e.Svrha)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasColumnName("SVRHA");
-            entity.Property(e => e.UkupanKapacitet).HasColumnName("UKUPAN_KAPACITET");
-            entity.Property(e => e.Zanr)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasColumnName("ZANR");
-        });
 
         modelBuilder.Entity<Gost>(entity =>
         {
@@ -298,9 +180,6 @@ public partial class Pi02Context : DbContext
 
             entity.ToTable("GOST");
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("ID");
             entity.Property(e => e.BrojStola).HasColumnName("BROJ_STOLA");
             entity.Property(e => e.IdDogadjajaa).HasColumnName("ID_DOGADJAJAA");
             entity.Property(e => e.ImeIPrezime)
@@ -323,9 +202,6 @@ public partial class Pi02Context : DbContext
 
             entity.ToTable("IZVJESCE");
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("ID");
             entity.Property(e => e.Kraj)
                 .HasColumnType("datetime")
                 .HasColumnName("KRAJ");
@@ -347,9 +223,6 @@ public partial class Pi02Context : DbContext
 
             entity.ToTable("MEDJUTABLICA_PT_1");
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("ID");
             entity.Property(e => e.DodatakNaProviziju).HasColumnName("DODATAK_NA_PROVIZIJU");
             entity.Property(e => e.IdAranzmana).HasColumnName("ID_ARANZMANA");
             entity.Property(e => e.IdDogadjaja).HasColumnName("ID_DOGADJAJA");
@@ -383,9 +256,6 @@ public partial class Pi02Context : DbContext
 
             entity.ToTable("MEDJUTABLICA_PT_2");
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("ID");
             entity.Property(e => e.IdIzvjesca).HasColumnName("ID_IZVJESCA");
             entity.Property(e => e.IdMedju1).HasColumnName("ID_MEDJU_1");
 
@@ -404,9 +274,6 @@ public partial class Pi02Context : DbContext
 
             entity.ToTable("PARTNERI");
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("ID");
             entity.Property(e => e.Napomena)
                 .HasMaxLength(100)
                 .IsUnicode(false)
