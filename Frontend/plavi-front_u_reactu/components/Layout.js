@@ -4,6 +4,10 @@ import HoverButton from './ui/Button';
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { usePage } from '../Routes';
+import CreateReport from './Reports/CreateReport';
+import ViewReport from './Reports/ViewReport';
+import EditReport from './Reports/EditReport';
+import ReportsPage from './Reports/ReportsPage';
 
 const Stack = createStackNavigator();
 
@@ -19,6 +23,28 @@ const Layout = () => {
                         component={currentPage.component}
                         options={currentPage.options}
                     />
+                     {/* Dodajemo CreateReportPage u Stack Navigator */}
+          <Stack.Screen 
+            name="CreateReport" 
+            component={CreateReport} 
+            options={{ title: 'Kreiraj Izvješće' }}
+          />
+          <Stack.Screen 
+            name="ViewReport" 
+            component={ViewReport} 
+            options={{ title: 'Kreiraj Izvješće' }}
+          />
+          <Stack.Screen 
+            name="EditReport" 
+            component={EditReport} 
+            options={{ title: 'Kreiraj Izvješće' }}
+          />
+          {/* Dodajemo ReportsPage u Stack Navigator */}
+          <Stack.Screen 
+            name="Reports" 
+            component={ReportsPage} 
+            options={{ title: 'Izvješća' }}
+          />
             </Stack.Navigator>
         </NavigationContainer>
     

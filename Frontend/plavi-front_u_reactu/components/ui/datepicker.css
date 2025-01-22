@@ -1,0 +1,41 @@
+/* Stilizacija unosa */
+.custom-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #e8c789;
+    border-radius: 5px;
+    background-color: #f5f5dc;
+    color: #333;
+    z-index: 2;
+  }
+  
+  /* Fokus na unosu */
+  .custom-input:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 5px #d4af37;
+  }
+  
+  /* Stilizacija kalendara */
+  .custom-calendar {
+    border: 1px solid #e8c789;
+    border-radius: 10px;
+    background-color: #fffbe6;
+    z-index: 2;
+  }
+  
+  .custom-calendar .react-datepicker__header {
+    background-color: #d4af37;
+    color: white;
+  }
+  
+  .custom-calendar .react-datepicker__day--selected {
+    background-color: #e8c789;
+    color: white;
+  }
+  
+  .custom-calendar .react-datepicker__day:hover {
+    background-color: #f5c27b;
+    color: black;
+  }

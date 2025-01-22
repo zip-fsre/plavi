@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext } from 'react';
 import EventsPage from "./components/EventsPage";
 import CreateEventPage from './components/CreateEventPage';
 import PartnersPage from './components/PartnersPage';
-import ReportsPage from './components/ReportsPage';
+import ReportsPage from './components/Reports/ReportsPage';
 import HomePage from './components/HomePage';
 
 const Routes = createContext();
