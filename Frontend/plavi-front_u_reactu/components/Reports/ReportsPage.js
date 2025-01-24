@@ -1,10 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import Pozadina from './ui/Pozadina';
-import HoverButton from './ui/Button';
-import './ui/scrollbar.css';
+import Pozadina from '../ui/Pozadina';
+import HoverButton from '../ui/Button';
+import '../ui/scrollbar.css';
+import { usePage } from '../../Routes'
 
-const ReportsPage = () => {
+const ReportsPage = ({ navigation }) => {
+  const {currentPage, setCurrentPage, pages} = usePage();
+
   return (
     <Pozadina >
     <View style={styles.container}>
@@ -15,7 +18,7 @@ const ReportsPage = () => {
       <View style={styles.createButtonContainer}>
         <HoverButton 
           title="Kreiraj izvješće" 
-          onPress={() => console.log('Kreiranje izvješća')} 
+          onPress={() => setCurrentPage(pages['CreateReport'])}
         />
       </View>
      

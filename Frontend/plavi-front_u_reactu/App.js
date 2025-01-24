@@ -1,15 +1,17 @@
 import React from 'react';
 
 import { StyleSheet } from 'react-native';
-
+import { ReportProvider } from './ReportContext';
 import Layout from './components/Layout';
 import { RoutesProvider } from './Routes';
 
 export default function App() {
   return (
-    <RoutesProvider>
-      <Layout/>
-    </RoutesProvider>
+    <ReportProvider>
+      <RoutesProvider>
+        <Layout/>
+      </RoutesProvider>
+    </ReportProvider>
   );
 }
 

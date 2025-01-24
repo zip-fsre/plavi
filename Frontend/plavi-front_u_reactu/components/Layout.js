@@ -4,6 +4,10 @@ import HoverButton from './ui/Button';
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { usePage } from '../Routes';
+import CreateReport from './Reports/CreateReport';
+import ViewReport from './Reports/ViewReport';
+import EditReport from './Reports/EditReport';
+import ReportsPage from './Reports/ReportsPage';
 
 const Stack = createStackNavigator();
 
@@ -13,12 +17,12 @@ const Layout = () => {
   return (
     <View style={styles.container}>
         <NavigationContainer>
-                <Stack.Navigator>
-                    <Stack.Screen
-                        name={'page'}
-                        component={currentPage.component}
-                        options={currentPage.options}
-                    />
+              <Stack.Navigator>
+                  <Stack.Screen
+                      name={'page'}
+                      component={currentPage.component}
+                      options={currentPage.options}
+                  />
             </Stack.Navigator>
         </NavigationContainer>
     
