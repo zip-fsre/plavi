@@ -4,6 +4,7 @@ import CreateEventPage from './components/CreateEventPage';
 import PartnersPage from './components/PartnersPage';
 import ReportsPage from './components/ReportsPage';
 import HomePage from './components/HomePage';
+import EditEventPage from './components/EditEventPage';
 
 const Routes = createContext();
 
@@ -14,6 +15,7 @@ export const RoutesProvider = ({ children }) => {
     createEvent: { component: CreateEventPage, options: { headerShown: false } },
     Partners: { component: PartnersPage, options: { headerShown: false } },
     Reports: { component: ReportsPage, options: { headerShown: false } },
+    EditEventPage: { component: EditEventPage, options: { headerShown: false } },
   };
 
   const [currentPage, setCurrentPage] = useState(pages['Home']);

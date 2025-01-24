@@ -4,9 +4,12 @@ import Pozadina from './ui/Pozadina';
 import Event from './ui/Event'
 import { ScrollView } from 'react-native';
 import  Button  from "./ui/Button";
+import { usePage } from '../Routes';
+import Layout from './Layout';
+
 
 const EventsPage = () => {
-
+  const {currentPage, setCurrentPage, pages} = usePage();
   const [events, setEvents] = useState([]);
 
   const handleAddEvent = () => {
@@ -14,6 +17,7 @@ const EventsPage = () => {
   }
   const handleEditEvent = () => {
     console.log("Uredi događaj!");
+
   }
 
 
@@ -47,7 +51,7 @@ const renderEvent = ({item}) => {
 
   return (
     <View style={styles.container}>
-      <Event onPress={handleEditEvent} naziv={item.naziv} vrsta={item.svrha} opis={item.napomena} datum={item.datum}/> {/* komponenta Event je dizajn prikaza kartice */}
+      <Event onPress={() => setCurrentPage(pages['EditEventPage'])} naziv={item.naziv} vrsta={item.svrha} opis={item.napomena} datum={item.datum}/> {/* komponenta Event je dizajn prikaza kartice */}
     </View>
   );
 
