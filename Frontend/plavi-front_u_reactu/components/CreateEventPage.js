@@ -4,8 +4,7 @@ import Pozadina from './ui/Pozadina';
 import { Picker } from '@react-native-picker/picker';
 
 const CreateEventPage = () => {
-  const [ime, setIme] = useState('');
-  const [prezime, setPrezime] = useState('');
+  const [imeIPrezime, setImeIPrezime] = useState('');
   const [nazivDogadjaja, setNazivDogadjaja] = useState('');
   const [tipDogadjaja, setTipDogadjaja] = useState('');
   const [brojGostiju, setBrojGostiju] = useState('');
@@ -13,9 +12,12 @@ const CreateEventPage = () => {
   const [napomena, setNapomena] = useState('');
 
   const handleSubmit = () => {
+    if (!imeIPrezime || !nazivDogadjaja || !tipDogadjaja || !brojGostiju || !datum) {
+      alert('Molimo popunite sva obavezna polja.');
+      return;
+    }
     console.log({
-      ime,
-      prezime,
+      imeIPrezime,
       nazivDogadjaja,
       tipDogadjaja,
       brojGostiju,
@@ -28,17 +30,17 @@ const CreateEventPage = () => {
   return (
     <Pozadina>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>STVORI DOGAĐAJ</Text>
+        <Text style={styles.title}>Stvori događaj</Text>
 
         {/* Forma */}
         <View style={styles.formRow}>
           <View style={styles.column}>
-            <Text style={styles.label}>Ime</Text>
+            <Text style={styles.label}>Ime i prezime</Text>
             <TextInput
               style={styles.input}
-              placeholder="Unesite ime"
-              value={ime}
-              onChangeText={setIme}
+              placeholder="Unesite ime i prezime"
+              value={imeIPrezime}
+              onChangeText={setImeIPrezime}
             />
             <Text style={styles.label}>Naziv događaja</Text>
             <TextInput
@@ -64,13 +66,6 @@ const CreateEventPage = () => {
             />
           </View>
           <View style={styles.column}>
-            <Text style={styles.label}>Prezime</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Unesite prezime"
-              value={prezime}
-              onChangeText={setPrezime}
-            />
             <Text style={styles.label}>Tip događaja</Text>
             <View style={styles.pickerContainer}>
               <Picker
@@ -95,13 +90,11 @@ const CreateEventPage = () => {
               onChangeText={setNapomena}
               multiline
             />
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+             <Text style={styles.buttonText}>STVORI DOGAĐAJ</Text>
+           </TouchableOpacity>
           </View>
         </View>
-
-        {/* Gumb */}
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>STVORI DOGAĐAJ</Text>
-        </TouchableOpacity>
       </ScrollView>
     </Pozadina>
   );
@@ -132,7 +125,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 20,
-    fontFamily: 'Alex Brush',
+    fontFamily: 'Monotype Corsova',
     color: '#e8c789',
     marginBottom: 10,
   },
@@ -186,7 +179,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 22,
-    fontFamily: 'Alex Brush',
+    fontFamily: 'Monotype Corsova',
     color: '#e8c789',
   },
 });
