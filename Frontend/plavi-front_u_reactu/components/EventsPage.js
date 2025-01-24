@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import Pozadina from './ui/Pozadina';
 import Event from './ui/Event'
 import { ScrollView } from 'react-native';
+import  Button  from "./ui/Button";
 
 const EventsPage = () => {
 
@@ -20,6 +21,8 @@ const EventsPage = () => {
             <Text style={styles.title}>Događaji</Text> 
           </View>
           <ScrollView style={styles.partneri}>
+            <Button title="Upiši me" bgColor="blue" textColor="white"></Button>
+            <Button title="Ispiši me" bgColor="red" textColor="white"></Button>
             <Event onPress={handleEditEvent} naziv='Prvi događaj' vrsta='Vjenčanje' opis='Ivan Matić - 063 223 321'/>
             <Event onPress={handleEditEvent} naziv='Drugi događaj' vrsta='Vjenčanje' opis='Ana Marić - 063 654 455'/>
             <Event onPress={handleEditEvent} naziv='Treci događaj' vrsta='Vjenčanje' opis='Ivan Galić - 063 232 321'/>
