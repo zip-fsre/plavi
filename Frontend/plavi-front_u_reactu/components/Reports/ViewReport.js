@@ -3,8 +3,10 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Pozadina from '../ui/Pozadina';
 import HoverButton from '../ui/Button';
 import { useReportContext } from '../../ReportContext';
+import { usePage } from '../../Routes'
 
 const ViewReport = ({ navigation }) => {
+  const {currentPage, setCurrentPage, pages} = usePage();
   const { reportData, description, startDate, endDate, reportTitle, selectedPartner } = useReportContext();
 
   const [filteredData, setFilteredData] = useState(reportData || []);
@@ -106,7 +108,7 @@ const ViewReport = ({ navigation }) => {
         <HoverButton
           title="Uredi izvješće"
           onPress={() =>
-            navigation.navigate('EditReport', { 
+            setCurrentPage(pages['EditReport'], { 
               reportData: filteredData,  
               description,  
               startDate: start, // Koristite već definirane stringove

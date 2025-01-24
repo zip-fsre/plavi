@@ -6,8 +6,10 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../ui/datepicker.css'; 
 import { useReportContext } from '../../ReportContext';
+import { usePage } from '../../Routes'
 
 const EditReport = ({ navigation }) => {
+  const {currentPage, setCurrentPage, pages} = usePage();
     const { reportData, description, startDate, endDate, reportTitle, selectedPartner,
          setReportTitle, setDescription, setStartDate, setEndDate, setSelectedPartner } = useReportContext();
     
@@ -36,7 +38,7 @@ const EditReport = ({ navigation }) => {
         setSelectedPartner(editedSelectedPartner);
 
         // Navigacija natrag na ViewReport
-        navigation.navigate('ViewReport');
+        setCurrentPage(pages['ViewReport']);
     };
 
     useEffect(() => {

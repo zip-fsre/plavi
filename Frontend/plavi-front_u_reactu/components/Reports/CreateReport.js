@@ -6,8 +6,10 @@ import '../ui/datepicker.css';
 import Pozadina from '../ui/Pozadina';
 import HoverButton from '../ui/Button';
 import { useReportContext } from '../../ReportContext';
+import { usePage } from '../../Routes'
 
 const CreateReport = ({ navigation }) => {
+  const {currentPage, setCurrentPage, pages} = usePage();
   const { setReportData, setDescription, setStartDate, setEndDate, setReportTitle, setSelectedPartner } = useReportContext();
 
   const [startDate, setStartDateInput] = useState(null); // Početni datum je null
@@ -39,7 +41,7 @@ const CreateReport = ({ navigation }) => {
     console.log("Opis izvješća:", reportDescription);
 
 
-    navigation.navigate('ViewReport');
+    setCurrentPage(pages['ViewReport']);
   };
 
   return (

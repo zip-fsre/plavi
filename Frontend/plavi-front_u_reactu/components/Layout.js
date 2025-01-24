@@ -17,34 +17,12 @@ const Layout = () => {
   return (
     <View style={styles.container}>
         <NavigationContainer>
-                <Stack.Navigator>
-                    <Stack.Screen
-                        name={'page'}
-                        component={currentPage.component}
-                        options={currentPage.options}
-                    />
-                     {/* Dodajemo CreateReportPage u Stack Navigator */}
-          <Stack.Screen 
-            name="CreateReport" 
-            component={CreateReport} 
-            options={{ title: 'Kreiraj Izvješće' }}
-          />
-          <Stack.Screen 
-            name="ViewReport" 
-            component={ViewReport} 
-            options={{ title: 'Kreiraj Izvješće' }}
-          />
-          <Stack.Screen 
-            name="EditReport" 
-            component={EditReport} 
-            options={{ title: 'Kreiraj Izvješće' }}
-          />
-          {/* Dodajemo ReportsPage u Stack Navigator */}
-          <Stack.Screen 
-            name="Reports" 
-            component={ReportsPage} 
-            options={{ title: 'Izvješća' }}
-          />
+              <Stack.Navigator>
+                  <Stack.Screen
+                      name={'page'}
+                      component={currentPage.component}
+                      options={currentPage.options}
+                  />
             </Stack.Navigator>
         </NavigationContainer>
     
