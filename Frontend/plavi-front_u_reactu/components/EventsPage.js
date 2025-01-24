@@ -1,11 +1,13 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import Pozadina from './ui/Pozadina';
 import Event from './ui/Event'
 import { ScrollView } from 'react-native';
 import  Button  from "./ui/Button";
 
 const EventsPage = () => {
+
+  const [events, setEvents] = useState([]);
 
   const handleAddEvent = () => {
     console.log("Dodaj događaj!");
@@ -14,6 +16,43 @@ const EventsPage = () => {
     console.log("Uredi događaj!");
   }
 
+
+  //funkcija koja kupi evente iz backenda
+  const getEvents = async () => {
+    try {
+      const response = await fetch('http://localhost:5149/api/Dogadjaj/');
+      const data = await response.json();
+      setEvents(data);
+      return data;
+    }
+    catch (error) {
+      console.error(error);
+    }
+  }
+
+
+  //dohvat podataka po učitavanju stranice
+  useEffect(() => {
+    async function fetchEvents() {
+      const data = await getEvents(); // Dohvat podataka kada se getEvents odradi
+      setEvents(data); 
+      console.log(data);
+    }
+    fetchEvents(); 
+  }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
+  
+
+  //kartica dogadjaja (prikaz)
+const renderEvent = ({item}) => {
+
+  return (
+    <View style={styles.container}>
+      <Event onPress={handleEditEvent} naziv={item.naziv} vrsta={item.svrha} opis={item.napomena} datum={item.datum}/> {/* komponenta Event je dizajn prikaza kartice */}
+    </View>
+  );
+
+};
+
   return (
     <Pozadina>
         <View style={styles.container}>
@@ -21,12 +60,11 @@ const EventsPage = () => {
             <Text style={styles.title}>Događaji</Text> 
           </View>
           <ScrollView style={styles.partneri}>
-            <Event onPress={handleEditEvent} naziv='Prvi događaj' vrsta='Vjenčanje' opis='Ivan Matić - 063 223 321'/>
-            <Event onPress={handleEditEvent} naziv='Drugi događaj' vrsta='Vjenčanje' opis='Ana Marić - 063 654 455'/>
-            <Event onPress={handleEditEvent} naziv='Treci događaj' vrsta='Vjenčanje' opis='Ivan Galić - 063 232 321'/>
-            <Event onPress={handleEditEvent} naziv='Cetvrti događaj' vrsta='Matura' opis='Antonija Matić - 063 235 544'/>
-            <Event onPress={handleEditEvent} naziv='Peti događaj' vrsta='Vjenčanje' opis='Krešo Matić - 063 123 344'/>
-            <Event onPress={handleEditEvent} naziv='Sesti događaj' vrsta='Krizma' opis='Mate Matić - 063 444 321'/>
+            <FlatList data={events} renderItem={renderEvent} />
+
+            {/*<Event onPress={handleEditEvent} naziv='Prvi događaj' vrsta='Vjenčanje' opis='Ivan Matić - 063 223 321'/>
+            <Event onPress={handleEditEvent} naziv='Drugi događaj' vrsta='Vjenčanje' opis='Ana Marić - 063 654 455'/>*/}
+          
           </ScrollView>
         </View>
     </Pozadina>

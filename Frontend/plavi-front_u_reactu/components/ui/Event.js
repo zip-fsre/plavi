@@ -1,10 +1,11 @@
 import React from 'react';
 import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
-const Event = ({ vrsta, naziv, opis, onPress }) => {
+const Event = ({ vrsta, naziv, opis, onPress, datum }) => {
   return (
     <View style={styles.partner}>
         <View style={styles.spacer}/>
+        <Text style={styles.title}>{datum}</Text>
         <View style={styles.item}>
             <View style={styles.textBox}>
             <Text style={styles.title}>{vrsta} | {naziv}</Text>
