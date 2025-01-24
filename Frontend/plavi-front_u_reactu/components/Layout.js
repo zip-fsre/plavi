@@ -19,7 +19,7 @@ const Layout = () => {
         <NavigationContainer>
               <Stack.Navigator>
                   <Stack.Screen
-                      name={'page'}
+                      name={'Planify'}
                       component={currentPage.component}
                       options={currentPage.options}
                   />
