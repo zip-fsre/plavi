@@ -35,15 +35,17 @@ const EventsPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignSelf: 'center',
-
-    
+    alignSelf: 'center',  
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 190,
   },
   title: {
     color: '#e8c789',
-    fontFamily: 'Monotype Corsiva',
-    fontSize: 140,
-    textAlign: 'center',
+    fontFamily: 'Alex Brush',
+    fontSize: 120,
     marginBottom: 10,
     textShadowColor: 'black',
     textShadowOffset: { width: 2, height: 2 },
@@ -62,11 +64,14 @@ const styles = StyleSheet.create({
     flex: 1,
     bottom: 15,
     left: '5%',
-    width: '90%',
+    width: '95%',
     backgroundColor: 'transparent',
     justifyContent: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  partneri: {
+    maxHeight: '55%',
   },
 });
 
