@@ -1,6 +1,6 @@
 import react, {useEffect, useState} from "react"
 import Pozadina from "./ui/Pozadina";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, TextInput } from "react-native";
 import { usePage } from '../Routes';
 import Event from './ui/Event'
 
@@ -38,12 +38,16 @@ const EditEventPage = () => {
         <Pozadina>
             <View style={styles.container}>
                 <Text style={styles.title}>Uredi (ime događaja)</Text> 
-                <Text style={styles.text}>Id: {id}</Text>
+                <Text style={styles.headerText}>Id: {id}</Text>
                 
                 {events ? ( //ispis kada se dohvati podaci
                 <>
-                    <Text style={styles.text}>Naziv: {events.naziv}</Text>
-                    <Text style={styles.text}>Opis: {events.opis}</Text>
+                <View style={styles.infoContainer}>
+                    <Text style={styles.headerText}>Naziv:</Text>
+                    <TextInput style={styles.text} placeholder={events.naziv}></TextInput>
+                    <Text style={styles.headerText}>Opis:</Text>
+                    <TextInput style={styles.text} placeholder={events.opis}></TextInput>
+                </View>
                 </>
                 ) : ( //alternativni ispis
                 <Text style={styles.text}>Učitavam podatke...</Text>
@@ -56,10 +60,23 @@ const EditEventPage = () => {
 export default EditEventPage;
 
 const styles = new StyleSheet.create({
-
+headerText:{
+    color: '#e8c789',
+    fontSize: 24,
+    fontFamily: 'Monotype Corsiva',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 20,
+    fontWeight: "bold",
+    },
 container:{
     flex: 1,
     alignSelf: 'center',
+},
+infoContainer:{
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 50,
 },
 title: {
     color: '#e8c789',
@@ -78,6 +95,10 @@ title: {
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 20,
+    borderColor: "grey",
+    borderRadius: "200",
+    borderWidth: 2,
+    backgroundColor: '#95997e',
   },
 
 })
