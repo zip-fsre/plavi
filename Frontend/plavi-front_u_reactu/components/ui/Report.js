@@ -3,7 +3,7 @@ import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
 const Event = ({ vrsta, naziv, opis, onPress, datum }) => {
   return (
-    <View style={styles.event}>
+    <View style={styles.report}>
         <View style={styles.spacer}/>
         <Text style={styles.title}>{datum}</Text>
         <View style={styles.item}>
@@ -28,9 +28,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignSelf: 'center',
   },
-  event: {
-    maxWidth: 500,
-    minWidth: 500,
+  report: {
+    maxWidth: '60%',
+    minWidth: '50%',
   },
   spacer: {
     height: 15,
