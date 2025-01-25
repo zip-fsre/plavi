@@ -16,7 +16,7 @@ const EventsPage = () => {
     console.log("Dodaj događaj!");
   }
   const handleEditEvent = () => {
-    console.log("Uredi događaj!");
+    console.log("Uredi događaj! (Ovaj dogadjaj je placeholder da vidimo kako izgleda kada su sve informacije unesene)");
 
   }
 
@@ -51,7 +51,7 @@ const renderEvent = ({item}) => {
 
   return (
     <View style={styles.container}>
-      <Event onPress={() => setCurrentPage(pages['EditEventPage'])} naziv={item.naziv} vrsta={item.svrha} opis={item.napomena} datum={item.datum}/> {/* komponenta Event je dizajn prikaza kartice */}
+      <Event onPress={() => setCurrentPage({...pages['EditEventPage'], id: item.id})} naziv={item.naziv} vrsta={item.svrha} opis={item.napomena} datum={item.datum}/> {/* komponenta Event je dizajn prikaza kartice */}
     </View>
   );
 
@@ -65,7 +65,7 @@ const renderEvent = ({item}) => {
           </View>
           <ScrollView style={styles.partneri}>
             <FlatList data={events} renderItem={renderEvent} />
-            <Event onPress={handleEditEvent} naziv='Prvi događaj' vrsta='Vjenčanje' opis='Ivan Matić - 063 223 321'/>
+            <Event onPress={handleEditEvent} datum='2024-01-02' naziv='Prvi događaj' vrsta='Vjenčanje' opis='Ivan Matić - 063 223 321'/>
             {/*<Event onPress={handleEditEvent} naziv='Prvi događaj' vrsta='Vjenčanje' opis='Ivan Matić - 063 223 321'/>
             <Event onPress={handleEditEvent} naziv='Drugi događaj' vrsta='Vjenčanje' opis='Ana Marić - 063 654 455'/>*/}
           
