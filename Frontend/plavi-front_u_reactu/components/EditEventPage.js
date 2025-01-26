@@ -1,8 +1,9 @@
 import react, {useEffect, useState} from "react"
 import Pozadina from "./ui/Pozadina";
-import { View, Text, StyleSheet, FlatList, TextInput } from "react-native";
+import { View, Text, StyleSheet, FlatList, TextInput, ScrollView } from "react-native";
 import { usePage } from '../Routes';
 import Event from './ui/Event'
+import DatePicker from 'react-datepicker';
 
 
 const EditEventPage = () => {
@@ -10,6 +11,8 @@ const EditEventPage = () => {
     const { currentPage } = usePage();
     const { id } = currentPage;
     const [events, setEvents] = useState();
+    const [startDate, setStartDateInput] = useState();
+
 
 
       //funkcija koja kupi evente iz backenda
@@ -18,6 +21,7 @@ const EditEventPage = () => {
           const response = await fetch(`http://localhost:5149/api/Dogadjaj/${id}`); //da ovo radi treba koristiti ` navodnike (desni alt+7)
           const data = await response.json();
           setEvents(data);
+          setStartDateInput(data.datum);
           return data;
         }
         catch (error) {
@@ -37,21 +41,69 @@ const EditEventPage = () => {
     return (
         <Pozadina>
             <View style={styles.container}>
-                <Text style={styles.title}>Uredi (ime događaja)</Text> 
+                <Text style={styles.title}>Uredi događaj</Text> 
                 <Text style={styles.headerText}>Id: {id}</Text>
                 
                 {events ? ( //ispis kada se dohvati podaci
                 <>
-                <View style={styles.infoContainer}>
+                <ScrollView style={styles.scrollView}>
+                  {/* naziv i vrsta */}
+                  <View style={styles.infoContainer}>
                     <Text style={styles.headerText}>Naziv:</Text>
                     <TextInput style={styles.text} placeholder={events.naziv}></TextInput>
-                    <Text style={styles.headerText}>Opis:</Text>
-                    <TextInput style={styles.text} placeholder={events.opis}></TextInput>
-                </View>
+                  </View>
+                  <View style={styles.infoContainer}>
+                    <Text style={styles.headerText}>Vrsta:</Text>
+                    <TextInput style={styles.text} placeholder={events.svrha}></TextInput>
+                  </View>
+
+                  {/* klijent i kontakt */}
+                  <View style={styles.infoContainer}>
+                      <Text style={styles.headerText}>Klijent:</Text>
+                      <TextInput style={styles.text} placeholder={events.klijent}></TextInput>
+                  </View>
+                  <View style={styles.infoContainer}>
+                    <Text style={styles.headerText}>Kontakt klijenta:</Text>
+                    <TextInput style={styles.text} placeholder={events.kontakt_klijenta}></TextInput>
+                  </View>
+
+                  {/* glavni sponzor*/}
+                  <View style={styles.infoContainer}>
+                      <Text style={styles.headerText}>Kontakt glavnog sponzora:</Text>
+                      <TextInput style={styles.text} placeholder={events.kontakt_sponzora}></TextInput>
+                  </View>
+                  {/* napomena*/}
+                  <View style={styles.infoContainer}>
+                      <Text style={styles.headerText}>Napomena:</Text>
+                      <TextInput style={styles.text} placeholder={events.napomena}></TextInput>
+                  </View>
+                  {/* Input za datum*/}
+                  <View style={styles.infoContainer}>
+                    <View style={styles.infoContainer}>
+                      <Text style={styles.dateText}>Datum:</Text>
+                      <DatePicker
+                        selected={startDate}
+                        onChange={(date) => setStartDateInput(date)}
+                        dateFormat="dd.MM.yyyy"
+                        placeholderText="Odaberite datum"
+                        className="custom-input"
+                        calendarClassName="custom-calendar"
+                        zIndex="2"
+                      />
+                    </View>
+                  </View>
+
+                  {/* PARTNERI SADA SLIJEDE BOŽE POMOZI */}
+                  <View style={styles.infoContainer}>
+
+                  </View>
+
+                </ScrollView>
                 </>
-                ) : ( //alternativni ispis
+                ) : ( //ispis dok nema podataka
                 <Text style={styles.text}>Učitavam podatke...</Text>
                 )}
+
             </View>
         </Pozadina>
     );
@@ -69,6 +121,18 @@ headerText:{
     marginBottom: 20,
     fontWeight: "bold",
     },
+scrollView:{
+  maxHeight: '60%',
+    },
+dateText:{
+      color: '#e8c789',
+      fontSize: 24,
+      fontFamily: 'Monotype Corsiva',
+      textAlign: 'center',
+      lineHeight: 24,
+      marginTop: 10,
+      fontWeight: "bold",
+      },
 container:{
     flex: 1,
     alignSelf: 'center',
@@ -78,10 +142,16 @@ infoContainer:{
     flexDirection: 'row',
     gap: 50,
 },
+dateInputContainer: {
+  flex: 1, // Dijeli prostor ravnomjerno između dva elementa
+  flexDirection: 'row',
+  gap: 50,
+  justifyContent: 'center', // Centriranje elementa vertikalno
+},
 title: {
     color: '#e8c789',
-    fontFamily: 'Monotype Corsiva',
-    fontSize: 100,
+    fontFamily: 'Alex Brush',
+    fontSize: 70,
     textAlign: 'center',
     marginBottom: 10,
     textShadowColor: 'black',
@@ -95,10 +165,10 @@ title: {
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 20,
-    borderColor: "grey",
-    borderRadius: "200",
+    borderColor: "#394a48",
     borderWidth: 2,
     backgroundColor: '#95997e',
+    placeholderTextColor: "#6b5b3c",
   },
 
 })
