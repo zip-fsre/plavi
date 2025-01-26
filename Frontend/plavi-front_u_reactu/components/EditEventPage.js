@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, FlatList, TextInput, ScrollView } from "react-n
 import { usePage } from '../Routes';
 import Event from './ui/Event'
 import DatePicker from 'react-datepicker';
+import Button from "./ui/Button";
 
 
 const EditEventPage = () => {
@@ -35,7 +36,20 @@ const EditEventPage = () => {
         getEvents();
       }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
 
+      /* prikazuje sve goste u guest listi */
+    const renderGuests = ({item}) => {
+
+     return (
+      <View style={styles.headerText}>{item}</View>
+     );
+    };
+
+    /* sprema promjene u bazu */
+    const saveChanges = () => {
+
+      console.log("Promjene (ce biti) spremljene kada se isprogramiraju");
       
+    };
 
 
     return (
@@ -81,23 +95,30 @@ const EditEventPage = () => {
                   <View style={styles.infoContainer}>
                     <View style={styles.infoContainer}>
                       <Text style={styles.dateText}>Datum:</Text>
-                      <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDateInput(date)}
-                        dateFormat="dd.MM.yyyy"
-                        placeholderText="Odaberite datum"
-                        className="custom-input"
-                        calendarClassName="custom-calendar"
-                        zIndex="2"
-                      />
+                      <View style={styles.datePick}>
+                        <DatePicker
+                          selected={startDate}
+                          onChange={(date) => setStartDateInput(date)}
+                          dateFormat="dd.MM.yyyy"
+                          placeholderText="Odaberite datum"
+                          className="custom-input"
+                          calendarClassName="custom-calendar"
+                          zIndex="2"
+                        />
+                      </View>
                     </View>
                   </View>
 
                   {/* PARTNERI SADA SLIJEDE BOŽE POMOZI */}
                   <View style={styles.infoContainer}>
-
+                    <Text> </Text>
                   </View>
-
+                  {/* Gosti*/}
+                  <View style={styles.infoContainer}>
+                    <Text style={styles.headerText}>Lista gostiju:</Text>
+                    <FlatList data={events.gosts} renderItem={renderGuests}></FlatList>
+                  </View>
+                  <Button title="Spremi promjene" onPress={saveChanges}></Button>
                 </ScrollView>
                 </>
                 ) : ( //ispis dok nema podataka
@@ -120,6 +141,9 @@ headerText:{
     lineHeight: 24,
     marginBottom: 20,
     fontWeight: "bold",
+    textShadowColor: 'black',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
     },
 scrollView:{
   maxHeight: '60%',
@@ -132,11 +156,21 @@ dateText:{
       lineHeight: 24,
       marginTop: 10,
       fontWeight: "bold",
-      },
+      textShadowColor: 'black',
+      textShadowOffset: { width: 2, height: 2 },
+      textShadowRadius: 3,
+},
+
+datePick:{
+  marginLeft: 100,
+  marginRight: 5,
+},
+
 container:{
     flex: 1,
     alignSelf: 'center',
 },
+
 infoContainer:{
     display: 'flex',
     flexDirection: 'row',
@@ -169,6 +203,8 @@ title: {
     borderWidth: 2,
     backgroundColor: '#95997e',
     placeholderTextColor: "#6b5b3c",
+    marginLeft: "auto",
+    marginRight: 5,
   },
 
 })
