@@ -22,14 +22,28 @@ const EditEventPage = () => {
     const [napomena, setNapomena] = useState();
 
 
+
     const showChanges = () => {
-      events.naziv = naziv;
-      events.svrha = svrha;
-      events.klijent = klijent;
-      events.kontaktKlijenta = kontaktKlijenta;
-      events.kontaktSponzora = kontaktSponzora;
-      events.napomena = napomena;
       events.datum = startDate;
+
+      if (!(naziv == undefined || naziv == "")) {
+        events.naziv = naziv;
+      }
+      if (!(svrha == undefined || svrha == "")) {
+        events.svrha = svrha;
+      }
+      if (!(klijent == undefined || klijent == "")) {
+        events.klijent = klijent;
+      }
+      if (!(kontaktKlijenta == undefined || kontaktKlijenta == "")) {
+        events.kontaktKlijenta = kontaktKlijenta;
+      }
+      if (!(kontaktSponzora == undefined || kontaktSponzora == "")) {
+        events.kontaktSponzora = kontaktSponzora;
+      }
+      if (!(napomena == undefined || napomena == "")) {
+        events.napomena = napomena;
+      }
 
       console.log(events);
     };
@@ -66,12 +80,26 @@ const EditEventPage = () => {
 
     /* sprema promjene u bazu */
     const saveChanges = () => {
-      events.naziv = naziv;
-      events.svrha = svrha;
-      events.klijent = klijent;
-      events.kontaktKlijenta = kontaktKlijenta;
-      events.kontaktSponzora = kontaktSponzora;
-      events.napomena = napomena;
+
+
+      if (!(naziv == undefined || naziv == "")) {
+        events.naziv = naziv;
+      }
+      if (!(svrha == undefined || svrha == "")) {
+        events.svrha = svrha;
+      }
+      if (!(klijent == undefined || klijent == "")) {
+        events.klijent = klijent;
+      }
+      if (!(kontaktKlijenta == undefined || kontaktKlijenta == "")) {
+        events.kontaktKlijenta = kontaktKlijenta;
+      }
+      if (!(kontaktSponzora == undefined || kontaktSponzora == "")) {
+        events.kontaktSponzora = kontaktSponzora;
+      }
+      if (!(napomena == undefined || napomena == "")) {
+        events.napomena = napomena;
+      }
       events.datum = new Date(startDate).toISOString().split('T')[0];
       console.log(events.datum);
     
