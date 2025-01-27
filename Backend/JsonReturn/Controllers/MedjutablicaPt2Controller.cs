@@ -50,5 +50,36 @@ namespace JsonReturn.Controllers
 
             return CreatedAtAction(nameof(GetMedjutablicaPt2), new { id = MedjutablicaPt2.Id }, MedjutablicaPt2);
         }
+
+        // POST: api/MedjutablicaPt2/1
+        [HttpPost("{id}")]
+        public ActionResult<MedjutablicaPt2> UpdateMedjutablicaPt2(int id, MedjutablicaPt2 MedjutablicaPt2)
+        {
+            if (MedjutablicaPt2 == null)
+            {
+                return NotFound();
+            }
+            var arrays = _context.MedjutablicaPt2s.ToList();
+            if (arrays.SingleOrDefault(item => item.Id == id) == null)
+            {
+                return NotFound();
+            }
+            var array = arrays.SingleOrDefault(item => item.Id == id);
+            if(MedjutablicaPt2.IdMedju1 != null)array.IdMedju1 = MedjutablicaPt2.IdMedju1;
+            if(MedjutablicaPt2.IdIzvjesca != null)array.IdIzvjesca = MedjutablicaPt2.IdIzvjesca;
+            _context.SaveChanges();
+            return array;
+        }
+
+        // DELETE: api/MedjutablicaPt2/1
+        [HttpDelete("{id}")]
+        public ActionResult<MedjutablicaPt2> DeleteMedjutablicaPt2(int id)
+        {
+            var array = _context.MedjutablicaPt2s.ToList();
+            var pom = array.SingleOrDefault(item => item.Id == id);
+            _context.MedjutablicaPt2s.Remove(pom);
+            _context.SaveChanges();
+            return _context.MedjutablicaPt2s.Find(id);
+        }
     }
 }

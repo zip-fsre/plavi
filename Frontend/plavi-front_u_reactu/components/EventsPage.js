@@ -1,17 +1,61 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import Pozadina from './ui/Pozadina';
 import Event from './ui/Event'
 import { ScrollView } from 'react-native';
+import  Button  from "./ui/Button";
+import { usePage } from '../Routes';
+import Layout from './Layout';
+
 
 const EventsPage = () => {
+  const {currentPage, setCurrentPage, pages} = usePage();
+  const [events, setEvents] = useState([]);
 
   const handleAddEvent = () => {
     console.log("Dodaj događaj!");
   }
   const handleEditEvent = () => {
-    console.log("Uredi događaj!");
+    console.log("Uredi događaj! (Ovaj dogadjaj je placeholder da vidimo kako izgleda kada su sve informacije unesene)");
+
   }
+
+
+  //funkcija koja kupi evente iz backenda
+  const getEvents = async () => {
+    try {
+      const response = await fetch('http://localhost:5149/api/Dogadjaj/');
+      const data = await response.json();
+      setEvents(data);
+      return data;
+    }
+    catch (error) {
+      console.error(error);
+    }
+  }
+
+
+  //dohvat podataka po učitavanju stranice
+  useEffect(() => {
+    async function fetchEvents() {
+      const data = await getEvents(); // Dohvat podataka kada se getEvents odradi
+      setEvents(data); 
+      console.log(data);
+    }
+    fetchEvents(); 
+  }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
+  
+
+  //kartica dogadjaja (prikaz)
+const renderEvent = ({item}) => {
+
+  return (
+    <View style={styles.container}>
+      <Event onPress={() => setCurrentPage({...pages['EditEventPage'], id: item.id})} naziv={item.naziv} vrsta={item.svrha} opis={item.napomena} datum={item.datum}/> {/* komponenta Event je dizajn prikaza kartice */}
+    </View>
+  );
+
+};
 
   return (
     <Pozadina>
@@ -20,12 +64,11 @@ const EventsPage = () => {
             <Text style={styles.title}>Događaji</Text> 
           </View>
           <ScrollView style={styles.partneri}>
-            <Event onPress={handleEditEvent} naziv='Prvi događaj' vrsta='Vjenčanje' opis='Ivan Matić - 063 223 321'/>
-            <Event onPress={handleEditEvent} naziv='Drugi događaj' vrsta='Vjenčanje' opis='Ana Marić - 063 654 455'/>
-            <Event onPress={handleEditEvent} naziv='Treci događaj' vrsta='Vjenčanje' opis='Ivan Galić - 063 232 321'/>
-            <Event onPress={handleEditEvent} naziv='Cetvrti događaj' vrsta='Matura' opis='Antonija Matić - 063 235 544'/>
-            <Event onPress={handleEditEvent} naziv='Peti događaj' vrsta='Vjenčanje' opis='Krešo Matić - 063 123 344'/>
-            <Event onPress={handleEditEvent} naziv='Sesti događaj' vrsta='Krizma' opis='Mate Matić - 063 444 321'/>
+            <FlatList data={events} renderItem={renderEvent} />
+            <Event onPress={handleEditEvent} datum='2024-01-02' naziv='Prvi događaj' vrsta='Vjenčanje' opis='Ivan Matić - 063 223 321'/>
+            {/*<Event onPress={handleEditEvent} naziv='Prvi događaj' vrsta='Vjenčanje' opis='Ivan Matić - 063 223 321'/>
+            <Event onPress={handleEditEvent} naziv='Drugi događaj' vrsta='Vjenčanje' opis='Ana Marić - 063 654 455'/>*/}
+          
           </ScrollView>
         </View>
     </Pozadina>
@@ -35,15 +78,17 @@ const EventsPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignSelf: 'center',
-
-    
+    alignSelf: 'center',  
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 190,
   },
   title: {
     color: '#e8c789',
-    fontFamily: 'Monotype Corsiva',
-    fontSize: 140,
-    textAlign: 'center',
+    fontFamily: 'Alex Brush',
+    fontSize: 70,
     marginBottom: 10,
     textShadowColor: 'black',
     textShadowOffset: { width: 2, height: 2 },
@@ -62,11 +107,14 @@ const styles = StyleSheet.create({
     flex: 1,
     bottom: 15,
     left: '5%',
-    width: '90%',
+    width: '95%',
     backgroundColor: 'transparent',
     justifyContent: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  partneri: {
+    maxHeight: '60%',
   },
 });
 
@@ -74,6 +122,97 @@ export default EventsPage;
 
 
 /*
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignSelf: 'center',  
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 190,
+  },
+  title: {
+    color: '#e8c789',
+    fontFamily: 'Alex Brush',
+    fontSize: 120,
+    marginBottom: 10,
+    textShadowColor: 'black',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
+  },
+  description: {
+    color: '#e8c789',
+    fontSize: 18,
+    fontFamily: 'Monotype Corsiva',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 20,
+  },
+  menu: {
+    position: 'absolute',
+    flex: 1,
+    bottom: 15,
+    left: '5%',
+    width: '95%',
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  partneri: {
+    maxHeight: '55%',
+  },
+});
+
+export default EventsPage;
+
+*/
+/*
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignSelf: 'center',  
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 190,
+  },
+  title: {
+    color: '#e8c789',
+    fontFamily: 'Alex Brush',
+    fontSize: 120,
+    marginBottom: 10,
+    textShadowColor: 'black',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
+  },
+  description: {
+    color: '#e8c789',
+    fontSize: 18,
+    fontFamily: 'Monotype Corsiva',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 20,
+  },
+  menu: {
+    position: 'absolute',
+    flex: 1,
+    bottom: 15,
+    left: '5%',
+    width: '95%',
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  partneri: {
+    maxHeight: '55%',
+  },
+});
+
+
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Pozadina from './ui/Pozadina';

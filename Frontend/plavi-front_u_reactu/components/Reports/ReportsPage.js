@@ -3,69 +3,90 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Pozadina from '../ui/Pozadina';
 import HoverButton from '../ui/Button';
 import '../ui/scrollbar.css';
-import { usePage } from '../../Routes'
+import { usePage } from '../../Routes';
+import Report from '../ui/Report'; // Added the missing import for Report
 
-const ReportsPage = ({ navigation }) => {
-  const {currentPage, setCurrentPage, pages} = usePage();
+const ReportsPage = () => {
+  const { currentPage, setCurrentPage, pages } = usePage();
 
   return (
-    <Pozadina >
-    <View style={styles.container}>
+    <Pozadina>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Izvješća</Text>
+          <HoverButton
+            style={styles.createButtonContainer}
+            title="Kreiraj izvješće"
+            onPress={() => setCurrentPage(pages['CreateReport'])}
+          />
+        </View>
 
-        <Text style={styles.title}>Izvješća</Text>
-      
-      {/* Gumb za kreiranje izvješća */}
-      <View style={styles.createButtonContainer}>
-        <HoverButton 
-          title="Kreiraj izvješće" 
-          onPress={() => setCurrentPage(pages['CreateReport'])}
-        />
-      </View>
-     
-      {/* Lista recent reports */}
-
-      <ScrollView style={styles.reportsList} >
         <Text style={styles.reportsTitle}>Nedavna izvješća:</Text>
-        {[...Array(12)].map((_, index) => (
-          <View key={index} style={styles.reportContainer}>
-            <Text style={styles.reportText}>Izvješće {index + 1}</Text>
-          </View>
-        ))}
-      </ScrollView>
-    </View>
+        <ScrollView
+          style={styles.reportsList}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Report naziv="Prvo izvješće" opis='siduvgbaoiEFONWPDCNJKbdcso'/>
+          <Report naziv="Drugo izvješće" opis='siduvgbaoiEFONWPDCNJKbdcso' />
+          <Report naziv="Treće izvješće" opis='siduvgbaoiEFONWPDCNJKbdcso'/>
+          <Report naziv="Četvrto izvješće" opis='siduvgbaoiEFONWPDCNJKbdcso'/>
+          <Report naziv="Peto izvješće" opis='siduvgbaoiEFONWPDCNJKbdcso'/>
+          <Report naziv="Šesto izvješće" opis='siduvgbaoiEFONWPDCNJKbdcso'/>
+        </ScrollView>
+      </View>
     </Pozadina>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'absolute',
     alignSelf: 'center',
-    width:'100%',
+  },
+  item: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 190,
   },
   title: {
     color: '#e8c789',
-    fontFamily: 'Monotype Corsiva',
-    fontSize: 100,
-    textAlign: 'center',
+    fontFamily: 'Alex Brush',
+    fontSize: 70,
+    textAlign: 'left',
+    marginBottom: 10,
     textShadowColor: 'black',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 3,
-    marginBottom: 20,
+  },
+  menu: {
+    position: 'absolute',
+    flex: 1,
+    bottom: 15,
+    left: '5%',
+    width: '90%',
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  image: {
+    height: 30,
+    width: 30,
   },
   createButtonContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#e8c789',
+    borderRadius: 10,
   },
   reportsList: {
-    flex: 1,
-    maxHeight:400,
-    paddingHorizontal: 15,
-    width: '100%',
-    overflowY: 'scroll',
+      maxHeight: '55%',
+      marginTop: 25,
   },
   reportsTitle: {
     fontSize: 25,
@@ -73,23 +94,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
-    width: '100%',
     fontFamily: 'Monotype Corsiva',
-  },
-  reportContainer: {
-    backgroundColor: '#405352',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    width: '60%',
-    alignSelf: 'center',
-  },
-  reportText: {
-    fontSize: 15,
-    color: '#e8c789',
-    fontFamily: 'Helvetica',
   },
 });
 
 export default ReportsPage;
-

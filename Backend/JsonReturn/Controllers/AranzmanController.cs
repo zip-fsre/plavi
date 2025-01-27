@@ -50,5 +50,36 @@ namespace JsonReturn.Controllers
 
             return CreatedAtAction(nameof(GetAranzman), new { id = Aranzman.Id }, Aranzman);
         }
+
+        // POST: api/Aranzman/1
+        [HttpPost("{id}")]
+        public ActionResult<Aranzman> UpdateAranzman(int id, Aranzman Aranzman)
+        {
+            if (Aranzman == null)
+            {
+                return NotFound();
+            }
+            var arrays = _context.Aranzmen.ToList();
+            if (arrays.SingleOrDefault(item => item.Id == id) == null)
+            {
+                return NotFound();
+            }
+            var array = arrays.SingleOrDefault(item => item.Id == id);
+            if(Aranzman.Cijena != null)array.Cijena = Aranzman.Cijena;
+            if(Aranzman.Opis != null)array.Opis = Aranzman.Opis;
+            _context.SaveChanges();
+            return array;
+        }
+
+        // DELETE: api/Aranzman/1
+        [HttpDelete("{id}")]
+        public ActionResult<Aranzman> DeleteAranzman(int id)
+        {
+            var array = _context.Aranzmen.ToList();
+            var pom = array.SingleOrDefault(item => item.Id == id);
+            _context.Aranzmen.Remove(pom);
+            _context.SaveChanges();
+            return _context.Aranzmen.Find(id);
+        }
     }
 }

@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   title: {
-    fontSize: 48,
+    fontSize: 55,
     fontFamily: 'Alex Brush',
     color: '#e8c789',
     textAlign: 'center',

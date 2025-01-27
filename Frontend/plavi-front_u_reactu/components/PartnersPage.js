@@ -39,7 +39,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   partneri: {
-    maxHeight: 800,
+    maxHeight: '55%',
+    marginTop: 25,
   },
   image: {
     height: 30,
@@ -56,7 +57,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#e8c789',
-    fontFamily: 'Monotype Corsiva',
+    fontFamily: 'Alex Brush',
     fontSize: 70,
     textAlign: 'left',
     marginBottom: 10,
