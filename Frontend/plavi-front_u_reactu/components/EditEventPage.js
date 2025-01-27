@@ -78,13 +78,13 @@ const EditEventPage = () => {
                   </View>
                   <View style={styles.infoContainer}>
                     <Text style={styles.headerText}>Kontakt klijenta:</Text>
-                    <TextInput style={styles.text} placeholder={events.kontakt_klijenta}></TextInput>
+                    <TextInput style={styles.text} placeholder={events.kontaktKlijenta}></TextInput>
                   </View>
 
                   {/* glavni sponzor*/}
                   <View style={styles.infoContainer}>
                       <Text style={styles.headerText}>Kontakt glavnog sponzora:</Text>
-                      <TextInput style={styles.text} placeholder={events.kontakt_sponzora}></TextInput>
+                      <TextInput style={styles.text} placeholder={events.kontaktSponzora}></TextInput>
                   </View>
                   {/* napomena*/}
                   <View style={styles.infoContainer}>
