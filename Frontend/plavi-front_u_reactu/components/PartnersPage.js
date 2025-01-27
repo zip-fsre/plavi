@@ -13,16 +13,12 @@ const PartnersPage = () => {
   ]);
 
   const handleAddPartner = () => {
-    setCurrentPage(pages.AddPartner);
+    setCurrentPage(pages['AddPartner']);
   };
 
   
   const handleEditPartner = (index) => {
-    const selectedPartner = partners[index];
-    setCurrentPage({
-      ...pages.EditPartner,
-      props: { partner: selectedPartner, index, setPartners },
-    });
+    setCurrentPage({...pages['EditPartner'], id: { index },});
   };
 
   const handleViewPartner = (index) => {

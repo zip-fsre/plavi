@@ -5,8 +5,7 @@ import { usePage } from '../Routes';
 
 
 export const AddPartner = () => {
-  const { setCurrentPage, currentPage } = usePage(); 
-  const { setPartners } = currentPage.props; 
+  const { pages, setCurrentPage, currentPage } = usePage(); 
   const [newPartner, setNewPartner] = useState({
     naziv: '',
     vrsta: '',
@@ -14,12 +13,11 @@ export const AddPartner = () => {
     cijena: '',
   });
 
-  console.log('Props:', currentPage.props);
-
   const handleCreatePartner = () => {
     if (newPartner.naziv && newPartner.vrsta && newPartner.opis && newPartner.cijena) {
-      setPartners((prevPartners) => [...prevPartners, newPartner]); 
-      setCurrentPage({ name: 'PartnersPage' }); 
+      //Ovdje povezati sa backom da doda novog partnera
+      console.log('Dodan novi partner!');
+      setCurrentPage(pages['Partners']); 
     } else {
       Alert.alert('Greška', 'Molimo ispunite sva polja!'); 
     }

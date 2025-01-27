@@ -1,17 +1,23 @@
 import React from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import Pozadina from './ui/Pozadina';
+import { usePage } from '../Routes'; 
 
-export const EditPartner = ({ navigation, route }) => {
-  const { partner, index, setPartners } = route.params;
-  const [editPartner, setEditPartner] = React.useState(partner);
+export const EditPartner = () => {
+  const { pages, currentPage, setCurrentPage } = usePage();
+  const { id } = currentPage;
+  const [editPartner, setEditPartner] = React.useState({
+    naziv: "Nesto",
+    vrsta: "drugo",
+    opis: "Neki opis",
+    cijena: 2500
+  });
+  console.log(id);
 
   const handleSaveEditPartner = () => {
     if (editPartner.naziv && editPartner.vrsta && editPartner.opis && editPartner.cijena) {
-      setPartners((prevPartners) =>
-        prevPartners.map((p, i) => (i === index ? editPartner : p))
-      );
-      navigation.goBack();
+      //Ovdje povezati sa backom za spremanje promjena
+      setCurrentPage(pages['Partners'])
     } else {
       alert('Molimo ispunite sva polja!');
     }
@@ -118,3 +124,5 @@ const styles = StyleSheet.create({
     color: 'black',
   },
 });
+
+export default EditPartner;

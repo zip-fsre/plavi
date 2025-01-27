@@ -1,19 +1,21 @@
 import React from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import Pozadina from './ui/Pozadina';
+import { usePage } from '../Routes'; 
 
-export const ViewPartner = ({ navigation, route }) => {
-  const { partner } = route.params;
+export const ViewPartner = () => {
+  const { pages, currentPage, setCurrentPage } = usePage();
+  const { id } = currentPage;
 
   return (
     <Pozadina>
       <View style={styles.container}>
         <Text style={styles.title}>Detalji partnera</Text>
-        <Text style={styles.detailText}>Naziv: {partner.naziv}</Text>
-        <Text style={styles.detailText}>Vrsta: {partner.vrsta}</Text>
-        <Text style={styles.detailText}>Opis: {partner.opis}</Text>
-        <Text style={styles.detailText}>Cijena: {partner.cijena} €</Text>
-        <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.detailText}>Naziv: {'partner.naziv'}</Text>
+        <Text style={styles.detailText}>Vrsta: {'partner.vrsta'}</Text>
+        <Text style={styles.detailText}>Opis: {'partner.opis'}</Text>
+        <Text style={styles.detailText}>Cijena: {'partner.cijena'} €</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={() => setCurrentPage(pages['Partners'])}>
           <Text style={styles.closeButtonText}>Zatvori</Text>
         </TouchableOpacity>
       </View>
@@ -81,3 +83,5 @@ const styles = StyleSheet.create({
     color: 'black',
   },
 });
+
+export default ViewPartner;
