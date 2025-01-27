@@ -56,6 +56,10 @@ public partial class Pi02Context : DbContext
 
             entity.ToTable("ARANZMAN");
 
+            entity.Property(e => e.Naziv)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("NAZIV");
             entity.Property(e => e.Cijena).HasColumnName("CIJENA");
             entity.Property(e => e.IdPartnera).HasColumnName("ID_PARTNERA");
             entity.Property(e => e.Opis)

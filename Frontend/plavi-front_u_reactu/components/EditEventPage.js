@@ -8,12 +8,31 @@ import Button from "./ui/Button";
 
 
 const EditEventPage = () => {
-
-    const { currentPage } = usePage();
+    const { currentPage, setCurrentPage, pages } = usePage();
     const { id } = currentPage;
+
+    /* varijable za pohranu lokalno (onChange se mijenjaju) pa slanje dalje u bazu */
     const [events, setEvents] = useState();
     const [startDate, setStartDateInput] = useState();
+    const [naziv, setNaziv] = useState();
+    const [svrha, setSvrha] = useState();
+    const [klijent, setKlijent] = useState();
+    const [kontaktKlijenta, setKontaktKlijenta] = useState();
+    const [kontaktSponzora, setKontaktSponzora] = useState();
+    const [napomena, setNapomena] = useState();
 
+
+    const showChanges = () => {
+      events.naziv = naziv;
+      events.svrha = svrha;
+      events.klijent = klijent;
+      events.kontaktKlijenta = kontaktKlijenta;
+      events.kontaktSponzora = kontaktSponzora;
+      events.napomena = napomena;
+      events.datum = startDate;
+
+      console.log(events);
+    };
 
 
       //funkcija koja kupi evente iz backenda
@@ -36,28 +55,49 @@ const EditEventPage = () => {
         getEvents();
       }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
 
-      /* prikazuje sve goste u guest listi */
+    /* prikazuje sve goste u guest listi */
     const renderGuests = ({item}) => {
-
      return (
       <View style={styles.headerText}>{item}</View>
      );
     };
 
+
+
     /* sprema promjene u bazu */
     const saveChanges = () => {
+      events.naziv = naziv;
+      events.svrha = svrha;
+      events.klijent = klijent;
+      events.kontaktKlijenta = kontaktKlijenta;
+      events.kontaktSponzora = kontaktSponzora;
+      events.napomena = napomena;
+      events.datum = new Date(startDate).toISOString().split('T')[0];
+      console.log(events.datum);
+    
+    // Simple POST request with fetch
+    fetch(`http://localhost:5149/api/Dogadjaj/${id}`, { 
+      method: 'POST', 
+      //body: '{"naziv": "neko ime"}',/      
+      body: JSON.stringify(events), 
+      //mode: "cors",
+      //cache: "no-cache",
+      //credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      //redirect: "follow",
+      //referrerPolicy: "no-referrer",
+    })
 
-      console.log("Promjene (ce biti) spremljene kada se isprogramiraju");
-      
+    .then(() => console.log("Promjene spremljene!!!"));
+
     };
+
     /* brise događaj iz baze */
     const deleteEvent = () => {
-
-          // Simple DELETE request with fetch
+      // Simple DELETE request with fetch
       fetch(`http://localhost:5149/api/Dogadjaj/${id}`, { method: 'DELETE' })
       .then(() => console.log("Uspješno obrisano!!!"));
-      
-
+      setCurrentPage(pages['Events']);
     };
 
 
@@ -73,32 +113,32 @@ const EditEventPage = () => {
                   {/* naziv i vrsta */}
                   <View style={styles.infoContainer}>
                     <Text style={styles.headerText}>Naziv:</Text>
-                    <TextInput style={styles.text} placeholder={events.naziv}></TextInput>
+                    <TextInput style={styles.text} placeholder={events.naziv} onChangeText={setNaziv}></TextInput>
                   </View>
                   <View style={styles.infoContainer}>
                     <Text style={styles.headerText}>Vrsta:</Text>
-                    <TextInput style={styles.text} placeholder={events.svrha}></TextInput>
+                    <TextInput style={styles.text} placeholder={events.svrha} onChangeText={setSvrha}></TextInput>
                   </View>
 
                   {/* klijent i kontakt */}
                   <View style={styles.infoContainer}>
                       <Text style={styles.headerText}>Klijent:</Text>
-                      <TextInput style={styles.text} placeholder={events.klijent}></TextInput>
+                      <TextInput style={styles.text} placeholder={events.klijent} onChangeText={setKlijent}></TextInput>
                   </View>
                   <View style={styles.infoContainer}>
                     <Text style={styles.headerText}>Kontakt klijenta:</Text>
-                    <TextInput style={styles.text} placeholder={events.kontaktKlijenta}></TextInput>
+                    <TextInput style={styles.text} placeholder={events.kontaktKlijenta} onChangeText={setKontaktKlijenta}></TextInput>
                   </View>
 
                   {/* glavni sponzor*/}
                   <View style={styles.infoContainer}>
                       <Text style={styles.headerText}>Kontakt glavnog sponzora:</Text>
-                      <TextInput style={styles.text} placeholder={events.kontaktSponzora}></TextInput>
+                      <TextInput style={styles.text} placeholder={events.kontaktSponzora} onChangeText={setKontaktSponzora}></TextInput>
                   </View>
                   {/* napomena*/}
                   <View style={styles.infoContainer}>
                       <Text style={styles.headerText}>Napomena:</Text>
-                      <TextInput style={styles.text} placeholder={events.napomena}></TextInput>
+                      <TextInput style={styles.text} placeholder={events.napomena} onChangeText={setNapomena}></TextInput>
                   </View>
                   {/* Input za datum*/}
                   <View style={styles.infoContainer}>
@@ -131,6 +171,7 @@ const EditEventPage = () => {
 
                     <Button title="Spremi promjene" onPress={saveChanges}></Button>
                     <Button title="Izbriši događaj" onPress={deleteEvent} bgColor="#b51010"></Button>
+                    <Button title="Prikaži nove podatke" onPress={showChanges} bgColor="blue"></Button>
                   </View>
 
                 </ScrollView>
