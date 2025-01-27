@@ -65,6 +65,7 @@ namespace JsonReturn.Controllers
                 return NotFound();
             }
             var array = arrays.SingleOrDefault(item => item.Id == id);
+            if(Aranzman.Naziv != null)array.Naziv = Aranzman.Naziv;
             if(Aranzman.Cijena != null)array.Cijena = Aranzman.Cijena;
             if(Aranzman.Opis != null)array.Opis = Aranzman.Opis;
             _context.SaveChanges();
