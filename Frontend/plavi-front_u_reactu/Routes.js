@@ -8,6 +8,10 @@ import EditEventPage from './components/EditEventPage';
 import ViewReport from './components/Reports/ViewReport';
 import CreateReport from './components/Reports/CreateReport';
 import EditReport from './components/Reports/EditReport';
+import  AddPartner from './components/AddPartnersPage'; 
+import  ViewPartner from './components/ViewPartnersPage'; 
+import  EditPartner from './components/EditPartnerPage'; 
+
 
 
 const Routes = createContext();
@@ -23,10 +27,12 @@ export const RoutesProvider = ({ children }) => {
     ViewReport: { component: ViewReport, options: { headerShown: false } },
     CreateReport: { component: CreateReport, options: { headerShown: false } },
     EditReport: { component: EditReport, options: { headerShown: false } },
+    AddPartner: { component: AddPartner, options: { headerShown: false } }, 
+    EditPartner: { component: EditPartner, options: { headerShown: false } }, 
+    ViewPartner: { component: ViewPartner, options: { headerShown: false } },
   };
 
   const [currentPage, setCurrentPage] = useState(pages['Home']);
-  
 
   return (
     <Routes.Provider value={{ currentPage, setCurrentPage, pages }}>
