@@ -50,5 +50,38 @@ namespace JsonReturn.Controllers
 
             return CreatedAtAction(nameof(GetIzvjesce), new { id = Izvjesce.Id }, Izvjesce);
         }
+
+        // POST: api/Izvjesce/1
+        [HttpPost("{id}")]
+        public ActionResult<Izvjesce> UpdateIzvjesce(int id, Izvjesce Izvjesce)
+        {
+            if (Izvjesce == null)
+            {
+                return NotFound();
+            }
+            var arrays = _context.Izvjesces.ToList();
+            if (arrays.SingleOrDefault(item => item.Id == id) == null)
+            {
+                return NotFound();
+            }
+            var array = arrays.SingleOrDefault(item => item.Id == id);
+            if(Izvjesce.Naziv != null)array.Naziv = Izvjesce.Naziv;
+            if(Izvjesce.Opis != null)array.Opis = Izvjesce.Opis;
+            if(Izvjesce.Pocetak != null)array.Pocetak = Izvjesce.Pocetak;
+            if(Izvjesce.Kraj != null)array.Kraj = Izvjesce.Kraj;
+            _context.SaveChanges();
+            return array;
+        }
+
+        // DELETE: api/Izvjesce/1
+        [HttpDelete("{id}")]
+        public ActionResult<Izvjesce> DeleteIzvjesce(int id)
+        {
+            var array = _context.Izvjesces.ToList();
+            var pom = array.SingleOrDefault(item => item.Id == id);
+            _context.Izvjesces.Remove(pom);
+            _context.SaveChanges();
+            return _context.Izvjesces.Find(id);
+        }
     }
 }

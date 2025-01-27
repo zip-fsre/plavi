@@ -50,5 +50,37 @@ namespace JsonReturn.Controllers
 
             return CreatedAtAction(nameof(GetGost), new { id = Gost.Id }, Gost);
         }
+
+        // POST: api/Gost/1
+        [HttpPost("{id}")]
+        public ActionResult<Gost> UpdateGost(int id, Gost Gost)
+        {
+            if (Gost == null)
+            {
+                return NotFound();
+            }
+            var arrays = _context.Gosts.ToList();
+            if (arrays.SingleOrDefault(item => item.Id == id) == null)
+            {
+                return NotFound();
+            }
+            var array = arrays.SingleOrDefault(item => item.Id == id);
+            if(Gost.ImeIPrezime != null)array.ImeIPrezime = Gost.ImeIPrezime;
+            if(Gost.StatusDolaska != null)array.StatusDolaska = Gost.StatusDolaska;
+            if(Gost.BrojStola != null)array.BrojStola = Gost.BrojStola;
+            _context.SaveChanges();
+            return array;
+        }
+
+        // DELETE: api/Gost/1
+        [HttpDelete("{id}")]
+        public ActionResult<Gost> DeleteGost(int id)
+        {
+            var array = _context.Gosts.ToList();
+            var pom = array.SingleOrDefault(item => item.Id == id);
+            _context.Gosts.Remove(pom);
+            _context.SaveChanges();
+            return _context.Gosts.Find(id);
+        }
     }
 }
