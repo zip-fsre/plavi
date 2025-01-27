@@ -50,6 +50,15 @@ const EditEventPage = () => {
       console.log("Promjene (ce biti) spremljene kada se isprogramiraju");
       
     };
+    /* brise događaj iz baze */
+    const deleteEvent = () => {
+
+          // Simple DELETE request with fetch
+      fetch(`http://localhost:5149/api/Dogadjaj/${id}`, { method: 'DELETE' })
+      .then(() => console.log("Uspješno obrisano!!!"));
+      
+
+    };
 
 
     return (
@@ -118,7 +127,12 @@ const EditEventPage = () => {
                     <Text style={styles.headerText}>Lista gostiju:</Text>
                     <FlatList data={events.gosts} renderItem={renderGuests}></FlatList>
                   </View>
-                  <Button title="Spremi promjene" onPress={saveChanges}></Button>
+                  <View style={styles.infoContainer}>
+
+                    <Button title="Spremi promjene" onPress={saveChanges}></Button>
+                    <Button title="Izbriši događaj" onPress={deleteEvent} bgColor="#b51010"></Button>
+                  </View>
+
                 </ScrollView>
                 </>
                 ) : ( //ispis dok nema podataka

@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   partneri: {
-    maxHeight: '55%',
+    maxHeight: '60%',
   },
 });
 
