@@ -85,5 +85,12 @@ namespace JsonReturn.Controllers
             _context.SaveChanges();
             return _context.MedjutablicaPt1s.Find(id);
         }
+
+        // Get: api/MedjutablicaPt1/Partner/1
+        [HttpGet("Partner/{id}")]
+        public ActionResult<IEnumerable<JsonReturn.Models.MedjutablicaPt1>> GetPartner(int id)
+        {
+            return _context.MedjutablicaPt1s.AsQueryable().Where(Podatci => Podatci.IdPartnera == id).ToList();
+        }
     }
 }

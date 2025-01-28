@@ -83,5 +83,12 @@ namespace JsonReturn.Controllers
             _context.SaveChanges();
             return _context.Izvjesces.Find(id);
         }
+
+        // Get: api/Izvjesce/Podatci
+        [HttpGet("Podatci/{id}")]
+        public ActionResult<IEnumerable<JsonReturn.Models.MedjutablicaPt2>> GetMedju2(int id)
+        {
+            return _context.MedjutablicaPt2s.AsQueryable().Where(Podatci => Podatci.IdIzvjesca == id).ToList();
+        }
     }
 }

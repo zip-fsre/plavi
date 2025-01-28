@@ -83,5 +83,12 @@ namespace JsonReturn.Controllers
             _context.SaveChanges();
             return _context.Partneris.Find(id);
         }
+
+        // Get: api/Partneri/Aranzmani/1
+        [HttpGet("Aranzmani/{id}")]
+        public ActionResult<IEnumerable<JsonReturn.Models.Aranzman>> GetAranzmani(int id)
+        {
+            return _context.Aranzmen.AsQueryable().Where(Aranzman => Aranzman.IdPartnera == id).ToList();
+        }
     }
 }

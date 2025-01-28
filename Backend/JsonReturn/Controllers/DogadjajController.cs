@@ -87,5 +87,19 @@ namespace JsonReturn.Controllers
             _context.SaveChanges();
             return _context.Dogadjajs.Find(id);
         }
+
+        // Get: api/Dogadjaj/Partners
+        [HttpGet("Partners/{id}")]
+        public ActionResult<IEnumerable<JsonReturn.Models.MedjutablicaPt1>> GetPartneri(int id)
+        {
+            return _context.MedjutablicaPt1s.AsQueryable().Where(MedjutablicaPt1s => MedjutablicaPt1s.IdDogadjaja == id).ToList();
+        }
+
+        // Get: api/Dogadjaj/Partners
+        [HttpGet("Gosti/{id}")]
+        public ActionResult<IEnumerable<JsonReturn.Models.Gost>> GetGosti(int id)
+        {
+            return _context.Gosts.AsQueryable().Where(Gosts => Gosts.IdDogadjajaa == id).ToList();
+        }
     }
 }
