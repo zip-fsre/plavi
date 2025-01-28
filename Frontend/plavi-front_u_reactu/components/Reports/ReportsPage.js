@@ -4,7 +4,7 @@ import Pozadina from '../ui/Pozadina';
 import HoverButton from '../ui/Button';
 import '../ui/scrollbar.css';
 import { usePage } from '../../Routes';
-import Report from '../ui/Report'; // Added the missing import for Report
+import Report from '../ui/Report';
 
 const ReportsPage = () => {
   const { currentPage, setCurrentPage, pages } = usePage();
@@ -41,21 +41,19 @@ const ReportsPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignSelf: 'center',
-  },
-  item: {
-    display: 'flex',
-    flexDirection: 'row',
   },
   header: {
     display: 'flex',
     flexDirection: 'row',
-    gap: 190,
+    justifyContent: 'space-between',
+    maxWidth: '70%',
+    marginBottom: 10,
+    marginLeft: 20,
   },
   title: {
     color: '#e8c789',
     fontFamily: 'Alex Brush',
-    fontSize: 70,
+    fontSize: 48,
     textAlign: 'left',
     marginBottom: 10,
     textShadowColor: 'black',
@@ -87,6 +85,7 @@ const styles = StyleSheet.create({
   reportsList: {
       maxHeight: '55%',
       marginTop: 25,
+      alignSelf: 'center',
   },
   reportsTitle: {
     fontSize: 25,
