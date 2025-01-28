@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import Pozadina from './ui/Pozadina';
-import { usePage } from '../Routes'; 
+import Pozadina from '../ui/Pozadina';
+import { usePage } from '../../Routes'; 
 
 export const ViewPartner = () => {
   const { pages, currentPage, setCurrentPage } = usePage();
@@ -13,8 +13,8 @@ export const ViewPartner = () => {
         <Text style={styles.title}>Detalji partnera</Text>
         <Text style={styles.detailText}>Naziv: {'partner.naziv'}</Text>
         <Text style={styles.detailText}>Vrsta: {'partner.vrsta'}</Text>
-        <Text style={styles.detailText}>Opis: {'partner.opis'}</Text>
-        <Text style={styles.detailText}>Cijena: {'partner.cijena'} €</Text>
+        <Text style={styles.detailText}>Napomena: {'partner.napomena'}</Text>
+        <Text style={styles.detailText}>Provizija: {'partner.provizija'} </Text>
         <TouchableOpacity style={styles.closeButton} onPress={() => setCurrentPage(pages['Partners'])}>
           <Text style={styles.closeButtonText}>Zatvori</Text>
         </TouchableOpacity>
@@ -31,41 +31,17 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#e8c789',
-    fontFamily: 'Monotype Corsiva',
-    fontSize: 40,
+    fontFamily: 'Alex Brush',
+    fontSize: 48,
     textShadowColor: 'black',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 3,
     marginBottom: 20,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#e8c789',
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 5,
-    width: '100%',
-    fontSize: 16,
-    fontFamily: 'Monotype Corsiva',
-    color: '#e8c789',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  saveButton: {
-    backgroundColor: '#e8c789',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  saveButtonText: {
-    color: 'black',
-    fontSize: 18,
-    fontFamily: 'Monotype Corsiva',
-  },
   detailText: {
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: 'Monotype Corsiva',
+    alignSelf: 'center',
     color: '#e8c789',
     marginBottom: 10,
   },
@@ -75,12 +51,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: '#e8c789',
     borderRadius: 5,
-    alignItems: 'center',
+    alignSelf: 'center',
   },
   closeButtonText: {
-    fontSize: 16,
+    fontSize: 20,
     fontFamily: 'Monotype Corsiva',
-    color: 'black',
   },
 });
 

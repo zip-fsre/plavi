@@ -1,16 +1,16 @@
 import React, { createContext, useState, useContext } from 'react';
 import EventsPage from "./components/EventsPage";
 import CreateEventPage from './components/CreateEventPage';
-import PartnersPage from './components/PartnersPage';
+import PartnersPage from './components/Partners/PartnersPage';
 import ReportsPage from './components/Reports/ReportsPage';
 import HomePage from './components/HomePage';
 import EditEventPage from './components/EditEventPage';
 import ViewReport from './components/Reports/ViewReport';
 import CreateReport from './components/Reports/CreateReport';
 import EditReport from './components/Reports/EditReport';
-import  AddPartner from './components/AddPartnersPage'; 
-import  ViewPartner from './components/ViewPartnersPage'; 
-import  EditPartner from './components/EditPartnerPage'; 
+import  AddPartner from './components/Partners/AddPartnersPage'; 
+import  ViewPartner from './components/Partners/ViewPartnersPage'; 
+import  EditPartner from './components/Partners/EditPartnerPage'; 
 
 
 

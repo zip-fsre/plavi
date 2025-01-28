@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import Pozadina from './ui/Pozadina';
-import SmallButton from './ui/SmallButton';
-import { usePage } from '../Routes'; 
+import Pozadina from '../ui/Pozadina';
+import SmallButton from '../ui/SmallButton';
+import { usePage } from '../../Routes'; 
 
 const PartnersPage = () => {
   const { setCurrentPage, pages } = usePage(); 
   const [partners, setPartners] = useState([
-    { naziv: 'Prvi partner', vrsta: 'Maneken', opis: 'Nisam ja za ovoga...', cijena: '1000' },
-    { naziv: 'Drugi partner', vrsta: 'Sviralo', opis: 'Svira svirku, brine brigu...', cijena: '1500' },
+    { naziv: 'Prvi partner', vrsta: 'Maneken', napomena: 'Nisam ja za ovoga...', provizija: '10%' },
+    { naziv: 'Drugi partner', vrsta: 'Sviralo', napomena: 'Svira svirku, brine brigu...', provizija: '15%' },
   ]);
 
   const handleAddPartner = () => {
@@ -43,8 +43,8 @@ const PartnersPage = () => {
               <View style={styles.partnerTextContainer}>
                 <Text style={styles.partnerName}>{partner.naziv}</Text>
                 <Text style={styles.partnerDetails}>{partner.vrsta}</Text>
-                <Text style={styles.partnerDetails}>{partner.opis}</Text>
-                <Text style={styles.partnerDetails}>Cijena: {partner.cijena} €</Text>
+                <Text style={styles.partnerDetails}>{partner.napomena}</Text>
+                <Text style={styles.partnerDetails}>Provizija: {partner.provizija} </Text>
               </View>
               <View style={styles.iconContainer}>
                 <TouchableOpacity onPress={() => handleViewPartner(index)}>
@@ -77,11 +77,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
     alignItems: 'center',
+    width: '80%',
   },
   title: {
     color: '#e8c789',
-    fontFamily: 'Monotype Corsiva',
-    fontSize: 40,
+    fontFamily: 'Alex Brush',
+    fontSize: 48,
     textShadowColor: 'black',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 3,
@@ -93,8 +94,7 @@ const styles = StyleSheet.create({
   partnerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#1a2322',
+    alignSelf: 'center',
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
@@ -103,14 +103,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
-    width: '100%',
+    width: '60%',
   },
   partnerTextContainer: {
     flex: 1,
     paddingRight: 10,
   },
   partnerName: {
-    fontSize: 20,
+    fontSize: 24,
     fontFamily: 'Monotype Corsiva',
     color: '#e8c789',
     marginBottom: 5,
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 2,
   },
   partnerDetails: {
-    fontSize: 16,
+    fontSize: 20,
     fontFamily: 'Monotype Corsiva',
     color: '#e8c789',
     textShadowColor: 'black',
