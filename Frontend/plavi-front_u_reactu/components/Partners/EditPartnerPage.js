@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from "react-native";
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import * as XLSX from 'xlsx';
+import { saveAs } from "file-saver";
 import Pozadina from "../ui/Pozadina";
 import { usePage } from "../../Routes";
 
@@ -45,7 +49,6 @@ export const EditPartner = () => {
 
   const [arrangements, setArrangements] = useState([]);
 
-  // **Dohvaćanje partnera i njegovih aranžmana**
   useEffect(() => {
     const handleFetchPartner = async () => {
       try {
@@ -57,10 +60,10 @@ export const EditPartner = () => {
           naziv: data.naziv,
           vrsta: data.tip,
           napomena: data.napomena,
-          provizija: String(data.provizija), // Pretvorba u string za TextInput
+          provizija: String(data.provizija), 
         });
 
-        // Dohvaćanje aranžmana za partnera
+        
         const arrangementsResponse = await fetch(`${BASE_URL}/Partneri/Aranzmani/${id}`);
         if (!arrangementsResponse.ok) throw new Error("Neuspjelo dohvaćanje aranžmana.");
         
@@ -74,8 +77,17 @@ export const EditPartner = () => {
 
     handleFetchPartner();
   }, [id]);
+  const handleExportToExcel = () => {
+    const wb = XLSX.utils.book_new();
+    const partnerSheet = XLSX.utils.json_to_sheet([partner]);
+    XLSX.utils.book_append_sheet(wb, partnerSheet, "Partner");
+    const arrangementsSheet = XLSX.utils.json_to_sheet(arrangements);
+    XLSX.utils.book_append_sheet(wb, arrangementsSheet, "Aranžmani");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([wbout], { type: "application/octet-stream" });
+    saveAs(blob, "Partner.xlsx");
+  };
 
-  // **Ažuriranje partnera**
   const handleEditPartner = async () => {
     if (!partner.naziv || !partner.vrsta || !partner.napomena || !partner.provizija) {
       Alert.alert("Greška", "Molimo ispunite sva polja!");
@@ -84,7 +96,7 @@ export const EditPartner = () => {
 
     try {
       const response = await fetch(`${BASE_URL}/Partneri/${id}`, {
-        method: "PUT", // Koristimo PUT umjesto POST za ažuriranje
+        method: "PUT", 
         headers: {
           "Content-Type": "application/json",
         },
@@ -98,11 +110,10 @@ export const EditPartner = () => {
 
       if (!response.ok) throw new Error("Neuspjelo ažuriranje partnera.");
 
-      // **Ažuriranje aranžmana**
       for (const aranzman of arrangements) {
         if (aranzman.naziv && aranzman.opis && aranzman.cijena) {
           const aranzmanResponse = await fetch(`${BASE_URL}/Aranzmani/${aranzman.id}`, {
-            method: "PUT", // PUT za ažuriranje aranžmana
+            method: "PUT", 
             headers: {
               "Content-Type": "application/json",
             },
@@ -121,14 +132,14 @@ export const EditPartner = () => {
       }
 
       Alert.alert("Uspjeh", "Partner i aranžmani su uspješno ažurirani!");
-      setCurrentPage(pages["Partners"]); // Povratak na stranicu s partnerima
+      setCurrentPage(pages["Partners"]);
     } catch (error) {
       console.error(error);
       Alert.alert("Greška", "Dogodila se greška pri ažuriranju partnera.");
     }
   };
 
-  // Dodavanje novog aranžmana
+  
   const handleAddArrangement = () => {
     setArrangements([...arrangements, { naziv: "", opis: "", cijena: "" }]);
   };
@@ -177,6 +188,9 @@ export const EditPartner = () => {
               <TouchableOpacity style={styles.saveButton} onPress={handleEditPartner}>
                 <Text style={styles.saveButtonText}>Spremi promjene</Text>
               </TouchableOpacity>
+              <TouchableOpacity style={styles.saveButton} onPress={handleExportToExcel}>
+                <Text style={styles.saveButtonText}>Izvezi u Excel</Text>
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -201,14 +215,16 @@ export const EditPartner = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, alignSelf: "center", width: "90%", paddingTop: 20, maxHeight: '80%', maxWidth: '70%' },
-  title: { fontSize: 48, color: "#e8c789", marginBottom: 20 },
+  title: { fontSize: 48, fontFamily: 'Alex Brush', color: "#e8c789", marginBottom: 20 },
   subtitleContainer: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
-  subtitle: { fontSize: 30, color: "#e8c789" },
+  subtitle: { fontSize: 30, color: "#e8c789" , fontFamily: 'Alex Brush', },
   buttonGroup: { flexDirection: "row" },
-  scrollView: { maxHeight: 500 },
-  addButton: { backgroundColor: "#e8c789", padding: 10, borderRadius: 5, marginLeft: 10 },
-  saveButton: { backgroundColor: "#e8c789", padding: 10, borderRadius: 5, marginLeft: 10 },
-  input: { borderWidth: 1, borderColor: "#e8c789", padding: 10, marginVertical: 10, borderRadius: 5, color: '#e8c789' },
+  scrollView: { maxHeight: 500 , },
+  addButton: { backgroundColor: "#e8c789", fontFamily: 'Monotype Corsiva', padding: 10, borderRadius: 5, marginLeft: 10 },
+  addButtonText: { fontFamily: 'Monotype Corsiva', fontSize: 24, },
+  saveButtonText: { fontFamily: 'Monotype Corsiva', fontSize: 24, },
+  saveButton: { backgroundColor: "#e8c789", fontFamily: 'Monotype Corsiva', padding: 10, borderRadius: 5, marginLeft: 10 },
+  input: { borderWidth: 1, marginLeft: 25, borderColor: "#e8c789", maxWidth: '80%', padding: 10, fontSize: 20, marginVertical: 10, borderRadius: 5, color: '#e8c789' , fontFamily: 'Monotype Corsiva', },
 });
 
 export default EditPartner;
