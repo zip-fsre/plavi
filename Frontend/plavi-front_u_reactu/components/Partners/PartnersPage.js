@@ -5,7 +5,7 @@ import Pozadina from '../ui/Pozadina';
 import SmallButton from '../ui/SmallButton';
 import { usePage } from '../../Routes';
 
-const BASE_URL = 'https://your-backend-url.com/api/Partneri'; // Zamijeni s točnim URL-om backend-a
+const BASE_URL = 'http://localhost:5149/api/Partneri'; // Zamijeni s točnim URL-om backend-a
 
 const PartnersPage = () => {
   const { setCurrentPage, pages } = usePage();
@@ -51,7 +51,7 @@ const PartnersPage = () => {
   const handleEditPartner = (partner) => {
     setCurrentPage({
       ...pages['EditPartner'],
-      props: { partner },
+      id: partner.id,
     });
   };
 
@@ -109,9 +109,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignSelf: 'center',
     width: '90%',
+    maxHeight: '85%',
   },
   partneri: {
-    maxHeight: 800,
+    maxHeight: 500,
   },
   header: {
     display: 'flex',

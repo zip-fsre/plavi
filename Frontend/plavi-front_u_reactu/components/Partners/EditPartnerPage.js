@@ -198,4 +198,17 @@ export const EditPartner = () => {
   );
 };
 
+
+const styles = StyleSheet.create({
+  container: { flex: 1, alignSelf: "center", width: "90%", paddingTop: 20, maxHeight: '80%', maxWidth: '70%' },
+  title: { fontSize: 48, color: "#e8c789", marginBottom: 20 },
+  subtitleContainer: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
+  subtitle: { fontSize: 30, color: "#e8c789" },
+  buttonGroup: { flexDirection: "row" },
+  scrollView: { maxHeight: 500 },
+  addButton: { backgroundColor: "#e8c789", padding: 10, borderRadius: 5, marginLeft: 10 },
+  saveButton: { backgroundColor: "#e8c789", padding: 10, borderRadius: 5, marginLeft: 10 },
+  input: { borderWidth: 1, borderColor: "#e8c789", padding: 10, marginVertical: 10, borderRadius: 5, color: '#e8c789' },
+});
+
 export default EditPartner;
