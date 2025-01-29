@@ -1,21 +1,98 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import Pozadina from '../ui/Pozadina';
-import { usePage } from '../../Routes'; 
+import { usePage } from '../../Routes';
 
-export const ViewPartner = () => {
-  const { pages, currentPage, setCurrentPage } = usePage();
-  const { id } = currentPage;
+const BASE_URL = 'https://your-backend-url.com/api/Partneri'; // Zamijeni s točnim URL-om backend-a
+
+export const ViewPartner = ({ partnerData }) => {
+  const { setCurrentPage, pages } = usePage();
+  const [partnerDetails, setPartnerDetails] = useState({
+    naziv: '',
+    tip: '',
+    napomena: '',
+    provizija: '',
+    aranzmani: [],
+  });
+
+  // Funkcija za dohvaćanje detalja o partneru i njegovim aranžmanima
+  const fetchPartnerDetails = async (id) => {
+    try {
+      // Dohvaćanje osnovnih podataka partnera
+      const partnerResponse = await fetch(`${BASE_URL}/${id}`);
+      const partner = await partnerResponse.json();
+
+      // Dohvaćanje aranžmana partnera
+      const aranzmaniResponse = await fetch(`${BASE_URL}/Aranzmani/${id}`);
+      const aranzmani = await aranzmaniResponse.json();
+
+      // Postavljanje podataka u state
+      setPartnerDetails({
+        ...partner,
+        aranzmani,
+      });
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Greška', 'Dogodila se greška pri dohvaćanju podataka o partneru.');
+    }
+  };
+
+  // Dohvaćanje detalja o partneru pri učitavanju komponente
+  useEffect(() => {
+    if (partnerData?.id) {
+      fetchPartnerDetails(partnerData.id);
+    }
+  }, [partnerData]);
 
   return (
     <Pozadina>
       <View style={styles.container}>
         <Text style={styles.title}>Detalji partnera</Text>
-        <Text style={styles.detailText}>Naziv: {'partner.naziv'}</Text>
-        <Text style={styles.detailText}>Vrsta: {'partner.vrsta'}</Text>
-        <Text style={styles.detailText}>Napomena: {'partner.napomena'}</Text>
-        <Text style={styles.detailText}>Provizija: {'partner.provizija'} </Text>
-        <TouchableOpacity style={styles.closeButton} onPress={() => setCurrentPage(pages['Partners'])}>
+        <ScrollView>
+          <Text style={styles.detailText}>
+            <Text style={styles.detailLabel}>Naziv: </Text>
+            {partnerDetails.naziv}
+          </Text>
+          <Text style={styles.detailText}>
+            <Text style={styles.detailLabel}>Vrsta: </Text>
+            {partnerDetails.tip}
+          </Text>
+          <Text style={styles.detailText}>
+            <Text style={styles.detailLabel}>Napomena: </Text>
+            {partnerDetails.napomena}
+          </Text>
+          <Text style={styles.detailText}>
+            <Text style={styles.detailLabel}>Provizija: </Text>
+            {partnerDetails.provizija}%
+          </Text>
+
+          <Text style={styles.subtitle}>Aranžmani</Text>
+          {partnerDetails.aranzmani.length > 0 ? (
+            partnerDetails.aranzmani.map((aranzman, index) => (
+              <View key={index} style={styles.aranzmanContainer}>
+                <Text style={styles.aranzmanText}>
+                  <Text style={styles.aranzmanLabel}>Naziv: </Text>
+                  {aranzman.naziv}
+                </Text>
+                <Text style={styles.aranzmanText}>
+                  <Text style={styles.aranzmanLabel}>Opis: </Text>
+                  {aranzman.opis}
+                </Text>
+                <Text style={styles.aranzmanText}>
+                  <Text style={styles.aranzmanLabel}>Cijena: </Text>
+                  {aranzman.cijena} kn
+                </Text>
+              </View>
+            ))
+          ) : (
+            <Text style={styles.noDataText}>Nema dodanih aranžmana.</Text>
+          )}
+        </ScrollView>
+
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={() => setCurrentPage(pages['Partners'])}
+        >
           <Text style={styles.closeButtonText}>Zatvori</Text>
         </TouchableOpacity>
       </View>
@@ -41,9 +118,40 @@ const styles = StyleSheet.create({
   detailText: {
     fontSize: 20,
     fontFamily: 'Monotype Corsiva',
-    alignSelf: 'center',
     color: '#e8c789',
     marginBottom: 10,
+  },
+  detailLabel: {
+    fontWeight: 'bold',
+  },
+  subtitle: {
+    fontSize: 24,
+    fontFamily: 'Alex Brush',
+    color: '#e8c789',
+    marginVertical: 20,
+    textAlign: 'center',
+  },
+  aranzmanContainer: {
+    marginBottom: 15,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#e8c789',
+    borderRadius: 5,
+  },
+  aranzmanText: {
+    fontSize: 18,
+    fontFamily: 'Monotype Corsiva',
+    color: '#e8c789',
+    marginBottom: 5,
+  },
+  aranzmanLabel: {
+    fontWeight: 'bold',
+  },
+  noDataText: {
+    fontSize: 18,
+    fontFamily: 'Monotype Corsiva',
+    color: '#e8c789',
+    textAlign: 'center',
   },
   closeButton: {
     marginTop: 20,
@@ -56,6 +164,7 @@ const styles = StyleSheet.create({
   closeButtonText: {
     fontSize: 20,
     fontFamily: 'Monotype Corsiva',
+    color: '#fff',
   },
 });
 
