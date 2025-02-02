@@ -1,13 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import Pozadina from '../ui/Pozadina';
 import HoverButton from '../ui/Button';
 import '../ui/scrollbar.css';
 import { usePage } from '../../Routes';
 import Report from '../ui/Report';
 
+const BASE_URL = 'http://localhost:5149/api/Izvjesce';
+
 const ReportsPage = () => {
-  const { currentPage, setCurrentPage, pages } = usePage();
+  const { setCurrentPage, pages } = usePage();
+  const [reports, setReports] = useState([]);
+
+   // Funkcija za dohvat izvješća sa servera
+   const fetchReports = useCallback(async () => {
+    try {
+      const response = await fetch(BASE_URL);
+      if (!response.ok) throw new Error('Neuspješan GET zahtjev');
+      const data = await response.json();
+
+      const sortedReports = data.sort((a, b) => b.id - a.id);
+
+      setReports(sortedReports); // Spremi podatke u state
+    } catch (error) {
+      console.error(error);
+      alert('Ne mogu dohvatiti izvješća. Pokušajte kasnije.');
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchReports();
+  }, [fetchReports]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchReports();
+    }, [fetchReports])
+  );
 
   return (
     <Pozadina>
@@ -26,13 +56,16 @@ const ReportsPage = () => {
           style={styles.reportsList}
           keyboardShouldPersistTaps="handled"
         >
-          <Report naziv="Prvo izvješće" opis='siduvgbaoiEFONWPDCNJKbdcso'/>
-          <Report naziv="Drugo izvješće" opis='siduvgbaoiEFONWPDCNJKbdcso' />
-          <Report naziv="Treće izvješće" opis='siduvgbaoiEFONWPDCNJKbdcso'/>
-          <Report naziv="Četvrto izvješće" opis='siduvgbaoiEFONWPDCNJKbdcso'/>
-          <Report naziv="Peto izvješće" opis='siduvgbaoiEFONWPDCNJKbdcso'/>
-          <Report naziv="Šesto izvješće" opis='siduvgbaoiEFONWPDCNJKbdcso'/>
-        </ScrollView>
+           {/* Renderiraj izvješća */}
+           {reports.map((report) => (
+            <Report 
+              key ={report.id}
+              id={report.id} 
+              naziv={report.naziv} 
+              opis={report.opis} 
+            />
+          ))}
+         </ScrollView>
       </View>
     </Pozadina>
   );
@@ -83,7 +116,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   reportsList: {
-      maxHeight: '55%',
+      maxHeight: 400,
       marginTop: 25,
       alignSelf: 'center',
   },

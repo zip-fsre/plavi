@@ -2,121 +2,190 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Pozadina from '../ui/Pozadina';
 import HoverButton from '../ui/Button';
-import { useReportContext } from '../../ReportContext';
-import { usePage } from '../../Routes'
+import { usePage } from '../../Routes';
 
-const ViewReport = ({ navigation }) => {
-  const {currentPage, setCurrentPage, pages} = usePage();
-  const { reportData, description, startDate, endDate, reportTitle, selectedPartner } = useReportContext();
+const ViewReport = () => {
+  const { currentPage, setCurrentPage, pages } = usePage();
+  const { reportId } = currentPage;
+  console.log('Report ID:', reportId);
 
-  const [filteredData, setFilteredData] = useState(reportData || []);
+  const [reportData, setReportData] = useState(null);
+  const [arrangements, setArrangements] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [totalCommission, setTotalCommission] = useState(0);
 
-  const calculateCommission = (price, commissionRate) => {
-    return (price * commissionRate) / 100;
-  };
-
-  // Filtriranje podataka prema datumu i partneru
-  const handleGenerateReport = () => {
-    console.log("Filtriranje izvješća:");
-    console.log("Početni datum:", startDate);
-    console.log("Završni datum:", endDate);
-    console.log("Odabrani partner:", selectedPartner);
-  
-    const newFilteredData = reportData.filter(item => {
-      // Parsiranje datuma u standardni format (yyyy-MM-dd)
-      const eventDate = new Date(item.date.split('.').reverse().join('-')); // pretvori "dd.MM.yyyy" u "yyyy-MM-dd"
-      const start = startDate ? new Date(startDate.split('.').reverse().join('-')) : null; // Start date
-      const end = endDate ? new Date(endDate.split('.').reverse().join('-')) : null; // End date
-  
-      const dateMatch = start && end ? eventDate >= start && eventDate <= end : true;
-      const partnerMatch = selectedPartner ? item.partner === selectedPartner : true;
-  
-      console.log(`Provjera za event ${item.event}:`, dateMatch, partnerMatch); // Logiranje svake provjere
-  
-      return dateMatch && partnerMatch;
-    });
-  
-    console.log("Filtrirani podaci:", newFilteredData);
-  
-    const newTotalPrice = newFilteredData.reduce((total, item) => total + item.price, 0);
-    setFilteredData(newFilteredData);
-    setTotalPrice(newTotalPrice);
-  
-    console.log("Ukupna cijena:", newTotalPrice);
-  };
-
-  // Automatsko pozivanje funkcije pri učitavanju komponente ili kada se promijene parametri
   useEffect(() => {
-    console.log("Ažuriranje parametara za izvješće:");
-    console.log("reportData:", reportData);
-    console.log("description:", description);
-    console.log("startDate:", startDate);
-    console.log("endDate:", endDate);
-    console.log("selectedPartner:", selectedPartner);
-    handleGenerateReport();
-  }, [reportData, description, startDate, endDate, selectedPartner]); // Ovisnosti
+    if (!reportId) return;
 
-  if (!reportData || reportData.length === 0) {
+    const fetchReport = async () => {
+      try {
+        console.log('Fetching report for reportId:', reportId);
+        const response = await fetch(`http://localhost:5149/api/Izvjesce/${reportId}`);
+        if (!response.ok) throw new Error('Greška prilikom dohvaćanja izvješća.');
+        const data = await response.json();
+        console.log('Fetched report data:', data);
+        setReportData(data);
+        fetchMedjutablicaPt2(data.id);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching report:', err);
+        setLoading(false);
+      }
+    };
+
+    const fetchMedjutablicaPt2 = async (reportId) => {
+      try {
+        // Change the URL to match the backend route
+        const response = await fetch(`http://localhost:5149/api/Izvjesce/Podatci/${reportId}`);
+        if (!response.ok) throw new Error('Greška prilikom dohvaćanja MedjutablicaPt2.');
+        const medjutablicaPt2Records = await response.json();
+        console.log('Fetched MedjutablicaPt2 records:', medjutablicaPt2Records);
+    
+        fetchMedjutablicaPt1(medjutablicaPt2Records);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching MedjutablicaPt2:', err);
+      }
+    };
+
+    
+    const fetchMedjutablicaPt1 = async (medjutablicaPt2Records) => {
+      try {
+        // Extract idMedju1 from MedjutablicaPt2
+        const medjutablicaPt2Ids = medjutablicaPt2Records.map(record => record.idMedju1);
+        console.log('MedjutablicaPt2 Ids:', medjutablicaPt2Ids);
+    
+        // Fetch all MedjutablicaPt1 records
+        const response = await fetch('http://localhost:5149/api/MedjutablicaPt1');
+        if (!response.ok) throw new Error('Greška prilikom dohvaćanja MedjutablicaPt1.');
+        const medjutablicaPt1Records = await response.json();
+        console.log('Fetched all MedjutablicaPt1 records:', medjutablicaPt1Records);
+    
+        // Filter MedjutablicaPt1 records based on idMedju1 from MedjutablicaPt2
+        const filteredMedjutablicaPt1Records = medjutablicaPt1Records.filter(record =>
+          medjutablicaPt2Ids.includes(record.id)
+        );
+        console.log('Filtered MedjutablicaPt1 records:', filteredMedjutablicaPt1Records);
+    
+        // Fetch arrangements based on idAranzmana in the filtered MedjutablicaPt1 records
+        if (filteredMedjutablicaPt1Records.length > 0) {
+          fetchEvents(filteredMedjutablicaPt1Records);
+        }
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching MedjutablicaPt1:', err);
+      }
+    };
+
+    const fetchEvents = async (filteredMedjutablicaPt1Records) => {
+      try {
+        const response = await fetch('http://localhost:5149/api/Dogadjaj');
+        if (!response.ok) throw new Error('Greška prilikom dohvaćanja događaja.');
+        const allEvents = await response.json();
+    
+        console.log('Fetched all events:', allEvents);
+    
+        // Poveži događaje s MedjutablicaPt1 zapisima
+        const enrichedMedjutablicaPt1 = filteredMedjutablicaPt1Records.map(record => {
+          const event = allEvents.find(evt => evt.id === record.idDogadjaja);
+          return {
+            ...record,
+            datum: event ? event.datum : null // Dodaj datum događaja
+          };
+        });
+    
+        console.log('Enriched MedjutablicaPt1 records:', enrichedMedjutablicaPt1);
+    
+        fetchArrangements(enrichedMedjutablicaPt1);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching events:', err);
+      }
+    };
+    
+
+    
+    const fetchArrangements = async (enrichedMedjutablicaPt1) => {
+      try {
+        const response = await fetch('http://localhost:5149/api/Aranzman');
+        if (!response.ok) throw new Error('Greška prilikom dohvaćanja aranžmana.');
+        const allArrangements = await response.json();
+    
+        // Mapiraj podatke tako da sačuvaš konacnaCijena iz MedjutablicaPt1
+        const finalArrangements = enrichedMedjutablicaPt1.map(record => {
+          const aranzman = allArrangements.find(arr => arr.id === record.idAranzmana);
+          return {
+            id: record.idAranzmana,
+            naziv: aranzman ? aranzman.naziv : "Nepoznato",
+            konacnaCijena: record.konacnaCijena,
+            dodatakNaProviziju: record? record.dodatakNaProviziju : 0,
+            datum: record? record.datum : null
+          };
+        });
+    
+        console.log('Final arrangements:', finalArrangements);
+    
+        setArrangements(finalArrangements);
+        setTotalPrice(finalArrangements.reduce((sum, arr) => sum + arr.konacnaCijena, 0));
+        setTotalCommission(finalArrangements.reduce((sum, arr) => sum + (arr.konacnaCijena * arr.dodatakNaProviziju) / 100, 0));
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching arrangements:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+
+    fetchReport();
+  }, [reportId]);
+
+  if (loading) {
     return (
       <Pozadina>
         <View style={styles.container}>
-          <Text style={styles.errorText}>Izvješće nije pronađeno.</Text>
-          <HoverButton title="Nazad" onPress={() => navigation.goBack()} />
+          <Text style={styles.loadingText}>Učitavanje izvješća...</Text>
         </View>
       </Pozadina>
     );
   }
 
-  // Pretvori datume u string prije prosljeđivanja
-  const start = new Date(startDate).toLocaleDateString('hr-HR');
-  const end = new Date(endDate).toLocaleDateString('hr-HR');
+  if (error) {
+    return (
+      <Pozadina>
+        <View style={styles.container}>
+          <Text style={styles.errorText}>{error}</Text>
+          <HoverButton title="Nazad" />
+        </View>
+      </Pozadina>
+    );
+  }
 
   return (
     <Pozadina>
       <View style={styles.container}>
-        <Text style={styles.title}>Izvješće: {reportTitle || 'N/A'}</Text>
-        <Text style={styles.description}>Opis izvješća: {description || 'N/A'}</Text>
+        <Text style={styles.title}>Izvješće: {reportData.naziv || 'N/A'}</Text>
+        <Text style={styles.description}>Opis izvješća: {reportData.opis || 'N/A'}</Text>
 
-        <ScrollView 
-          style={styles.reportList} 
-          contentContainerStyle={styles.reportListContent}
-        >
-          {filteredData.length > 0 ? (
-            filteredData.map((event, index) => {
-              const commission = calculateCommission(event.price, event.commission);
-              return (
-                <View key={index} style={styles.reportItem}>
-                  <Text style={styles.reportText}>Naziv aranžmana: {event.event}</Text>
-                  <Text style={styles.reportText}>Opis: {event.description}</Text>
-                  <Text style={styles.reportText}>Provizija: {event.commission}%</Text>
-                  <Text style={styles.reportText}>Datum održavanja: {event.date}</Text>
-                  <Text style={styles.reportText}>Provizija u količini: {commission} KM</Text>
-                </View>
-              );
-            })
-          ) : (
-            <Text style={styles.errorText}>Nema aranžmana za odabrani datum i partnera.</Text>
-          )}
+        <ScrollView style={styles.reportList} contentContainerStyle={styles.reportListContent}>
+          {arrangements.map((arr, index) => (
+            <View key={index} style={styles.reportItem}>
+              <Text style={styles.reportText}>Naziv aranžmana: {arr.naziv}</Text>
+              <Text style={styles.reportText}>Cijena: {arr.konacnaCijena} KM</Text>
+              <Text style={styles.reportText}>Provizija: {arr.dodatakNaProviziju}%</Text>
+              <Text style={styles.reportText}>Datum održavanja: {arr.datum ? new Date(arr.datum).toLocaleDateString() : 'N/A'}</Text>
+            </View>
+          ))}
         </ScrollView>
 
-        <Text style={styles.totalPrice}>Ukupna cijena: {totalPrice || 0} KM</Text>
-        <Text style={styles.totalPrice}>
-          Ukupna provizija: {filteredData.reduce((total, event) => total + calculateCommission(event.price, event.commission), 0)} KM
-        </Text>
+        <Text style={styles.totalPrice}>Ukupna cijena: {totalPrice} KM</Text>
+        <Text style={styles.totalPrice}>Ukupna provizija: {totalCommission} KM</Text>
 
         <HoverButton
           title="Uredi izvješće"
-          onPress={() =>
-            setCurrentPage(pages['EditReport'], { 
-              reportData: filteredData,  
-              description,  
-              startDate: start, // Koristite već definirane stringove
-              endDate: end,
-              reportTitle,
-              selectedPartner 
-            })
-          }
+          onPress={() => setCurrentPage({ ...pages['EditReport'], reportId })}
         />
       </View>
     </Pozadina>
@@ -138,7 +207,6 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 18,
     color: '#e8c789',
-    fontFamily: 'Monotype Corsiva',
     marginBottom: 20,
   },
   reportList: {

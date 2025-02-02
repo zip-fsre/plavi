@@ -1,47 +1,166 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Picker } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../ui/datepicker.css'; 
 import Pozadina from '../ui/Pozadina';
 import HoverButton from '../ui/Button';
-import { useReportContext } from '../../ReportContext';
-import { usePage } from '../../Routes'
+import { usePage } from '../../Routes';
+import { Picker } from '@react-native-picker/picker';
 
-const CreateReport = ({ navigation }) => {
-  const {currentPage, setCurrentPage, pages} = usePage();
-  const { setReportData, setDescription, setStartDate, setEndDate, setReportTitle, setSelectedPartner } = useReportContext();
+const CreateReport = () => {
+  const { setCurrentPage, pages } = usePage();
 
-  const [startDate, setStartDateInput] = useState(null); // Početni datum je null
-  const [endDate, setEndDateInput] = useState(null);
-  const [selectedPartner, setSelectedPartnerInput] = useState('');
-  const [reportTitle, setReportTitleInput] = useState('');
-  const [reportDescription, setReportDescriptionInput] = useState('');
+  const [reportTitle, setReportTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [selectedPartner, setSelectedPartner] = useState('');
+  const [partners, setPartners] = useState([]);
+  const [medjutablicaPt1, setMedjutablicaPt1] = useState([]);
+  const [events, setEvents] = useState([]);
 
-  const partners = ["Bend Orkestar", "DJ Krmak", "Bend XYZ"];
-  const events = [
-    { date: "12.12.2024", partner: "Bend Orkestar", event: "Vjenčanje žnj", price: 250, description: "Svirali su na vjenčanju", commission: 10 },
-    { date: "15.03.2025", partner: "DJ Krmak", event: "Vjenčanje neko nmp", price: 200, description: "Pustio je neku playlistu", commission: 8 },
-    { date: "14.03.2025", partner: "DJ Krmak", event: "hrkljuš", price: 200, description: "najbolja igra sto je postojala", commission: 8 },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const partnerResponse = await fetch('http://localhost:5149/api/Partneri');
+        const partnerData = await partnerResponse.json();
+        setPartners(partnerData);
 
-  const handleNavigation = () => {
-    setReportData(events);
-    setDescription(reportDescription);
-    setStartDate(startDate ? startDate.toLocaleDateString('hr-HR') : '');
-    setEndDate(endDate ? endDate.toLocaleDateString('hr-HR') : '');
-    setReportTitle(reportTitle);
-    setSelectedPartner(selectedPartner);
-    console.log("Odabrani datumi:", {
-      startDate: startDate ? startDate.toLocaleDateString('hr-HR') : 'nije odabran',
-      endDate: endDate ? endDate.toLocaleDateString('hr-HR') : 'nije odabran',
-    });
-    console.log("Odabrani partner:", selectedPartner);
-    console.log("Naziv izvješća:", reportTitle);
-    console.log("Opis izvješća:", reportDescription);
+        const medjutablicaResponse = await fetch('http://localhost:5149/api/MedjutablicaPt1');
+        const medjutablicaData = await medjutablicaResponse.json();
+        setMedjutablicaPt1(medjutablicaData);
 
+        const eventsResponse = await fetch('http://localhost:5149/api/Dogadjaj');
+        const eventsData = await eventsResponse.json();
+        setEvents(eventsData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
 
-    setCurrentPage(pages['ViewReport']);
+    fetchData();
+  }, []);
+
+  const handleGenerateReport = async () => {
+    if (!reportTitle || !description) {
+      console.warn("Molimo unesite naziv i opis izvješća.");
+      return;
+    }
+  
+    console.log("Početak generiranja izvješća...");
+    console.log("Početni datum:", startDate);
+    console.log("Završni datum:", endDate);
+    console.log("Odabrani partner ID:", selectedPartner);
+  
+    try {
+
+      let filteredPartnerData = [];
+      const startDateTime = startDate ? new Date(startDate).setHours(0, 0, 0, 0) : null;
+    const endDateTime = endDate ? new Date(endDate).setHours(23, 59, 59, 999) : null;
+
+    console.log('datumi:' ,startDateTime, endDateTime);
+
+  
+      // 1. Ako je partner odabran, filtriraj prema partneru
+      if (selectedPartner) {
+        const filteredPartnerDataResponse = await fetch(`http://localhost:5149/api/MedjutablicaPt1/Partner/${selectedPartner}`);
+        filteredPartnerData = await filteredPartnerDataResponse.json();
+        console.log("Filtered MedjutablicaPt1 by Partner:", filteredPartnerData);
+      } else {
+        // Ako partner nije odabran, uzmi sve podatke
+        filteredPartnerData = medjutablicaPt1;
+      }
+  
+      // 2. Filtriraj događaje prema datumu ako su datumi uneseni
+      const filteredEvents = startDate && endDate
+       ? events.filter(event => {
+      const eventDate = new Date(event.datum);
+      const reportStartDate = new Date(startDate);
+      const reportEndDate = new Date(endDate);
+
+      // Normalize both dates to ignore the time part by setting the time to midnight
+      reportStartDate.setHours(0, 0, 0, 0);
+      reportEndDate.setHours(23, 59, 59, 999);
+
+      // Strip the time from eventDate to compare only the date part
+      eventDate.setHours(0, 0, 0, 0);
+      console.log('Filtering event:', event, 'Start:', reportStartDate, 'End:', reportEndDate, 'Event Date:', eventDate);
+      return eventDate >= reportStartDate && eventDate <= reportEndDate;
+    })
+  : events;
+  
+      console.log("Filtered Events:", filteredEvents);
+  
+      // 3. Filtriraj MedjutablicaPt1 prema filtriranim događajima
+      const filteredMedjutablicaPt1 = filteredPartnerData.filter(item => {
+        const matchingEvent = filteredEvents.find(event => event.id === item.idDogadjaja);
+        return matchingEvent;
+      });
+  
+      console.log("Filtered MedjutablicaPt1 with Events:", filteredMedjutablicaPt1);
+  
+      // 4. Kreiranje izvještaja
+      const reportData = {
+        naziv: reportTitle,
+        opis: description,
+        pocetak: startDate ? new Date(startDateTime).toISOString() : null,
+        kraj: endDate ? new Date(endDateTime).toISOString() : null,
+      };
+  
+      console.log("Slanje izvješća na backend:", reportData);
+      const reportResponse = await fetch('http://localhost:5149/api/Izvjesce', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reportData)
+      });
+  
+      if (!reportResponse.ok) {
+        console.error("Greška pri stvaranju izvješća! Status:", reportResponse.status);
+        alert("Došlo je do pogreške pri stvaranju izvještaja.");
+        return;
+      }
+  
+      const createdReport = await reportResponse.json();
+      console.log("Izvješće uspješno kreirano:", createdReport);
+  
+      // 5. Kreiranje veza u MedjutablicaPt2
+      console.log("Spremanje veza između izvješća i medjutablica...");
+      for (const item of filteredMedjutablicaPt1) {
+        const newMedjutablicaPt2 = {
+          idIzvjesca: createdReport.id, // ID izvješća
+          idMedju1: item.id, // ID medjutablicePt1
+        };
+  
+        console.log("Slanje u MedjutablicaPt2:", newMedjutablicaPt2);
+  
+        try {
+          const response = await fetch('http://localhost:5149/api/MedjutablicaPt2', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newMedjutablicaPt2)
+          });
+  
+          if (!response.ok) {
+            console.error(`Greška pri dodavanju u MedjutablicaPt2! Status: ${response.status}`);
+            return;
+          }
+  
+          const responseData = await response.json();
+          console.log('Uspješno dodano u MedjutablicaPt2:', responseData);
+        } catch (error) {
+          console.error(`Pogreška kod dodavanja u MedjutablicaPt2:, error`);
+        }
+      }
+  
+      // 6. Navigacija na ViewReport s ID-em izvješća
+      console.log(`Navigacija na ViewReport (ID: ${createdReport.id})`);
+      setCurrentPage({ ...pages['ViewReport'], reportId: createdReport.id });
+  
+    } catch (error) {
+      console.error("Neočekivana greška:", error);
+      alert("Dogodila se greška pri stvaranju izvješća.");
+    }
   };
 
   return (
@@ -55,15 +174,15 @@ const CreateReport = ({ navigation }) => {
           style={styles.input}
           placeholder="Naziv izvješća"
           value={reportTitle}
-          onChangeText={setReportTitleInput}
+          onChangeText={setReportTitle}
         />
 
         {/* Input za opis izvješća */}
         <TextInput
           style={styles.input}
           placeholder="Opis izvješća"
-          value={reportDescription}
-          onChangeText={setReportDescriptionInput}
+          value={description}
+          onChangeText={setDescription}
         />
         <View style={styles.datesContainer}>
           {/* Input za datum od */}
@@ -71,7 +190,7 @@ const CreateReport = ({ navigation }) => {
             <Text style={styles.label}>Datum od:</Text>
             <DatePicker
               selected={startDate}
-              onChange={(date) => setStartDateInput(date)}
+             onChange={(date) => setStartDate(date)}
               dateFormat="dd.MM.yyyy"
               placeholderText="Odaberite datum"
               className="custom-input"
@@ -85,7 +204,7 @@ const CreateReport = ({ navigation }) => {
             <Text style={styles.label}>Datum do:</Text>
             <DatePicker
               selected={endDate}
-              onChange={(date) => setEndDateInput(date)}
+              onChange={(date) => setEndDate(date)}
               dateFormat="dd.MM.yyyy"
               placeholderText="Odaberite datum"
               className="custom-input"
@@ -99,21 +218,20 @@ const CreateReport = ({ navigation }) => {
         {/* Picker za odabir partnera */}
         <Picker
           selectedValue={selectedPartner}
-          onValueChange={setSelectedPartnerInput}
+          onValueChange={setSelectedPartner}
           style={styles.picker}
         >
           <Picker.Item label="Odaberite partnera" value="" />
-          {partners.map((partner, index) => (
-            <Picker.Item key={index} label={partner} value={partner} />
+          {partners.map((partner) => (
+            <Picker.Item key={partner.id} label={partner.naziv} value={partner.id} />
           ))}
         </Picker>
 
-        <HoverButton title="Generiraj izvješće" onPress={handleNavigation} />
+        <HoverButton title="Generiraj izvješće" onPress={handleGenerateReport} />
       </View>
     </Pozadina>
   );
-};
-
+}; 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
