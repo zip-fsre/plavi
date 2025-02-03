@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import Pozadina from '../ui/Pozadina';
-import { usePage } from '../../Routes';
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from "react-native";
+import Pozadina from "../ui/Pozadina";
+import { usePage } from "../../Routes";
 
+const BASE_URL = "http://localhost:5149/api"; // URL backend-a
 
 const ArrangementInput = ({ arrangement, index, onChange }) => (
   <View style={styles.arrangementContainer}>
@@ -11,59 +12,95 @@ const ArrangementInput = ({ arrangement, index, onChange }) => (
       placeholder="Naziv aranžmana"
       placeholderTextColor="#ccc"
       value={arrangement.naziv}
-      onChangeText={(text) => onChange(index, 'naziv', text)}
+      onChangeText={(text) => onChange(index, "naziv", text)}
     />
     <TextInput
       style={styles.input}
       placeholder="Opis aranžmana"
       placeholderTextColor="#ccc"
       value={arrangement.opis}
-      onChangeText={(text) => onChange(index, 'opis', text)}
+      onChangeText={(text) => onChange(index, "opis", text)}
     />
     <TextInput
       style={styles.input}
       placeholder="Cijena aranžmana"
       placeholderTextColor="#ccc"
       value={arrangement.cijena}
-      onChangeText={(text) => onChange(index, 'cijena', text)}
+      onChangeText={(text) => onChange(index, "cijena", text)}
       keyboardType="numeric"
     />
   </View>
 );
 
 export const AddPartner = () => {
-  const { pages, setCurrentPage, currentPage } = usePage();
+  const { pages, setCurrentPage } = usePage();
   const [newPartner, setNewPartner] = useState({
-    naziv: '',
-    vrsta: '',
-    napomena: '',
-    provizija: '',
+    naziv: "",
+    vrsta: "",
+    napomena: "",
+    provizija: "",
   });
 
-  const [arrangements, setArrangements] = useState([{ naziv: '', opis: '', cijena: '' }]);
+  const [arrangements, setArrangements] = useState([{ naziv: "", opis: "", cijena: "" }]);
 
-  const handleCreatePartner = () => {
-    if (newPartner.naziv && newPartner.vrsta && newPartner.napomena && newPartner.provizija) {
-      console.log('Dodan novi partner!');
-      setCurrentPage(pages['Partners']);
-    } else {
-      Alert.alert('Greška', 'Molimo ispunite sva polja!');
+  // Funkcija koja prvo dodaje partnera, zatim aranžmane koji mu pripadaju
+  const handleCreatePartner = async () => {
+    if (!newPartner.naziv || !newPartner.vrsta || !newPartner.napomena || !newPartner.provizija) {
+      Alert.alert("Greška", "Molimo ispunite sva polja!");
+      return;
+    }
+
+    try {
+      // Prvo dodajemo partnera
+      const partnerResponse = await fetch(`${BASE_URL}/Partneri`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Naziv: newPartner.naziv,
+          Tip: newPartner.vrsta,
+          Napomena: newPartner.napomena,
+          Provizija: parseFloat(newPartner.provizija),
+        }),
+      });
+
+      if (!partnerResponse.ok) {
+        throw new Error("Neuspješno dodavanje partnera!");
+      }
+
+      const partnerData = await partnerResponse.json();
+      const partnerId = partnerData.id; // Dobijemo ID partnera iz odgovora
+
+      // Sada dodajemo aranžmane povezane s ovim partnerom
+      for (let arrangement of arrangements) {
+        if (arrangement.naziv && arrangement.opis && arrangement.cijena) {
+          await fetch(`${BASE_URL}/Aranzman`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              Naziv: arrangement.naziv,
+              Opis: arrangement.opis,
+              Cijena: parseFloat(arrangement.cijena),
+              IdPartnera: partnerId, // Vežemo aranžman za kreiranog partnera
+            }),
+          });
+        }
+      }
+
+      Alert.alert("Uspjeh", "Partner i aranžmani su uspješno dodani!");
+      setCurrentPage(pages["Partners"]); // Povratak na stranicu s partnerima
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Greška", "Dogodila se greška pri dodavanju partnera i aranžmana.");
     }
   };
 
   const handleAddArrangement = () => {
-    setArrangements([...arrangements, { naziv: '', opis: '', cijena: '' }]);
+    setArrangements([...arrangements, { naziv: "", opis: "", cijena: "" }]);
   };
-
-  const splitArrangementsIntoRows = (arrangements, itemsPerRow) => {
-    const rows = [];
-    for (let i = 0; i < arrangements.length; i += itemsPerRow) {
-      rows.push(arrangements.slice(i, i + itemsPerRow));
-    }
-    return rows;
-  };
-
-  const arrangementRows = splitArrangementsIntoRows(arrangements, 3);
 
   return (
     <Pozadina>
@@ -101,7 +138,7 @@ export const AddPartner = () => {
           />
 
           <View style={styles.subtitleContainer}>
-            <Text style={styles.subtitle}>Aranzmani</Text>
+            <Text style={styles.subtitle}>Aranžmani</Text>
             <View style={styles.buttonGroup}>
               <TouchableOpacity style={styles.addButton} onPress={handleAddArrangement}>
                 <Text style={styles.addButtonText}>+ Dodaj aranžman</Text>
@@ -112,24 +149,18 @@ export const AddPartner = () => {
             </View>
           </View>
 
-          <View style={styles.arrangementsWrapper}>
-            {arrangementRows.map((row, rowIndex) => (
-              <View key={rowIndex} style={styles.arrangementRow}>
-                {row.map((arrangement, index) => (
-                  <ArrangementInput
-                    key={index}
-                    arrangement={arrangement}
-                    index={index + rowIndex * 3}
-                    onChange={(idx, field, value) => {
-                      const updatedArrangements = [...arrangements];
-                      updatedArrangements[idx][field] = value;
-                      setArrangements(updatedArrangements);
-                    }}
-                  />
-                ))}
-              </View>
-            ))}
-          </View>
+          {arrangements.map((arrangement, index) => (
+            <ArrangementInput
+              key={index}
+              arrangement={arrangement}
+              index={index}
+              onChange={(idx, field, value) => {
+                const updatedArrangements = [...arrangements];
+                updatedArrangements[idx][field] = value;
+                setArrangements(updatedArrangements);
+              }}
+            />
+          ))}
         </ScrollView>
       </View>
     </Pozadina>
@@ -137,85 +168,15 @@ export const AddPartner = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignSelf: 'center',
-    width: '90%',
-    paddingTop: 20,
-  },
-  title: {
-    color: '#e8c789',
-    fontFamily: 'Alex Brush',
-    fontSize: 48,
-    textShadowColor: 'black',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 3,
-    marginBottom: 20,
-  },
-  subtitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  subtitle: {
-    color: '#e8c789',
-    fontFamily: 'Alex Brush',
-    fontSize: 30,
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-  },
-  addButton: {
-    backgroundColor: '#e8c789',
-    padding: 10,
-    borderRadius: 5,
-    marginLeft: 10,
-  },
-  addButtonText: {
-    fontSize: 20,
-    fontFamily: 'Monotype Corsiva',
-    color: '#fff',
-  },
-  saveButton: {
-    backgroundColor: '#e8c789',
-    padding: 10,
-    borderRadius: 5,
-    marginLeft: 10,
-  },
-  saveButtonText: {
-    fontSize: 20,
-    fontFamily: 'Monotype Corsiva',
-    color: '#fff',
-  },
-  scrollView: {
-    maxHeight: '60%',
-    alignSelf: 'center',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#e8c789',
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 5,
-    width: '80%',
-    fontSize: 20,
-    fontFamily: 'Monotype Corsiva',
-    color: '#e8c789',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  arrangementsWrapper: {
-    flexGrow: 1,
-  },
-  arrangementRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  arrangementContainer: {
-    flex: 1,
-    marginHorizontal: 5,
-  },
+  container: { flex: 1, alignSelf: "center", width: "90%", paddingTop: 20, maxHeight: "80%" },
+  title: { fontSize: 48, color: "#e8c789", marginBottom: 20 },
+  subtitleContainer: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
+  subtitle: { fontSize: 30, color: "#e8c789" },
+  buttonGroup: { flexDirection: "row" },
+  scrollView: { maxHeight: 500 },
+  addButton: { backgroundColor: "#e8c789", padding: 10, borderRadius: 5, marginLeft: 10 },
+  saveButton: { backgroundColor: "#e8c789", padding: 10, borderRadius: 5, marginLeft: 10 },
+  input: { borderWidth: 1, borderColor: "#e8c789", padding: 10, marginVertical: 10, borderRadius: 5 },
 });
 
 export default AddPartner;

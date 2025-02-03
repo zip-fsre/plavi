@@ -1,33 +1,72 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Pozadina from '../ui/Pozadina';
 import SmallButton from '../ui/SmallButton';
-import { usePage } from '../../Routes'; 
+import { usePage } from '../../Routes';
+
+const BASE_URL = 'http://localhost:5149/api/Partneri'; // Zamijeni s točnim URL-om backend-a
 
 const PartnersPage = () => {
-  const { setCurrentPage, pages } = usePage(); 
-  const [partners, setPartners] = useState([
-    { naziv: 'Prvi partner', vrsta: 'Maneken', napomena: 'Nisam ja za ovoga...', provizija: '10%' },
-    { naziv: 'Drugi partner', vrsta: 'Sviralo', napomena: 'Svira svirku, brine brigu...', provizija: '15%' },
-  ]);
+  const { setCurrentPage, pages } = usePage();
+  const [partners, setPartners] = useState([]);
 
+  // Funkcija za dohvaćanje partnera s backend-a
+  const fetchPartners = async () => {
+    try {
+      const response = await fetch(BASE_URL);
+      const data = await response.json();
+      setPartners(data); // Postavljanje dohvaćenih partnera u state
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Greška', 'Ne mogu dohvatiti podatke o partnerima.');
+    }
+  };
+
+  // Funkcija za brisanje partnera
+  const handleDeletePartner = async (id) => {
+    try {
+      const response = await fetch(`${BASE_URL}/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        Alert.alert('Uspjeh', 'Partner je uspješno obrisan!');
+        fetchPartners(); // Ponovno dohvaćanje partnera nakon brisanja
+      } else {
+        Alert.alert('Greška', 'Nešto nije u redu. Pokušajte ponovno.');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Greška', 'Dogodila se greška pri brisanju partnera.');
+    }
+  };
+
+  // Funkcija za dodavanje novog partnera
   const handleAddPartner = () => {
     setCurrentPage(pages['AddPartner']);
   };
 
-  
-  const handleEditPartner = (index) => {
-    setCurrentPage({...pages['EditPartner'], id: { index },});
-  };
-
-  const handleViewPartner = (index) => {
-    const selectedPartner = partners[index];
+  // Funkcija za uređivanje partnera
+  const handleEditPartner = (partner) => {
     setCurrentPage({
-      ...pages.ViewPartner,
-      props: { partner: selectedPartner },
+      ...pages['EditPartner'],
+      id: partner.id,
     });
   };
+
+  // Funkcija za pregled detalja partnera
+  const handleViewPartner = (partner) => {
+    setCurrentPage({
+      ...pages['ViewPartner'],
+      id: partner.id,
+    });
+  };
+
+  // Dohvaćanje partnera prilikom učitavanja komponente
+  useEffect(() => {
+    fetchPartners();
+  }, []);
 
   return (
     <Pozadina>
@@ -38,20 +77,23 @@ const PartnersPage = () => {
         </View>
 
         <ScrollView style={styles.partneri}>
-          {partners.map((partner, index) => (
-            <View key={index} style={styles.partnerContainer}>
+          {partners.map((partner) => (
+            <View key={partner.id} style={styles.partnerContainer}>
               <View style={styles.partnerTextContainer}>
                 <Text style={styles.partnerName}>{partner.naziv}</Text>
-                <Text style={styles.partnerDetails}>{partner.vrsta}</Text>
+                <Text style={styles.partnerDetails}>{partner.tip}</Text>
                 <Text style={styles.partnerDetails}>{partner.napomena}</Text>
-                <Text style={styles.partnerDetails}>Provizija: {partner.provizija} </Text>
+                <Text style={styles.partnerDetails}>Provizija: {partner.provizija}%</Text>
               </View>
               <View style={styles.iconContainer}>
-                <TouchableOpacity onPress={() => handleViewPartner(index)}>
+                <TouchableOpacity onPress={() => handleViewPartner(partner)}>
                   <Icon name="info" size={24} color="#e8c789" style={styles.viewIcon} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleEditPartner(index)}>
+                <TouchableOpacity onPress={() => handleEditPartner(partner)}>
                   <Icon name="edit" size={24} color="#e8c789" style={styles.editIcon} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDeletePartner(partner.id)}>
+                  <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -67,9 +109,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignSelf: 'center',
     width: '90%',
+    maxHeight: '85%',
   },
   partneri: {
-    maxHeight: 800,
+    maxHeight: 500,
   },
   header: {
     display: 'flex',
@@ -134,6 +177,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   editIcon: {
+    marginHorizontal: 5,
+  },
+  deleteIcon: {
     marginHorizontal: 5,
   },
 });

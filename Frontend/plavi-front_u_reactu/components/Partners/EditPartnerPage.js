@@ -1,7 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import Pozadina from '../ui/Pozadina';
-import { usePage } from '../../Routes';
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from "react-native";
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import * as XLSX from 'xlsx';
+import { saveAs } from "file-saver";
+import Pozadina from "../ui/Pozadina";
+import { usePage } from "../../Routes";
+
+const BASE_URL = "http://localhost:5149/api"; // Točan URL backend-a
 
 const ArrangementInput = ({ arrangement, index, onChange }) => (
   <View style={styles.arrangementContainer}>
@@ -10,76 +16,155 @@ const ArrangementInput = ({ arrangement, index, onChange }) => (
       placeholder="Naziv aranžmana"
       placeholderTextColor="#ccc"
       value={arrangement.naziv}
-      onChangeText={(text) => onChange(index, 'naziv', text)}
+      onChangeText={(text) => onChange(index, "naziv", text)}
     />
     <TextInput
       style={styles.input}
       placeholder="Opis aranžmana"
       placeholderTextColor="#ccc"
       value={arrangement.opis}
-      onChangeText={(text) => onChange(index, 'opis', text)}
+      onChangeText={(text) => onChange(index, "opis", text)}
     />
     <TextInput
       style={styles.input}
       placeholder="Cijena aranžmana"
       placeholderTextColor="#ccc"
       value={arrangement.cijena}
-      onChangeText={(text) => onChange(index, 'cijena', text)}
+      onChangeText={(text) => onChange(index, "cijena", text)}
       keyboardType="numeric"
     />
   </View>
 );
 
-export const EditPartner = ({ partnerData }) => {
-  const { pages, setCurrentPage, currentPage } = usePage();
+export const EditPartner = () => {
+  const { currentPage, setCurrentPage, pages } = usePage();
+  const { id } = currentPage;
+
   const [partner, setPartner] = useState({
-    naziv: '',
-    vrsta: '',
-    napomena: '',
-    provizija: '',
+    naziv: "",
+    vrsta: "",
+    napomena: "",
+    provizija: "",
   });
 
-  const [arrangements, setArrangements] = useState([{ naziv: '', opis: '', cijena: '' }]);
+  const [arrangements, setArrangements] = useState([]);
 
   useEffect(() => {
-    if (partnerData) {
-      setPartner({
-        naziv: partnerData.naziv,
-        vrsta: partnerData.vrsta,
-        napomena: partnerData.napomena,
-        provizija: partnerData.provizija,
+    const handleFetchPartner = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/Partneri/${id}`);
+        if (!response.ok) throw new Error("Neuspjelo dohvaćanje partnera.");
+        
+        const data = await response.json();
+        setPartner({
+          naziv: data.naziv,
+          vrsta: data.tip,
+          napomena: data.napomena,
+          provizija: String(data.provizija), 
+        });
+
+        
+        const arrangementsResponse = await fetch(`${BASE_URL}/Partneri/Aranzmani/${id}`);
+        if (!arrangementsResponse.ok) throw new Error("Neuspjelo dohvaćanje aranžmana.");
+        
+        const arrangementsData = await arrangementsResponse.json();
+        setArrangements(arrangementsData || []);
+      } catch (error) {
+        console.error(error);
+        Alert.alert("Greška", "Dogodila se greška pri dohvaćanju podataka.");
+      }
+    };
+
+    handleFetchPartner();
+  }, [id]);
+  const handleExportToExcel = () => {
+    const wb = XLSX.utils.book_new();
+    const partnerSheet = XLSX.utils.json_to_sheet([partner]);
+    XLSX.utils.book_append_sheet(wb, partnerSheet, "Partner");
+    const arrangementsSheet = XLSX.utils.json_to_sheet(arrangements);
+    XLSX.utils.book_append_sheet(wb, arrangementsSheet, "Aranžmani");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([wbout], { type: "application/octet-stream" });
+    saveAs(blob, "Partner.xlsx");
+  };
+
+  const handleEditPartner = async () => {
+    if (!partner.naziv || !partner.vrsta || !partner.napomena || !partner.provizija) {
+      Alert.alert("Greška", "Molimo ispunite sva polja!");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${BASE_URL}/Partneri/${id}`, {
+        method: "POST", 
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Naziv: partner.naziv,
+          Tip: partner.vrsta,
+          Napomena: partner.napomena,
+          Provizija: parseFloat(partner.provizija),
+        }),
       });
-      setArrangements(partnerData.arrangements || []);
-    }
-  }, [partnerData]);
 
-  const handleEditPartner = () => {
-    if (partner.naziv && partner.vrsta && partner.napomena && partner.provizija) {
-      console.log('Partner edited!');
-      setCurrentPage(pages['Partners']);
-    } else {
-      Alert.alert('Greška', 'Molimo ispunite sva polja!');
+      if (!response.ok) throw new Error("Neuspjelo ažuriranje partnera.");
+
+      for (const aranzman of arrangements) {
+        if (aranzman.naziv && aranzman.opis && aranzman.cijena && aranzman.id) {
+          const aranzmanResponse = await fetch(`${BASE_URL}/Aranzman/${aranzman.id}`, {
+            method: "POST", 
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              IdPartnera: id,
+              Naziv: aranzman.naziv,
+              Opis: aranzman.opis,
+              Cijena: parseFloat(aranzman.cijena),
+            }),
+          });
+
+          if (!aranzmanResponse.ok) {
+            throw new Error("Neuspjelo ažuriranje aranžmana!");
+          }
+        } else if(aranzman.naziv && aranzman.opis && aranzman.cijena) {
+          const aranzmanResponse = await fetch(`${BASE_URL}/Aranzman`, {
+            method: "POST", 
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              IdPartnera: id,
+              Naziv: aranzman.naziv,
+              Opis: aranzman.opis,
+              Cijena: parseFloat(aranzman.cijena),
+            }),
+          });
+
+          if (!aranzmanResponse.ok) {
+            throw new Error("Neuspjelo ažuriranje aranžmana!");
+          }
+        }
+      }
+
+      Alert.alert("Uspjeh", "Partner i aranžmani su uspješno ažurirani!");
+      setCurrentPage(pages["Partners"]);
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Greška", "Dogodila se greška pri ažuriranju partnera.");
     }
   };
 
+  
   const handleAddArrangement = () => {
-    setArrangements([...arrangements, { naziv: '', opis: '', cijena: '' }]);
+    setArrangements([...arrangements, { naziv: "", opis: "", cijena: "" }]);
   };
-
-  const splitArrangementsIntoRows = (arrangements, itemsPerRow) => {
-    const rows = [];
-    for (let i = 0; i < arrangements.length; i += itemsPerRow) {
-      rows.push(arrangements.slice(i, i + itemsPerRow));
-    }
-    return rows;
-  };
-
-  const arrangementRows = splitArrangementsIntoRows(arrangements, 3);
 
   return (
     <Pozadina>
       <View style={styles.container}>
-        <Text style={styles.title}>Edit Partner</Text>
+        <Text style={styles.title}>Uredi partnera</Text>
         <ScrollView style={styles.scrollView}>
           <TextInput
             style={styles.input}
@@ -112,7 +197,7 @@ export const EditPartner = ({ partnerData }) => {
           />
 
           <View style={styles.subtitleContainer}>
-            <Text style={styles.subtitle}>Aranzmani</Text>
+            <Text style={styles.subtitle}>Aranžmani</Text>
             <View style={styles.buttonGroup}>
               <TouchableOpacity style={styles.addButton} onPress={handleAddArrangement}>
                 <Text style={styles.addButtonText}>+ Dodaj aranžman</Text>
@@ -120,113 +205,43 @@ export const EditPartner = ({ partnerData }) => {
               <TouchableOpacity style={styles.saveButton} onPress={handleEditPartner}>
                 <Text style={styles.saveButtonText}>Spremi promjene</Text>
               </TouchableOpacity>
+              <TouchableOpacity style={styles.saveButton} onPress={handleExportToExcel}>
+                <Text style={styles.saveButtonText}>Izvezi u Excel</Text>
+              </TouchableOpacity>
             </View>
           </View>
 
-          <View style={styles.arrangementsWrapper}>
-            {arrangementRows.map((row, rowIndex) => (
-              <View key={rowIndex} style={styles.arrangementRow}>
-                {row.map((arrangement, index) => (
-                  <ArrangementInput
-                    key={index}
-                    arrangement={arrangement}
-                    index={index + rowIndex * 3}
-                    onChange={(idx, field, value) => {
-                      const updatedArrangements = [...arrangements];
-                      updatedArrangements[idx][field] = value;
-                      setArrangements(updatedArrangements);
-                    }}
-                  />
-                ))}
-              </View>
-            ))}
-          </View>
+          {arrangements.map((arrangement, index) => (
+            <ArrangementInput
+              key={index}
+              arrangement={arrangement}
+              index={index}
+              onChange={(idx, field, value) => {
+                const updatedArrangements = [...arrangements];
+                updatedArrangements[idx][field] = value;
+                setArrangements(updatedArrangements);
+              }}
+            />
+          ))}
         </ScrollView>
       </View>
     </Pozadina>
   );
 };
 
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignSelf: 'center',
-    width: '90%',
-    paddingTop: 20,
-  },
-  title: {
-    color: '#e8c789',
-    fontFamily: 'Alex Brush',
-    fontSize: 48,
-    textShadowColor: 'black',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 3,
-    marginBottom: 20,
-  },
-  subtitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  subtitle: {
-    color: '#e8c789',
-    fontFamily: 'Alex Brush',
-    fontSize: 30,
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-  },
-  addButton: {
-    backgroundColor: '#e8c789',
-    padding: 10,
-    borderRadius: 5,
-    marginLeft: 10,
-  },
-  addButtonText: {
-    fontSize: 20,
-    fontFamily: 'Monotype Corsiva',
-    color: '#fff',
-  },
-  saveButton: {
-    backgroundColor: '#e8c789',
-    padding: 10,
-    borderRadius: 5,
-    marginLeft: 10,
-  },
-  saveButtonText: {
-    fontSize: 20,
-    fontFamily: 'Monotype Corsiva',
-    color: '#fff',
-  },
-  scrollView: {
-    maxHeight: '60%',
-    alignSelf: 'center',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#e8c789',
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 5,
-    width: '80%',
-    fontSize: 20,
-    fontFamily: 'Monotype Corsiva',
-    color: '#e8c789',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  arrangementsWrapper: {
-    flexGrow: 1,
-  },
-  arrangementRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  arrangementContainer: {
-    flex: 1,
-    marginHorizontal: 5,
-  },
+  container: { flex: 1, alignSelf: "center", width: "90%", paddingTop: 20, maxHeight: '80%', maxWidth: '70%' },
+  title: { fontSize: 48, fontFamily: 'Alex Brush', color: "#e8c789", marginBottom: 20 },
+  subtitleContainer: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
+  subtitle: { fontSize: 30, color: "#e8c789" , fontFamily: 'Alex Brush', },
+  buttonGroup: { flexDirection: "row" },
+  scrollView: { maxHeight: 500 , },
+  addButton: { backgroundColor: "#e8c789", fontFamily: 'Monotype Corsiva', padding: 10, borderRadius: 5, marginLeft: 10 },
+  addButtonText: { fontFamily: 'Monotype Corsiva', fontSize: 24, },
+  saveButtonText: { fontFamily: 'Monotype Corsiva', fontSize: 24, },
+  saveButton: { backgroundColor: "#e8c789", fontFamily: 'Monotype Corsiva', padding: 10, borderRadius: 5, marginLeft: 10 },
+  input: { borderWidth: 1, marginLeft: 25, borderColor: "#e8c789", maxWidth: '80%', padding: 10, fontSize: 20, marginVertical: 10, borderRadius: 5, color: '#e8c789' , fontFamily: 'Monotype Corsiva', },
 });
 
 export default EditPartner;
