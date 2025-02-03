@@ -69,6 +69,7 @@ namespace JsonReturn.Controllers
             if(Izvjesce.Opis != null)array.Opis = Izvjesce.Opis;
             if(Izvjesce.Pocetak != null)array.Pocetak = Izvjesce.Pocetak;
             if(Izvjesce.Kraj != null)array.Kraj = Izvjesce.Kraj;
+            if(Izvjesce.OdabraniPartner != null)array.OdabraniPartner = Izvjesce.OdabraniPartner;
             _context.SaveChanges();
             return array;
         }
@@ -89,6 +90,18 @@ namespace JsonReturn.Controllers
         public ActionResult<IEnumerable<JsonReturn.Models.MedjutablicaPt2>> GetMedju2(int id)
         {
             return _context.MedjutablicaPt2s.AsQueryable().Where(Podatci => Podatci.IdIzvjesca == id).ToList();
+        }
+
+        // DELETE: api/Izvjesce/Podaci/1
+        [HttpDelete("Podaci/{id}")]
+        public System.Collections.Generic.IEnumerable<JsonReturn.Models.MedjutablicaPt2> DeletePodatke(int id)
+        {
+            var pom = _context.MedjutablicaPt2s.ToList().Where(item => item.IdIzvjesca == id);
+            foreach(JsonReturn.Models.MedjutablicaPt2 podatak in pom){
+                _context.MedjutablicaPt2s.Remove(podatak);
+            }
+            _context.SaveChanges();
+            return _context.MedjutablicaPt2s;
         }
     }
 }

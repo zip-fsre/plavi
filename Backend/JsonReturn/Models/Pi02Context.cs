@@ -219,6 +219,8 @@ public partial class Pi02Context : DbContext
             entity.Property(e => e.Pocetak)
                 .HasColumnType("datetime")
                 .HasColumnName("POCETAK");
+            entity.Property(e => e.OdabraniPartner)
+                .HasColumnName("OdabraniPartner");
         });
 
         modelBuilder.Entity<MedjutablicaPt1>(entity =>

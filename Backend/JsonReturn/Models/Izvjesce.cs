@@ -11,6 +11,8 @@ public partial class Izvjesce
 
     public string? Opis { get; set; }
 
+    public int? OdabraniPartner { get; set; }
+
     public DateTime? Pocetak { get; set; }
 
     public DateTime? Kraj { get; set; }
