@@ -3,10 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'rea
 import Pozadina from '../ui/Pozadina';
 import { usePage } from '../../Routes';
 
-const BASE_URL = 'https://your-backend-url.com/api/Partneri'; // Zamijeni s točnim URL-om backend-a
+const BASE_URL = 'http://localhost:5149/api/Partneri'; // Zamijeni s točnim URL-om backend-a
 
-export const ViewPartner = ({ partnerData }) => {
-  const { setCurrentPage, pages } = usePage();
+export const ViewPartner = () => {
+  const { currentPage, setCurrentPage, pages } = usePage();
+    const { id } = currentPage;
   const [partnerDetails, setPartnerDetails] = useState({
     naziv: '',
     tip: '',
@@ -39,16 +40,20 @@ export const ViewPartner = ({ partnerData }) => {
 
   // Dohvaćanje detalja o partneru pri učitavanju komponente
   useEffect(() => {
-    if (partnerData?.id) {
-      fetchPartnerDetails(partnerData.id);
+    if (id) {
+      fetchPartnerDetails(id);
     }
-  }, [partnerData]);
+  }, [id]);
+
+  useEffect(() => {
+    fetchPartnerDetails(id);
+  }, []);
 
   return (
     <Pozadina>
       <View style={styles.container}>
         <Text style={styles.title}>Detalji partnera</Text>
-        <ScrollView>
+        <ScrollView style={styles.scrollViews}>
           <Text style={styles.detailText}>
             <Text style={styles.detailLabel}>Naziv: </Text>
             {partnerDetails.naziv}
@@ -104,7 +109,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignSelf: 'center',
+    maxHeight: 450,
     width: '90%',
+  },
+  scrollView: {
+    maxHeight: 200
   },
   title: {
     color: '#e8c789',
@@ -136,7 +145,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderColor: '#e8c789',
-    borderRadius: 5,
+    borderRadius: 5
   },
   aranzmanText: {
     fontSize: 18,

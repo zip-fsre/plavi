@@ -96,7 +96,7 @@ export const EditPartner = () => {
 
     try {
       const response = await fetch(`${BASE_URL}/Partneri/${id}`, {
-        method: "PUT", 
+        method: "POST", 
         headers: {
           "Content-Type": "application/json",
         },
@@ -111,9 +111,26 @@ export const EditPartner = () => {
       if (!response.ok) throw new Error("Neuspjelo ažuriranje partnera.");
 
       for (const aranzman of arrangements) {
-        if (aranzman.naziv && aranzman.opis && aranzman.cijena) {
-          const aranzmanResponse = await fetch(`${BASE_URL}/Aranzmani/${aranzman.id}`, {
-            method: "PUT", 
+        if (aranzman.naziv && aranzman.opis && aranzman.cijena && aranzman.id) {
+          const aranzmanResponse = await fetch(`${BASE_URL}/Aranzman/${aranzman.id}`, {
+            method: "POST", 
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              IdPartnera: id,
+              Naziv: aranzman.naziv,
+              Opis: aranzman.opis,
+              Cijena: parseFloat(aranzman.cijena),
+            }),
+          });
+
+          if (!aranzmanResponse.ok) {
+            throw new Error("Neuspjelo ažuriranje aranžmana!");
+          }
+        } else if(aranzman.naziv && aranzman.opis && aranzman.cijena) {
+          const aranzmanResponse = await fetch(`${BASE_URL}/Aranzman`, {
+            method: "POST", 
             headers: {
               "Content-Type": "application/json",
             },

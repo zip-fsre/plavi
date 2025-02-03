@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView 
 import Pozadina from "../ui/Pozadina";
 import { usePage } from "../../Routes";
 
-const BASE_URL = "http://localhost:5149/api/Partneri"; // URL backend-a
+const BASE_URL = "http://localhost:5149/api"; // URL backend-a
 
 const ArrangementInput = ({ arrangement, index, onChange }) => (
   <View style={styles.arrangementContainer}>
@@ -52,7 +52,7 @@ export const AddPartner = () => {
 
     try {
       // Prvo dodajemo partnera
-      const partnerResponse = await fetch(BASE_URL, {
+      const partnerResponse = await fetch(`${BASE_URL}/Partneri`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +75,7 @@ export const AddPartner = () => {
       // Sada dodajemo aranžmane povezane s ovim partnerom
       for (let arrangement of arrangements) {
         if (arrangement.naziv && arrangement.opis && arrangement.cijena) {
-          await fetch(`${BASE_URL}/Aranzmani`, {
+          await fetch(`${BASE_URL}/Aranzman`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -168,11 +168,12 @@ export const AddPartner = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignSelf: "center", width: "90%", paddingTop: 20 },
+  container: { flex: 1, alignSelf: "center", width: "90%", paddingTop: 20, maxHeight: "80%" },
   title: { fontSize: 48, color: "#e8c789", marginBottom: 20 },
   subtitleContainer: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
   subtitle: { fontSize: 30, color: "#e8c789" },
   buttonGroup: { flexDirection: "row" },
+  scrollView: { maxHeight: 500 },
   addButton: { backgroundColor: "#e8c789", padding: 10, borderRadius: 5, marginLeft: 10 },
   saveButton: { backgroundColor: "#e8c789", padding: 10, borderRadius: 5, marginLeft: 10 },
   input: { borderWidth: 1, borderColor: "#e8c789", padding: 10, marginVertical: 10, borderRadius: 5 },

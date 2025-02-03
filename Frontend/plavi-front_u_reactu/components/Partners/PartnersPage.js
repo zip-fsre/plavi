@@ -59,7 +59,7 @@ const PartnersPage = () => {
   const handleViewPartner = (partner) => {
     setCurrentPage({
       ...pages['ViewPartner'],
-      props: { partner },
+      id: partner.id,
     });
   };
 
