@@ -51,6 +51,21 @@ namespace JsonReturn.Controllers
             return CreatedAtAction(nameof(GetAranzman), new { id = Aranzman.Id }, Aranzman);
         }
 
+        // POST: api/Aranzman/Vise
+        [HttpPost("Vise")]
+        public string CreateAranzman(Aranzman[] Aranzmani)
+        {
+            if (Aranzmani == null)
+            {
+                return "BadRequest()";
+            }
+            foreach(Aranzman Aranzman in Aranzmani){
+                _context.Aranzmen.Add(Aranzman);
+            }
+            _context.SaveChanges();
+            return "Uspjesno";
+        }
+
         // POST: api/Aranzman/1
         [HttpPost("{id}")]
         public ActionResult<Aranzman> UpdateAranzman(int id, Aranzman Aranzman)
