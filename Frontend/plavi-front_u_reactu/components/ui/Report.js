@@ -1,7 +1,14 @@
 import React from 'react';
 import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { usePage } from '../../Routes';
 
-const Event = ({ vrsta, naziv, opis, onPress, datum }) => {
+const Event = ({id, vrsta, naziv, opis, datum }) => {
+  const { currentPage, setCurrentPage, pages } = usePage();
+  const handlePress = () => {
+    // Navigiraj na 'ViewReport' i proslijedi reportId
+    console.log('id:', id);
+    setCurrentPage({ ...pages['ViewReport'], reportId: id });
+  };
   return (
     <View style={styles.report}>
         <View style={styles.spacer}/>
@@ -11,7 +18,7 @@ const Event = ({ vrsta, naziv, opis, onPress, datum }) => {
             <Text style={styles.title}>{vrsta} | {naziv}</Text>
             <Text style={styles.title}>{opis}</Text>
             </View>
-            <TouchableOpacity onPress={onPress}>
+            <TouchableOpacity onPress={handlePress}>
                 <Image style={styles.image} source={{uri: 'https://cdn-icons-png.freepik.com/256/9373/9373528.png'}}/>
             </TouchableOpacity>
         </View>
