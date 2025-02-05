@@ -8,6 +8,7 @@ import { usePage } from '../Routes';
 import Layout from './Layout';
 
 
+
 const EventsPage = () => {
   const {currentPage, setCurrentPage, pages} = usePage();
   const [events, setEvents] = useState([]);

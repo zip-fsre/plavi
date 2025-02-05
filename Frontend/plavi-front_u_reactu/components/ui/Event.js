@@ -1,5 +1,7 @@
 import React from 'react';
 import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 
 const Event = ({ vrsta, naziv, opis, onPress, datum }) => {
   return (
@@ -12,7 +14,9 @@ const Event = ({ vrsta, naziv, opis, onPress, datum }) => {
             <Text style={styles.title}>{opis}</Text>
             </View>
             <TouchableOpacity onPress={onPress}>
-                <Image style={styles.image} source={{uri: 'https://cdn-icons-png.freepik.com/256/9373/9373528.png'}}/>
+                {/*<Image style={styles.image} source={{uri: 'https://cdn-icons-png.freepik.com/256/9373/9373528.png'}}/>*/}
+                <Icon name="edit" size={24} color="#e8c789" style={styles.image} />
+                
             </TouchableOpacity>
         </View>
         <View style={styles.spacer}/>
@@ -40,8 +44,7 @@ const styles = StyleSheet.create({
     maxWidth: 400,
   },
   image: {
-    height: 30,
-    width: 30,
+  /* Nista korisno zasad */
   },
   item: {
     display: 'flex',
