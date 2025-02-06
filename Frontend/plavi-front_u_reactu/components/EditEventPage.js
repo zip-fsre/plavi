@@ -20,6 +20,7 @@ const EditEventPage = () => {
     const [kontaktKlijenta, setKontaktKlijenta] = useState();
     const [kontaktSponzora, setKontaktSponzora] = useState();
     const [napomena, setNapomena] = useState();
+    const [gosti, setGosti] = useState();
 
 
 
@@ -46,6 +47,7 @@ const EditEventPage = () => {
       }
 
       console.log(events);
+      console.log(gosti);
     };
 
 
@@ -62,18 +64,39 @@ const EditEventPage = () => {
           console.error(error);
         }
       }
+      
+      //funkcija koja kupi goste iz backenda
+      const getGuests = async () => {
+        try {
+          /*const response = await fetch(`http://localhost:5149/api/Gost/${id}`); //da ovo radi treba koristiti ` navodnike (desni alt+7)*/
+          const response = await fetch(`http://localhost:5149/api/Dogadjaj/Gosti/${id}`);
+          const data = await response.json();
+          setGosti(data);
+          return data;
+        }
+        catch (error) {
+          console.error(error);
+        }
+      }
     
     
       //dohvat podataka po učitavanju stranice
       useEffect(() => {
         getEvents();
+        getGuests();
       }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
 
     /* prikazuje sve goste u guest listi */
     const renderGuests = ({item}) => {
      return (
-      <View style={styles.headerText}>{item}</View>
+      <View style={styles.headerText}>
+        <Text style={styles.headerText}>{item.id} - {item.imeIPrezime}</Text>
+      </View>
      );
+    };
+
+    const renderPartners = () => {
+        console.log("Ova tipka ce ispisati partnere");
     };
 
 
@@ -139,38 +162,31 @@ const EditEventPage = () => {
                 <>
                 <ScrollView style={styles.scrollView}>
                   {/* naziv i vrsta */}
-                  <View style={styles.infoContainer}>
-                    <Text style={styles.headerText}>Naziv:</Text>
-                    <TextInput style={styles.text} placeholder={events.naziv} onChangeText={setNaziv}></TextInput>
-                  </View>
-                  <View style={styles.infoContainer}>
-                    <Text style={styles.headerText}>Vrsta:</Text>
-                    <TextInput style={styles.text} placeholder={events.svrha} onChangeText={setSvrha}></TextInput>
-                  </View>
+                  <Text style={styles.categoryText}>Naziv:</Text>
+                  <TextInput style={styles.input} placeholder={events.naziv} onChangeText={setNaziv}></TextInput>
+
+                    <Text style={styles.categoryText}>Vrsta:</Text>
+                    <TextInput style={styles.input} placeholder={events.svrha} onChangeText={setSvrha}></TextInput>
 
                   {/* klijent i kontakt */}
-                  <View style={styles.infoContainer}>
-                      <Text style={styles.headerText}>Klijent:</Text>
-                      <TextInput style={styles.text} placeholder={events.klijent} onChangeText={setKlijent}></TextInput>
-                  </View>
-                  <View style={styles.infoContainer}>
-                    <Text style={styles.headerText}>Kontakt klijenta:</Text>
-                    <TextInput style={styles.text} placeholder={events.kontaktKlijenta} onChangeText={setKontaktKlijenta}></TextInput>
-                  </View>
+
+                      <Text style={styles.categoryText}>Klijent:</Text>
+                      <TextInput style={styles.input} placeholder={events.klijent} onChangeText={setKlijent}></TextInput>
+
+                    <Text style={styles.categoryText}>Kontakt klijenta:</Text>
+                    <TextInput style={styles.input} placeholder={events.kontaktKlijenta} onChangeText={setKontaktKlijenta}></TextInput>
 
                   {/* glavni sponzor*/}
-                  <View style={styles.infoContainer}>
-                      <Text style={styles.headerText}>Kontakt glavnog sponzora:</Text>
-                      <TextInput style={styles.text} placeholder={events.kontaktSponzora} onChangeText={setKontaktSponzora}></TextInput>
-                  </View>
+
+                      <Text style={styles.categoryText}>Kontakt glavnog sponzora:</Text>
+                      <TextInput style={styles.input} placeholder={events.kontaktSponzora} onChangeText={setKontaktSponzora}></TextInput>
+
                   {/* napomena*/}
-                  <View style={styles.infoContainer}>
-                      <Text style={styles.headerText}>Napomena:</Text>
-                      <TextInput style={styles.text} placeholder={events.napomena} onChangeText={setNapomena}></TextInput>
-                  </View>
+
+                      <Text style={styles.categoryText}>Napomena:</Text>
+                      <TextInput style={styles.input} placeholder={events.napomena} onChangeText={setNapomena}></TextInput>
+
                   {/* Input za datum*/}
-                  <View style={styles.infoContainer}>
-                    <View style={styles.infoContainer}>
                       <Text style={styles.dateText}>Datum:</Text>
                       <View style={styles.datePick}>
                         <DatePicker
@@ -183,20 +199,25 @@ const EditEventPage = () => {
                           zIndex="2"
                         />
                       </View>
-                    </View>
-                  </View>
 
                   {/* PARTNERI SADA SLIJEDE BOŽE POMOZI */}
-                  <View style={styles.infoContainer}>
+                  <View style={styles.itemContainer}>
                     <Text> </Text>
                   </View>
                   {/* Gosti*/}
-                  <View style={styles.infoContainer}>
-                    <Text style={styles.headerText}>Lista gostiju:</Text>
-                    <FlatList data={events.gosts} renderItem={renderGuests}></FlatList>
+                  <View style={styles.itemContainer}>
+                    <Text style={styles.categoryText}>Lista gostiju:</Text>
+                    {gosti ? (
+                      <FlatList data={gosti} renderItem={renderGuests}></FlatList>
+                    ):
+                      <Text style={styles.categoryText}>Nema gostiju</Text>
+                    }
                   </View>
-                  <View style={styles.infoContainer}>
 
+                  <Text style={styles.categoryText}>Lista partnera:</Text>
+                  <FlatList data={events.gosts} renderItem={renderPartners}></FlatList>
+                  
+                  <View style={styles.buttons}>
                     <Button title="Spremi promjene" onPress={saveChanges}></Button>
                     <Button title="Izbriši događaj" onPress={deleteEvent} bgColor="#b51010"></Button>
                     <Button title="Prikaži nove podatke" onPress={showChanges} bgColor="blue"></Button>
@@ -228,9 +249,23 @@ headerText:{
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 3,
     },
+    categoryText:{
+      color: '#e8c789',
+      fontSize: 24,
+      fontFamily: 'Monotype Corsiva',
+      textAlign: 'center',
+      lineHeight: 24,
+      margin: "auto",
+      marginLeft: 10,
+      fontWeight: "bold",
+      textShadowColor: 'black',
+      textShadowOffset: { width: 2, height: 2 },
+      textShadowRadius: 3,
+      },
 scrollView:{
-  maxHeight: '60%',
-    },
+  maxHeight: 400,
+  width: 600,
+  },
 dateText:{
       color: '#e8c789',
       fontSize: 24,
@@ -238,6 +273,7 @@ dateText:{
       textAlign: 'center',
       lineHeight: 24,
       marginTop: 10,
+      marginBottom: 10,
       fontWeight: "bold",
       textShadowColor: 'black',
       textShadowOffset: { width: 2, height: 2 },
@@ -245,8 +281,7 @@ dateText:{
 },
 
 datePick:{
-  marginLeft: 100,
-  marginRight: 5,
+  margin: "auto",
 },
 
 container:{
@@ -258,6 +293,16 @@ infoContainer:{
     display: 'flex',
     flexDirection: 'row',
     gap: 50,
+},
+itemContainer:{
+  
+},
+buttons:{
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: "center",
+  gap: 20,
+
 },
 dateInputContainer: {
   flex: 1, // Dijeli prostor ravnomjerno između dva elementa
@@ -289,5 +334,18 @@ title: {
     marginLeft: "auto",
     marginRight: 5,
   },
+
+  input: { 
+    borderWidth: 1, 
+    borderColor: "#e8c789",
+    padding: 10, 
+    margin: 10, 
+    fontSize: 20, 
+    borderRadius: 5, 
+    color: '#e8c789' , 
+    fontFamily: 'Monotype Corsiva', 
+  },
+
+
 
 })
