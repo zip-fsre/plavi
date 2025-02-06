@@ -282,6 +282,7 @@ dateText:{
 
 datePick:{
   margin: "auto",
+  zIndex: 1,
 },
 
 container:{
