@@ -39,6 +39,11 @@ const ReportsPage = () => {
     }, [fetchReports])
   );
 
+  const handleDeleteReport = (deletedId) => {
+    setReports((prevReports) => prevReports.filter(report => report.id !== deletedId));
+  };
+
+
   return (
     <Pozadina>
       <View style={styles.container}>
@@ -63,6 +68,7 @@ const ReportsPage = () => {
               id={report.id} 
               naziv={report.naziv} 
               opis={report.opis} 
+              onDelete={handleDeleteReport} 
             />
           ))}
          </ScrollView>
