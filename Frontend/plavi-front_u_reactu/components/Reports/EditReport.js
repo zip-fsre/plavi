@@ -33,6 +33,7 @@ const EditReport = () => {
         setDescription(reportData.opis);
         setStartDate(reportData.pocetak ? new Date(reportData.pocetak) : null);
         setEndDate(reportData.kraj ? new Date(reportData.kraj) : null);
+        setSelectedPartner(reportData.odabraniPartner || undefined);
       } catch (error) {
         setError('Greška pri dohvaćanju izvješća');
       } finally {
@@ -84,6 +85,11 @@ const EditReport = () => {
       return;
     }
 
+    if (startDate && endDate && new Date(startDate) >= new Date(endDate)) {
+      alert("Početni datum mora biti manji od završnog datuma.");
+      return;
+    }
+
     let filteredPartnerData = [];
     if (selectedPartner) {
       const response = await fetch(`http://localhost:5149/api/MedjutablicaPt1/Partner/${selectedPartner}`);
@@ -106,6 +112,11 @@ const EditReport = () => {
     );
       console.log('filteredMedjutablicaPt1 edit:',filteredMedjutablicaPt1)
     try {
+       
+      await fetch(`http://localhost:5149/api/Izvjesce/Podaci/${reportId}`, {
+         method: 'DELETE',
+       });
+
       const response = await fetch(`http://localhost:5149/api/Izvjesce/${reportId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -114,6 +125,7 @@ const EditReport = () => {
           opis: description,
           pocetak: startDate ? new Date(startDate).toISOString() : null,
           kraj: endDate ? new Date(endDate).toISOString() : null,
+          odabraniPartner: selectedPartner || undefined,
         }),
       });
 
@@ -123,7 +135,7 @@ const EditReport = () => {
       }
 
       for (const item of filteredMedjutablicaPt1) {
-        await fetch(`http://localhost:5149/api/MedjutablicaPt2/${item.id}`, {
+        await fetch('http://localhost:5149/api/MedjutablicaPt2', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ idIzvjesca: reportId, idMedju1: item.id }),
@@ -151,7 +163,7 @@ const EditReport = () => {
       <Pozadina>
         <View style={styles.container}>
           <Text style={styles.errorText}>{error}</Text>
-          <HoverButton title="Nazad" onPress={setCurrentPage({ ...pages['ReportsPage'], reportId })} />
+          <HoverButton title="Nazad" onPress={setCurrentPage({ ...pages['Reports']})} />
         </View>
       </Pozadina>
     );
@@ -261,17 +273,17 @@ const styles = StyleSheet.create({
       color: '#222c2b',
     },
     datesContainer: {
-      flexDirection: 'row', // Postavlja djecu u red
-      justifyContent: 'space-between', // Raspoređuje prostor između djece
-      width: '60%', // Širina roditeljskog elementa
-      marginBottom: 15,
+      flexDirection: 'row', 
+      justifyContent: 'space-between', 
+      width: '60%', 
       zIndex:2,
+      marginBottom:15,
     },
     dateInputContainer: {
-      flex: 1, // Dijeli prostor ravnomjerno između dva elementa
-      marginHorizontal: 5, // Razmak između dva inputa
-      alignItems: 'center', // Centriranje elementa horizontalno
-      justifyContent: 'center', // Centriranje elementa vertikalno
+      flex: 1, 
+      marginHorizontal: 5, 
+      alignItems: 'center', 
+      justifyContent: 'center', 
       width: '50%',
     },
     picker: {

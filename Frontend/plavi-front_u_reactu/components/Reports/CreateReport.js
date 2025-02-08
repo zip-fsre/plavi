@@ -47,6 +47,11 @@ const CreateReport = () => {
       console.warn("Molimo unesite naziv i opis izvješća.");
       return;
     }
+
+    if (startDate && endDate && new Date(startDate) >= new Date(endDate)) {
+      alert("Početni datum mora biti manji od završnog datuma.");
+      return;
+    }
   
     console.log("Početak generiranja izvješća...");
     console.log("Početni datum:", startDate);
@@ -106,6 +111,7 @@ const CreateReport = () => {
         opis: description,
         pocetak: startDate ? new Date(startDateTime).toISOString() : null,
         kraj: endDate ? new Date(endDateTime).toISOString() : null,
+        odabraniPartner: selectedPartner || undefined,
       };
   
       console.log("Slanje izvješća na backend:", reportData);
@@ -271,10 +277,10 @@ const styles = StyleSheet.create({
     zIndex:2,
   },
   dateInputContainer: {
-    flex: 1, // Dijeli prostor ravnomjerno između dva elementa
-    marginHorizontal: 5, // Razmak između dva inputa
-    alignItems: 'center', // Centriranje elementa horizontalno
-    justifyContent: 'center', // Centriranje elementa vertikalno
+    flex: 1, 
+    marginHorizontal: 5, 
+    alignItems: 'center', 
+    justifyContent: 'center',
     width: '50%',
   },
   picker: {

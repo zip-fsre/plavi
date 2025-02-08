@@ -37,7 +37,7 @@ const ViewReport = () => {
 
     const fetchMedjutablicaPt2 = async (reportId) => {
       try {
-        // Change the URL to match the backend route
+        
         const response = await fetch(`http://localhost:5149/api/Izvjesce/Podatci/${reportId}`);
         if (!response.ok) throw new Error('Greška prilikom dohvaćanja MedjutablicaPt2.');
         const medjutablicaPt2Records = await response.json();
@@ -68,6 +68,10 @@ const ViewReport = () => {
           medjutablicaPt2Ids.includes(record.id)
         );
         console.log('Filtered MedjutablicaPt1 records:', filteredMedjutablicaPt1Records);
+        if (filteredMedjutablicaPt1Records.length === 0) {
+          setError("Nema dostupnih aranžmana za ovo izvješće.");
+          setLoading(false);
+        }
     
         // Fetch arrangements based on idAranzmana in the filtered MedjutablicaPt1 records
         if (filteredMedjutablicaPt1Records.length > 0) {
@@ -130,6 +134,11 @@ const ViewReport = () => {
         setArrangements(finalArrangements);
         setTotalPrice(finalArrangements.reduce((sum, arr) => sum + arr.konacnaCijena, 0));
         setTotalCommission(finalArrangements.reduce((sum, arr) => sum + (arr.konacnaCijena * arr.dodatakNaProviziju) / 100, 0));
+      
+        if (finalArrangements.length === 0) {
+          setError("Nema dostupnih aranžmana za ovo izvješće.");
+        }
+
       } catch (err) {
         setError(err.message);
         console.error('Error fetching arrangements:', err);
@@ -157,7 +166,7 @@ const ViewReport = () => {
       <Pozadina>
         <View style={styles.container}>
           <Text style={styles.errorText}>{error}</Text>
-          <HoverButton title="Nazad" />
+          <HoverButton title="Nazad"  onPress={() => setCurrentPage({ ...pages['Reports']})}/>
         </View>
       </Pozadina>
     );
