@@ -185,7 +185,7 @@ const EditEventPage = () => {
     }));
     const temp = JSON.stringify(finalGuests);
     //POST REQUEST ZA GOSTE    
-    fetch(`http://localhost:5149/api/Gost/`,{
+    fetch(`http://localhost:5149/api/Gost/Vise`,{
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(finalGuests),

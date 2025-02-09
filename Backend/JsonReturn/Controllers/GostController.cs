@@ -82,5 +82,20 @@ namespace JsonReturn.Controllers
             _context.SaveChanges();
             return _context.Gosts.Find(id);
         }
+
+        // POST: api/Gost/Vise
+        [HttpPost("Vise")]
+        public string CreateGosti(Gost[] Gosti)
+        {
+            if (Gosti == null)
+            {
+                return "Missing parameter: Gosti";
+            }
+            foreach(Gost Gost in Gosti){
+                _context.Gosts.Add(Gost);
+            }
+            _context.SaveChanges();
+            return "Uspjesno";
+        }
     }
 }
