@@ -24,6 +24,10 @@ const EditEventPage = () => {
     const [kontaktSponzora, setKontaktSponzora] = useState();
     const [napomena, setNapomena] = useState();
     const [gosti, setGosti] = useState();
+    const [brojGostiju, setBrojGostiju] = useState(0);
+
+
+  
 
     const showChanges = () => {
       events.datum = startDate;
@@ -49,9 +53,17 @@ const EditEventPage = () => {
 
       console.log(events);
       console.log(gosti);
+      console.log(brojGostiju);
     };
 
-
+    //BROJI KOLIKO IMA PRIKAZANIH GOSTIJU
+    useEffect(() => {
+      if (gosti && gosti.length > 0) {
+          const maxId = Math.max(...gosti.map(gost => gost.id)); // Pronađi najveći postojeći ID
+          setBrojGostiju(maxId); // Postavi globalni broj gostiju na najveći ID
+      }
+  }, [gosti]);
+  
       //funkcija koja kupi evente iz backenda
       const getEvents = async () => {
         try {
@@ -89,9 +101,10 @@ const EditEventPage = () => {
 
     /* prikazuje sve goste u guest listi */
     const renderGuests = ({item, index }) => {
+
      return (
       <View style={styles.guestStyle}>
-        <Guest id={item.id} statusDolaska={item.statusDolaska} brojStola={item.brojStola} imePrezime={item.imeIPrezime} redniBroj={index+1} onUpdate={handleUpdateGuest}/>
+        <Guest idGosta={item.id} statusDolaska={item.statusDolaska} brojStola={item.brojStola} imePrezime={item.imeIPrezime} redniBroj={index+1}/>
         <TouchableOpacity onPress={() => handleDeleteGuest(item.id)}>
           <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
         </TouchableOpacity>
@@ -165,20 +178,15 @@ const EditEventPage = () => {
     };
 
     const addNewGuest = () => {
-      // dodaje novog gosta u array gosti
-      const noviGost = { imePrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1, onUpdate:{handleUpdateGuest} };
-      setGosti(prevGosti => [...prevGosti, noviGost]);
-    };
-
-  // Funkcija koja ažurira podatke gosta
-  const handleUpdateGuest = (updatedGuest) => {
-    setGosti(prevGosti =>
-        prevGosti.map(guest =>
-            guest.id === updatedGuest.id ? updatedGuest : guest
-        )
-    );
-    
+      setGosti(prevGosti => {
+          const newId = brojGostiju + 1;
+          setBrojGostiju(newId);
+          
+          return [...prevGosti, { id: newId, imePrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1 }];
+      });
   };
+  
+
 
     return (
         <Pozadina>
@@ -239,7 +247,7 @@ const EditEventPage = () => {
                     <Text style={styles.categoryText}>Lista gostiju:</Text>
                     <Button title="+ Novi gost" onPress={addNewGuest}></Button>
                     {gosti ? (
-                      <FlatList data={gosti} renderItem={renderGuests}></FlatList>
+                      <FlatList data={gosti} renderItem={renderGuests} keyExtractor={(item) => item.id.toString()} ></FlatList>
                     ):
                       <Text style={styles.categoryText}>Nema gostiju</Text>
                     }
