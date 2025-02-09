@@ -1,10 +1,10 @@
-import react, { useState } from "react";
+import react, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 
-const Guest = ({imePrezime, idGosta, brojStola, statusDolaska, redniBroj }) => {
+const Guest = ({imePrezime, idGosta, brojStola, statusDolaska, redniBroj, sendUpdateToParent }) => {
 
     const [statusi] = useState(["Nepotvrđen", "Potvrđen","Ne dolazi"]);
     const [updatedGuest, setUpdatedGuest] = useState({
@@ -14,10 +14,14 @@ const Guest = ({imePrezime, idGosta, brojStola, statusDolaska, redniBroj }) => {
       redniBroj: redniBroj || ""
       });
 
-
+    
     const handleChange = (field, value) => {
-      setUpdatedGuest((prevState) => ({ ...prevState, [field]: value })); // Ažuriraj samo određeno polje
-  };
+      setUpdatedGuest((prevState) => ({ ...prevState, [field]: value })); //Ažuriraj samo određeno polje
+    };
+
+    useEffect(() => {
+      sendUpdateToParent(updatedGuest); // proslijedi update parent komponenti nakon izmjene bilo cega u updatedGuest
+    },[updatedGuest]);
 
     return(
     <View style={styles.categoryText}>

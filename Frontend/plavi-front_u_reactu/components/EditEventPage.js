@@ -15,18 +15,24 @@ const EditEventPage = () => {
     const { id } = currentPage;
 
     /* varijable za pohranu lokalno (onChange se mijenjaju) pa slanje dalje u bazu */
-    const [events, setEvents] = useState();
+    const [events, setEvents] = useState(); //trenutno uredjivani dogadjaj i podaci o njemu
+    //opcenite varijable o dogadjaju
     const [startDate, setStartDateInput] = useState();
     const [naziv, setNaziv] = useState();
     const [svrha, setSvrha] = useState();
     const [klijent, setKlijent] = useState();
     const [kontaktKlijenta, setKontaktKlijenta] = useState();
     const [kontaktSponzora, setKontaktSponzora] = useState();
-    const [napomena, setNapomena] = useState();
-    const [gosti, setGosti] = useState();
-    const [brojGostiju, setBrojGostiju] = useState(0);
+    const [napomena, setNapomena] = useState(); 
+    //varijable o gostima
+    const [gosti, setGosti] = useState(); //gosti koje povucemo iz baze, a kasnije i "finalna" lista gostiju koju saljemo u bazu
+    const [brojGostiju, setBrojGostiju] = useState(0); //racuna koliko je gostiju zbog postavljanja ID-eva u Flatlisti (nije najtocnije jer i ne mora biti posto se ID ne salje u bazu, ovo je samo za prikaz na frontu kada se generira novi gost)
+    const [uredjeniGost, setUredjeniGost] = useState(""); //sluzi za komunikaciju child i parent komponente (Guest.js i ovaj EditEventPage.js)
 
-
+    //sluzi za mijenjanje uredjenog gosta iz child komponente Guest.js
+    const handeDataFromChildGuest = (data) => {
+      setUredjeniGost(data);
+    };
   
 
     const showChanges = () => {
@@ -51,9 +57,18 @@ const EditEventPage = () => {
         events.napomena = napomena;
       }
 
+      for (let gost of gosti) {
+        if (gost.imePrezime) {
+          setGosti();
+        }        
+      }
+
       console.log(events);
       console.log(gosti);
       console.log(brojGostiju);
+      console.log(uredjeniGost);
+      
+      
     };
 
     //BROJI KOLIKO IMA PRIKAZANIH GOSTIJU
@@ -104,7 +119,7 @@ const EditEventPage = () => {
 
      return (
       <View style={styles.guestStyle}>
-        <Guest idGosta={item.id} statusDolaska={item.statusDolaska} brojStola={item.brojStola} imePrezime={item.imeIPrezime} redniBroj={index+1}/>
+        <Guest idGosta={item.id} statusDolaska={item.statusDolaska} brojStola={item.brojStola} imePrezime={item.imeIPrezime} redniBroj={index+1} sendUpdateToParent={handeDataFromChildGuest} />
         <TouchableOpacity onPress={() => handleDeleteGuest(item.id)}>
           <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
         </TouchableOpacity>
@@ -181,7 +196,7 @@ const EditEventPage = () => {
       setGosti(prevGosti => {
           const newId = brojGostiju + 1;
           setBrojGostiju(newId);
-          return [...prevGosti, { id: newId, imePrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1, redniBroj: newId }];
+          return [...prevGosti, { id: newId, imePrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1, idDogadjajaa: events.id, sendUpdateToParent: handeDataFromChildGuest}];
       });
   };
   
