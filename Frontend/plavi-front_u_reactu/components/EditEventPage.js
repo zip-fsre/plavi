@@ -59,7 +59,7 @@ const EditEventPage = () => {
     //BROJI KOLIKO IMA PRIKAZANIH GOSTIJU
     useEffect(() => {
       if (gosti && gosti.length > 0) {
-          const maxId = Math.max(...gosti.map(gost => gost.id)); // Pronađi najveći postojeći ID
+          const maxId = Math.max(...gosti.map(gost => gost.id)); // Pronađi najveći postojeći ID (upitna potreba za ovim ali eto)
           setBrojGostiju(maxId); // Postavi globalni broj gostiju na najveći ID
       }
   }, [gosti]);
@@ -181,8 +181,7 @@ const EditEventPage = () => {
       setGosti(prevGosti => {
           const newId = brojGostiju + 1;
           setBrojGostiju(newId);
-          
-          return [...prevGosti, { id: newId, imePrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1 }];
+          return [...prevGosti, { id: newId, imePrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1, redniBroj: newId }];
       });
   };
   

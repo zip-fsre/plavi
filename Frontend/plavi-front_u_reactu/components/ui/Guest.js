@@ -7,26 +7,31 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 const Guest = ({imePrezime, idGosta, brojStola, statusDolaska, redniBroj }) => {
 
     const [statusi] = useState(["Nepotvrđen", "Potvrđen","Ne dolazi"]);
-    const [updatedGuest, setUpdatedGuest] = useState({imePrezime: imePrezime, brojStola: brojStola, statusDolaska: statusDolaska, redniBroj: redniBroj});
+    const [updatedGuest, setUpdatedGuest] = useState({
+      imePrezime: imePrezime || "",
+      brojStola: brojStola || "",
+      statusDolaska: statusDolaska || "",
+      redniBroj: redniBroj || ""
+      });
+
 
     const handleChange = (field, value) => {
-      setUpdatedGuest({[field]: value});
-     //onUpdate(updatedGuest);
-    };
+      setUpdatedGuest((prevState) => ({ ...prevState, [field]: value })); // Ažuriraj samo određeno polje
+  };
 
     return(
     <View style={styles.categoryText}>
       <Text style={styles.numberStyle}>{redniBroj}.</Text>
       <TextInput style={styles.nameInput} value={updatedGuest.imePrezime}
-       onChangeText={(text) => {handleChange({field:"imePrezime", value:text});}} placeholder="Ime i prezime gosta"
+       onChangeText={(text) => {handleChange("imePrezime", text);}} placeholder="Ime i prezime gosta"
       ></TextInput>
       <Text style={styles.tableText}>Broj stola:</Text>
       <TextInput style={styles.numInput} keyboardType="number-pad" value={updatedGuest.brojStola} 
-      onChangeText={(text) => {handleChange({field: brojStola, value:text.replace(/[^0-9]/g, "")});}} placeholder="0"/>
+      onChangeText={(text) => {handleChange("brojStola", text.replace(/[^0-9]/g));}} placeholder="0"/>
       <Text style={styles.guestStatus}>Status dolaska:</Text>
 
         {/* Picker za gosta */}
-        <Picker selectedValue={updatedGuest.statusDolaska} onValueChange={(value) => {handleChange({field: statusDolaska, value: value})}} style={styles.picker}> {/* ; handleChange({field:"statusDolaska", value:value});*/}
+        <Picker selectedValue={updatedGuest.statusDolaska} onValueChange={(value) => {handleChange("statusDolaska", value)}} style={styles.picker}> {/* ; handleChange({field:"statusDolaska", value:value});*/}
             {statusi.map((statusi, index) => (
                 <Picker.Item key={index} label={statusi} value={statusi} />
             ))}
