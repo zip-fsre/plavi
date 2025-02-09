@@ -1,10 +1,13 @@
 import react, {useEffect, useState} from "react"
 import Pozadina from "./ui/Pozadina";
-import { View, Text, StyleSheet, FlatList, TextInput, ScrollView } from "react-native";
+import { View, Text, StyleSheet, FlatList, TextInput, ScrollView, TouchableOpacity } from "react-native";
 import { usePage } from '../Routes';
 import Event from './ui/Event'
 import DatePicker from 'react-datepicker';
 import Button from "./ui/Button";
+import Guest from "./ui/Guest";
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 
 
 const EditEventPage = () => {
@@ -21,8 +24,6 @@ const EditEventPage = () => {
     const [kontaktSponzora, setKontaktSponzora] = useState();
     const [napomena, setNapomena] = useState();
     const [gosti, setGosti] = useState();
-
-
 
     const showChanges = () => {
       events.datum = startDate;
@@ -87,10 +88,13 @@ const EditEventPage = () => {
       }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
 
     /* prikazuje sve goste u guest listi */
-    const renderGuests = ({item}) => {
+    const renderGuests = ({item, index }) => {
      return (
-      <View style={styles.headerText}>
-        <Text style={styles.headerText}>{item.id} - {item.imeIPrezime}</Text>
+      <View style={styles.guestStyle}>
+        <Guest id={item.id} statusDolaska={item.statusDolaska} brojStola={item.brojStola} imePrezime={item.imeIPrezime} redniBroj={index+1} onUpdate={handleUpdateGuest}/>
+        <TouchableOpacity onPress={() => handleDeleteGuest(item.id)}>
+          <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
+        </TouchableOpacity>
       </View>
      );
     };
@@ -99,12 +103,8 @@ const EditEventPage = () => {
         console.log("Ova tipka ce ispisati partnere");
     };
 
-
-
     /* sprema promjene u bazu */
     const saveChanges = () => {
-
-
       if (!(naziv == undefined || naziv == "")) {
         events.naziv = naziv;
       }
@@ -126,21 +126,30 @@ const EditEventPage = () => {
       events.datum = new Date(startDate).toISOString().split('T')[0];
       console.log(events.datum);
     
-    // Simple POST request with fetch
+    // Simple POST request with fetch - ZA DOGADJAJE
     fetch(`http://localhost:5149/api/Dogadjaj/${id}`, { 
       method: 'POST', 
       //body: '{"naziv": "neko ime"}',/      
-      body: JSON.stringify(events), 
+      body: JSON.stringify({
+        ...events, // Zadržava postojeće podatke iz events
+        gosts: gosti // Dodaj array gostiju
+      }),
       //mode: "cors",
       //cache: "no-cache",
       //credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       //redirect: "follow",
       //referrerPolicy: "no-referrer",
-    })
+    }).then(() => console.log("Promjene spremljene događaja!!!"));
 
-    .then(() => console.log("Promjene spremljene!!!"));
-
+    //POST REQUEST ZA GOSTE
+    /*
+    fetch(`http://localhost:5149/api/Dogadjaj/Gosti/${id}`,{
+      method: 'POST',
+      body: JSON.stringify(gosti),
+      headers: {"Content-Type": "application/json"},
+    }).then(()=>console.log("Promjene gostiju spremljene!"));
+    */
     };
 
     /* brise događaj iz baze */
@@ -150,7 +159,26 @@ const EditEventPage = () => {
       .then(() => console.log("Uspješno obrisano!!!"));
       setCurrentPage(pages['Events']);
     };
+    const handleDeleteGuest = (guestId) => {
+      // brise gosta LOKALNO iz arraya gosti
+      setGosti(prevGosti => prevGosti.filter(guest => guest.id !== guestId));
+    };
 
+    const addNewGuest = () => {
+      // dodaje novog gosta u array gosti
+      const noviGost = { imePrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1, onUpdate:{handleUpdateGuest} };
+      setGosti(prevGosti => [...prevGosti, noviGost]);
+    };
+
+  // Funkcija koja ažurira podatke gosta
+  const handleUpdateGuest = (updatedGuest) => {
+    setGosti(prevGosti =>
+        prevGosti.map(guest =>
+            guest.id === updatedGuest.id ? updatedGuest : guest
+        )
+    );
+    
+  };
 
     return (
         <Pozadina>
@@ -165,31 +193,31 @@ const EditEventPage = () => {
                   <Text style={styles.categoryText}>Naziv:</Text>
                   <TextInput style={styles.input} placeholder={events.naziv} onChangeText={setNaziv}></TextInput>
 
-                    <Text style={styles.categoryText}>Vrsta:</Text>
-                    <TextInput style={styles.input} placeholder={events.svrha} onChangeText={setSvrha}></TextInput>
+                  <Text style={styles.categoryText}>Vrsta:</Text>
+                  <TextInput style={styles.input} placeholder={events.svrha} onChangeText={setSvrha}></TextInput>
 
                   {/* klijent i kontakt */}
 
-                      <Text style={styles.categoryText}>Klijent:</Text>
-                      <TextInput style={styles.input} placeholder={events.klijent} onChangeText={setKlijent}></TextInput>
+                    <Text style={styles.categoryText}>Klijent:</Text>
+                    <TextInput style={styles.input} placeholder={events.klijent} onChangeText={setKlijent}></TextInput>
 
                     <Text style={styles.categoryText}>Kontakt klijenta:</Text>
                     <TextInput style={styles.input} placeholder={events.kontaktKlijenta} onChangeText={setKontaktKlijenta}></TextInput>
 
                   {/* glavni sponzor*/}
 
-                      <Text style={styles.categoryText}>Kontakt glavnog sponzora:</Text>
-                      <TextInput style={styles.input} placeholder={events.kontaktSponzora} onChangeText={setKontaktSponzora}></TextInput>
+                    <Text style={styles.categoryText}>Kontakt glavnog sponzora:</Text>
+                    <TextInput style={styles.input} placeholder={events.kontaktSponzora} onChangeText={setKontaktSponzora}></TextInput>
 
                   {/* napomena*/}
 
-                      <Text style={styles.categoryText}>Napomena:</Text>
-                      <TextInput style={styles.input} placeholder={events.napomena} onChangeText={setNapomena}></TextInput>
+                    <Text style={styles.categoryText}>Napomena:</Text>
+                    <TextInput style={styles.input} placeholder={events.napomena} onChangeText={setNapomena}></TextInput>
 
                   {/* Input za datum*/}
-                      <Text style={styles.dateText}>Datum:</Text>
-                      <View style={styles.datePick}>
-                        <DatePicker
+                    <Text style={styles.dateText}>Datum:</Text>
+                    <View style={styles.datePick}>
+                      <DatePicker
                           selected={startDate}
                           onChange={(date) => setStartDateInput(date)}
                           dateFormat="dd.MM.yyyy"
@@ -198,15 +226,18 @@ const EditEventPage = () => {
                           calendarClassName="custom-calendar"
                           zIndex="2"
                         />
-                      </View>
+                    </View>
 
                   {/* PARTNERI SADA SLIJEDE BOŽE POMOZI */}
                   <View style={styles.itemContainer}>
                     <Text> </Text>
                   </View>
+
+
                   {/* Gosti*/}
                   <View style={styles.itemContainer}>
                     <Text style={styles.categoryText}>Lista gostiju:</Text>
+                    <Button title="+ Novi gost" onPress={addNewGuest}></Button>
                     {gosti ? (
                       <FlatList data={gosti} renderItem={renderGuests}></FlatList>
                     ):
@@ -263,8 +294,8 @@ headerText:{
       textShadowRadius: 3,
       },
 scrollView:{
-  maxHeight: 400,
-  width: 600,
+  maxHeight: 500,
+  width: 800,
   },
 dateText:{
       color: '#e8c789',
@@ -298,12 +329,21 @@ infoContainer:{
 itemContainer:{
   
 },
+deleteIcon: {
+  marginTop: 10,
+  marginRight: 10,
+},
 buttons:{
   display: 'flex',
   flexDirection: 'row',
   justifyContent: "center",
   gap: 20,
-
+},
+guestStyle:{
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: "center",
+  gap: 20,
 },
 dateInputContainer: {
   flex: 1, // Dijeli prostor ravnomjerno između dva elementa

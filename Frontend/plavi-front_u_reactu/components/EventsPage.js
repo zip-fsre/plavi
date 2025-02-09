@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
 import Pozadina from './ui/Pozadina';
 import Event from './ui/Event'
 import { ScrollView } from 'react-native';
@@ -17,8 +17,7 @@ const EventsPage = () => {
     console.log("Dodaj događaj!");
   }
   const handleEditEvent = () => {
-    console.log("Uredi događaj! (Ovaj dogadjaj je placeholder da vidimo kako izgleda kada su sve informacije unesene)");
-
+    alert("Ovo je samo placeholder događaj koji nema veze s backendom! Ovdje je samo kao primjer kako izgleda uredno unesen događaj");
   }
 
 
@@ -49,7 +48,6 @@ const EventsPage = () => {
 
   //kartica dogadjaja (prikaz)
 const renderEvent = ({item}) => {
-
   return (
     <View style={styles.container}>
       <Event onPress={() => setCurrentPage({...pages['EditEventPage'], id: item.id})} naziv={item.naziv} vrsta={item.svrha} opis={item.napomena} datum={item.datum}/> {/* komponenta Event je dizajn prikaza kartice */}
