@@ -25,7 +25,7 @@ const EditEventPage = () => {
     const [kontaktSponzora, setKontaktSponzora] = useState();
     const [napomena, setNapomena] = useState(); 
     //varijable o gostima
-    const [gosti, setGosti] = useState(); //gosti koje povucemo iz baze, a kasnije i "finalna" lista gostiju koju saljemo u bazu
+    const [gosti, setGosti] = useState([]); //gosti koje povucemo iz baze, a kasnije i "finalna" lista gostiju koju saljemo u bazu
     const [brojGostiju, setBrojGostiju] = useState(0); //racuna koliko je gostiju zbog postavljanja ID-eva u Flatlisti (nije najtocnije jer i ne mora biti posto se ID ne salje u bazu, ovo je samo za prikaz na frontu kada se generira novi gost)
     const [uredjeniGost, setUredjeniGost] = useState(""); //sluzi za komunikaciju child i parent komponente (Guest.js i ovaj EditEventPage.js)
 
@@ -34,6 +34,18 @@ const EditEventPage = () => {
       setUredjeniGost(data);
     };
   
+    //prebaci promijenjene podatke iz uredjeniGost u gosti array (zapravo zamijeni podatke kod gosta o kojem je rijec)
+    useEffect(() => {
+      if (gosti && gosti.length > 0) {
+        // Provjeri postoji li stvarna promjena
+        const updatedGuests = gosti.map((guest) =>
+          guest.id === uredjeniGost.id ? uredjeniGost : guest 
+        );
+    
+          setGosti(updatedGuests); 
+      }
+    }, [uredjeniGost]);
+    
 
     const showChanges = () => {
       events.datum = startDate;
@@ -57,12 +69,6 @@ const EditEventPage = () => {
         events.napomena = napomena;
       }
 
-      for (let gost of gosti) {
-        if (gost.imePrezime) {
-          setGosti();
-        }        
-      }
-
       console.log(events);
       console.log(gosti);
       console.log(brojGostiju);
@@ -79,80 +85,81 @@ const EditEventPage = () => {
       }
   }, [gosti]);
   
-      //funkcija koja kupi evente iz backenda
-      const getEvents = async () => {
-        try {
-          const response = await fetch(`http://localhost:5149/api/Dogadjaj/${id}`); //da ovo radi treba koristiti ` navodnike (desni alt+7)
-          const data = await response.json();
-          setEvents(data);
-          setStartDateInput(data.datum);
-          return data;
-        }
-        catch (error) {
-          console.error(error);
-        }
-      }
-      
-      //funkcija koja kupi goste iz backenda
-      const getGuests = async () => {
-        try {
-          /*const response = await fetch(`http://localhost:5149/api/Gost/${id}`); //da ovo radi treba koristiti ` navodnike (desni alt+7)*/
-          const response = await fetch(`http://localhost:5149/api/Dogadjaj/Gosti/${id}`);
-          const data = await response.json();
-          setGosti(data);
-          return data;
-        }
-        catch (error) {
-          console.error(error);
-        }
-      }
+  //funkcija koja kupi evente iz backenda
+  const getEvents = async () => {
+    try {
+      const response = await fetch(`http://localhost:5149/api/Dogadjaj/${id}`); //da ovo radi treba koristiti ` navodnike (desni alt+7)
+      const data = await response.json();
+      setEvents(data);
+      setStartDateInput(data.datum);
+      return data;
+    }
+    catch (error) {
+      console.error(error);
+    }
+  }
+  
+  //funkcija koja kupi goste iz backenda
+  const getGuests = async () => {
+    try {
+      /*const response = await fetch(`http://localhost:5149/api/Gost/${id}`); //da ovo radi treba koristiti ` navodnike (desni alt+7)*/
+      const response = await fetch(`http://localhost:5149/api/Dogadjaj/Gosti/${id}`);
+      const data = await response.json();
+      setGosti(data);
+      return data;
+    }
+    catch (error) {
+      console.error(error);
+    }
+
+  }
     
     
-      //dohvat podataka po učitavanju stranice
-      useEffect(() => {
-        getEvents();
-        getGuests();
-      }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
+  //dohvat podataka po učitavanju stranice
+  useEffect(() => {
+    getEvents();
+    getGuests();
 
-    /* prikazuje sve goste u guest listi */
-    const renderGuests = ({item, index }) => {
+  }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
 
-     return (
-      <View style={styles.guestStyle}>
-        <Guest idGosta={item.id} statusDolaska={item.statusDolaska} brojStola={item.brojStola} imePrezime={item.imeIPrezime} redniBroj={index+1} sendUpdateToParent={handeDataFromChildGuest} />
-        <TouchableOpacity onPress={() => handleDeleteGuest(item.id)}>
-          <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
-        </TouchableOpacity>
-      </View>
-     );
-    };
+  /* prikazuje sve goste u guest listi */
+  const renderGuests = ({item, index }) => {
 
-    const renderPartners = () => {
-        console.log("Ova tipka ce ispisati partnere");
-    };
+   return (
+    <View style={styles.guestStyle}>
+      <Guest idGosta={item.id} statusDolaska={item.statusDolaska} brojStola={item.brojStola} imePrezime={item.imeIPrezime} redniBroj={index+1} sendUpdateToParent={handeDataFromChildGuest} />
+      <TouchableOpacity onPress={() => handleDeleteGuest(item.id)}>
+        <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
+      </TouchableOpacity>
+    </View>
+   );
+  };
 
-    /* sprema promjene u bazu */
-    const saveChanges = () => {
-      if (!(naziv == undefined || naziv == "")) {
-        events.naziv = naziv;
-      }
-      if (!(svrha == undefined || svrha == "")) {
-        events.svrha = svrha;
-      }
-      if (!(klijent == undefined || klijent == "")) {
-        events.klijent = klijent;
-      }
-      if (!(kontaktKlijenta == undefined || kontaktKlijenta == "")) {
-        events.kontaktKlijenta = kontaktKlijenta;
-      }
-      if (!(kontaktSponzora == undefined || kontaktSponzora == "")) {
-        events.kontaktSponzora = kontaktSponzora;
-      }
-      if (!(napomena == undefined || napomena == "")) {
-        events.napomena = napomena;
-      }
-      events.datum = new Date(startDate).toISOString().split('T')[0];
-      console.log(events.datum);
+  const renderPartners = () => {
+      console.log("Ova tipka ce ispisati partnere");
+  };
+
+  /* sprema promjene u bazu */
+  const saveChanges = () => {
+    if (!(naziv == undefined || naziv == "")) {
+      events.naziv = naziv;
+    }
+    if (!(svrha == undefined || svrha == "")) {
+      events.svrha = svrha;
+    }
+    if (!(klijent == undefined || klijent == "")) {
+      events.klijent = klijent;
+    }
+    if (!(kontaktKlijenta == undefined || kontaktKlijenta == "")) {
+      events.kontaktKlijenta = kontaktKlijenta;
+    }
+    if (!(kontaktSponzora == undefined || kontaktSponzora == "")) {
+      events.kontaktSponzora = kontaktSponzora;
+    }
+    if (!(napomena == undefined || napomena == "")) {
+      events.napomena = napomena;
+    }
+    events.datum = new Date(startDate).toISOString().split('T')[0];
     
     // Simple POST request with fetch - ZA DOGADJAJE
     fetch(`http://localhost:5149/api/Dogadjaj/${id}`, { 
@@ -160,7 +167,6 @@ const EditEventPage = () => {
       //body: '{"naziv": "neko ime"}',/      
       body: JSON.stringify({
         ...events, // Zadržava postojeće podatke iz events
-        gosts: gosti // Dodaj array gostiju
       }),
       //mode: "cors",
       //cache: "no-cache",
@@ -170,121 +176,128 @@ const EditEventPage = () => {
       //referrerPolicy: "no-referrer",
     }).then(() => console.log("Promjene spremljene događaja!!!"));
 
-    //POST REQUEST ZA GOSTE
-    /*
-    fetch(`http://localhost:5149/api/Dogadjaj/Gosti/${id}`,{
+    //SLANJE ZA GOSTE
+    const finalGuests = gosti.map(guest => ({
+      imeIPrezime: guest.imePrezime,
+      brojStola: guest.brojStola,
+      idDogadjajaa: events.id,
+      statusDolaska: guest.statusDolaska
+    }));
+    const temp = JSON.stringify(finalGuests);
+    //POST REQUEST ZA GOSTE    
+    fetch(`http://localhost:5149/api/Gost/`,{
       method: 'POST',
-      body: JSON.stringify(gosti),
-      headers: {"Content-Type": "application/json"},
-    }).then(()=>console.log("Promjene gostiju spremljene!"));
-    */
-    };
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(finalGuests),
+    }).then(()=>console.log("Promjene gostiju spremljene!",{temp}));
+    
+  };
 
     /* brise događaj iz baze */
-    const deleteEvent = () => {
-      // Simple DELETE request with fetch
-      fetch(`http://localhost:5149/api/Dogadjaj/${id}`, { method: 'DELETE' })
-      .then(() => console.log("Uspješno obrisano!!!"));
-      setCurrentPage(pages['Events']);
-    };
-    const handleDeleteGuest = (guestId) => {
-      // brise gosta LOKALNO iz arraya gosti
-      setGosti(prevGosti => prevGosti.filter(guest => guest.id !== guestId));
-    };
+  const deleteEvent = () => {
+    // Simple DELETE request with fetch
+    fetch(`http://localhost:5149/api/Dogadjaj/${id}`, { method: 'DELETE' })
+    .then(() => console.log("Uspješno obrisano!!!"));
+    setCurrentPage(pages['Events']);
+  };
+  const handleDeleteGuest = (guestId) => {
+    // brise gosta LOKALNO iz arraya gosti
+    setGosti(prevGosti => prevGosti.filter(guest => guest.id !== guestId));
+  };
 
-    const addNewGuest = () => {
-      setGosti(prevGosti => {
-          const newId = brojGostiju + 1;
-          setBrojGostiju(newId);
-          return [...prevGosti, { id: newId, imePrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1, idDogadjajaa: events.id, sendUpdateToParent: handeDataFromChildGuest}];
-      });
+  const addNewGuest = () => {
+    setGosti(prevGosti => {
+        const newId = brojGostiju + 1;
+        setBrojGostiju(newId);
+        return [...prevGosti, { id: newId, imeIPrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1, idDogadjajaa: events.id, sendUpdateToParent: handeDataFromChildGuest}];
+    });
   };
   
 
 
-    return (
-        <Pozadina>
-            <View style={styles.container}>
-                <Text style={styles.title}>Uredi događaj</Text> 
-                <Text style={styles.headerText}>Id: {id}</Text>
+  return (
+      <Pozadina>
+          <View style={styles.container}>
+              <Text style={styles.title}>Uredi događaj</Text> 
+              <Text style={styles.headerText}>Id: {id}</Text>
+              
+              {events ? ( //ispis kada se dohvati podaci
+              <>
+              <ScrollView style={styles.scrollView}>
+                {/* naziv i vrsta */}
+                <Text style={styles.categoryText}>Naziv:</Text>
+                <TextInput style={styles.input} placeholder={events.naziv} onChangeText={setNaziv}></TextInput>
+
+                <Text style={styles.categoryText}>Vrsta:</Text>
+                <TextInput style={styles.input} placeholder={events.svrha} onChangeText={setSvrha}></TextInput>
+
+                {/* klijent i kontakt */}
+
+                  <Text style={styles.categoryText}>Klijent:</Text>
+                  <TextInput style={styles.input} placeholder={events.klijent} onChangeText={setKlijent}></TextInput>
+
+                  <Text style={styles.categoryText}>Kontakt klijenta:</Text>
+                  <TextInput style={styles.input} placeholder={events.kontaktKlijenta} onChangeText={setKontaktKlijenta}></TextInput>
+
+                {/* glavni sponzor*/}
+
+                  <Text style={styles.categoryText}>Kontakt glavnog sponzora:</Text>
+                  <TextInput style={styles.input} placeholder={events.kontaktSponzora} onChangeText={setKontaktSponzora}></TextInput>
+
+                {/* napomena*/}
+
+                  <Text style={styles.categoryText}>Napomena:</Text>
+                  <TextInput style={styles.input} placeholder={events.napomena} onChangeText={setNapomena}></TextInput>
+
+                {/* Input za datum*/}
+                  <Text style={styles.dateText}>Datum:</Text>
+                  <View style={styles.datePick}>
+                    <DatePicker
+                        selected={startDate}
+                        onChange={(date) => setStartDateInput(date)}
+                        dateFormat="dd.MM.yyyy"
+                        placeholderText="Odaberite datum"
+                        className="custom-input"
+                        calendarClassName="custom-calendar"
+                        zIndex="2"
+                      />
+                  </View>
+
+                {/* PARTNERI SADA SLIJEDE BOŽE POMOZI */}
+                <View style={styles.itemContainer}>
+                  <Text> </Text>
+                </View>
+
+
+                {/* Gosti*/}
+                <View style={styles.itemContainer}>
+                  <Text style={styles.categoryText}>Lista gostiju:</Text>
+                  <Button title="+ Novi gost" onPress={addNewGuest}></Button>
+                  {gosti ? (
+                    <FlatList data={gosti} renderItem={renderGuests} keyExtractor={(item) => item.id.toString()} ></FlatList>
+                  ):
+                    <Text style={styles.categoryText}>Nema gostiju</Text>
+                  }
+                </View>
+
+                <Text style={styles.categoryText}>Lista partnera:</Text>
+                <FlatList data={events.gosts} renderItem={renderPartners}></FlatList>
                 
-                {events ? ( //ispis kada se dohvati podaci
-                <>
-                <ScrollView style={styles.scrollView}>
-                  {/* naziv i vrsta */}
-                  <Text style={styles.categoryText}>Naziv:</Text>
-                  <TextInput style={styles.input} placeholder={events.naziv} onChangeText={setNaziv}></TextInput>
+                <View style={styles.buttons}>
+                  <Button title="Spremi promjene" onPress={saveChanges}></Button>
+                  <Button title="Izbriši događaj" onPress={deleteEvent} bgColor="#b51010"></Button>
+                  <Button title="Prikaži nove podatke" onPress={showChanges} bgColor="blue"></Button>
+                </View>
 
-                  <Text style={styles.categoryText}>Vrsta:</Text>
-                  <TextInput style={styles.input} placeholder={events.svrha} onChangeText={setSvrha}></TextInput>
+              </ScrollView>
+              </>
+              ) : ( //ispis dok nema podataka
+              <Text style={styles.text}>Učitavam podatke...</Text>
+              )}
 
-                  {/* klijent i kontakt */}
-
-                    <Text style={styles.categoryText}>Klijent:</Text>
-                    <TextInput style={styles.input} placeholder={events.klijent} onChangeText={setKlijent}></TextInput>
-
-                    <Text style={styles.categoryText}>Kontakt klijenta:</Text>
-                    <TextInput style={styles.input} placeholder={events.kontaktKlijenta} onChangeText={setKontaktKlijenta}></TextInput>
-
-                  {/* glavni sponzor*/}
-
-                    <Text style={styles.categoryText}>Kontakt glavnog sponzora:</Text>
-                    <TextInput style={styles.input} placeholder={events.kontaktSponzora} onChangeText={setKontaktSponzora}></TextInput>
-
-                  {/* napomena*/}
-
-                    <Text style={styles.categoryText}>Napomena:</Text>
-                    <TextInput style={styles.input} placeholder={events.napomena} onChangeText={setNapomena}></TextInput>
-
-                  {/* Input za datum*/}
-                    <Text style={styles.dateText}>Datum:</Text>
-                    <View style={styles.datePick}>
-                      <DatePicker
-                          selected={startDate}
-                          onChange={(date) => setStartDateInput(date)}
-                          dateFormat="dd.MM.yyyy"
-                          placeholderText="Odaberite datum"
-                          className="custom-input"
-                          calendarClassName="custom-calendar"
-                          zIndex="2"
-                        />
-                    </View>
-
-                  {/* PARTNERI SADA SLIJEDE BOŽE POMOZI */}
-                  <View style={styles.itemContainer}>
-                    <Text> </Text>
-                  </View>
-
-
-                  {/* Gosti*/}
-                  <View style={styles.itemContainer}>
-                    <Text style={styles.categoryText}>Lista gostiju:</Text>
-                    <Button title="+ Novi gost" onPress={addNewGuest}></Button>
-                    {gosti ? (
-                      <FlatList data={gosti} renderItem={renderGuests} keyExtractor={(item) => item.id.toString()} ></FlatList>
-                    ):
-                      <Text style={styles.categoryText}>Nema gostiju</Text>
-                    }
-                  </View>
-
-                  <Text style={styles.categoryText}>Lista partnera:</Text>
-                  <FlatList data={events.gosts} renderItem={renderPartners}></FlatList>
-                  
-                  <View style={styles.buttons}>
-                    <Button title="Spremi promjene" onPress={saveChanges}></Button>
-                    <Button title="Izbriši događaj" onPress={deleteEvent} bgColor="#b51010"></Button>
-                    <Button title="Prikaži nove podatke" onPress={showChanges} bgColor="blue"></Button>
-                  </View>
-
-                </ScrollView>
-                </>
-                ) : ( //ispis dok nema podataka
-                <Text style={styles.text}>Učitavam podatke...</Text>
-                )}
-
-            </View>
-        </Pozadina>
-    );
+          </View>
+      </Pozadina>
+  );
 }
 
 export default EditEventPage;

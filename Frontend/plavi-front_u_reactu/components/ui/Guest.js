@@ -9,9 +9,10 @@ const Guest = ({imePrezime, idGosta, brojStola, statusDolaska, redniBroj, sendUp
     const [statusi] = useState(["Nepotvrđen", "Potvrđen","Ne dolazi"]);
     const [updatedGuest, setUpdatedGuest] = useState({
       imePrezime: imePrezime || "",
-      brojStola: brojStola || "",
+      brojStola: brojStola || 1,
       statusDolaska: statusDolaska || "",
-      redniBroj: redniBroj || ""
+      redniBroj: redniBroj || "",
+      id: idGosta || "",
       });
 
     
@@ -31,7 +32,10 @@ const Guest = ({imePrezime, idGosta, brojStola, statusDolaska, redniBroj, sendUp
       ></TextInput>
       <Text style={styles.tableText}>Broj stola:</Text>
       <TextInput style={styles.numInput} keyboardType="number-pad" value={updatedGuest.brojStola} 
-      onChangeText={(text) => {handleChange("brojStola", text.replace(/[^0-9]/g));}} placeholder="0"/>
+      onChangeText={(text) => {
+        const numericValue = parseInt(text.replace(/[^0-9]/g, ''), 10); //pretvara iz stringa u broj
+        handleChange("brojStola", isNaN(numericValue) ? 0 : numericValue); //ako je neka glupost stavi da je 0 (mada vec jednom ovo provjeravamo ali eto :P)
+        }} placeholder="0"/>
       <Text style={styles.guestStatus}>Status dolaska:</Text>
 
         {/* Picker za gosta */}
