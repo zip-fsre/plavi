@@ -28,6 +28,7 @@ const EditEventPage = () => {
     const [gosti, setGosti] = useState([]); //gosti koje povucemo iz baze, a kasnije i "finalna" lista gostiju koju saljemo u bazu
     const [brojGostiju, setBrojGostiju] = useState(0); //racuna koliko je gostiju zbog postavljanja ID-eva u Flatlisti (nije najtocnije jer i ne mora biti posto se ID ne salje u bazu, ovo je samo za prikaz na frontu kada se generira novi gost)
     const [uredjeniGost, setUredjeniGost] = useState(""); //sluzi za komunikaciju child i parent komponente (Guest.js i ovaj EditEventPage.js)
+    
 
     //sluzi za mijenjanje uredjenog gosta iz child komponente Guest.js
     const handeDataFromChildGuest = (data) => {
@@ -70,9 +71,6 @@ const EditEventPage = () => {
       }
 
       console.log(events);
-      console.log(gosti);
-      console.log(brojGostiju);
-      console.log(uredjeniGost);
       
       
     };
@@ -92,6 +90,12 @@ const EditEventPage = () => {
       const data = await response.json();
       setEvents(data);
       setStartDateInput(data.datum);
+      setNaziv(data.naziv);
+      setSvrha(data.svrha);
+      setKlijent(data.klijent);
+      setKontaktKlijenta(data.kontaktKlijenta);
+      setKontaktSponzora(data.kontaktSponzora);
+      setNapomena(data.napomena);
       return data;
     }
     catch (error) {
@@ -174,22 +178,33 @@ const EditEventPage = () => {
       headers: { "Content-Type": "application/json" },
       //redirect: "follow",
       //referrerPolicy: "no-referrer",
-    }).then(() => console.log("Promjene spremljene događaja!!!"));
+    }).then(() => console.log("POST za događaj gotov (spremljen)!!!"));
 
-    //SLANJE ZA GOSTE
+    
+
+    console.log(gosti, "-- ovo su gosti i podaci pred slanje!");
+
     const finalGuests = gosti.map(guest => ({
-      imeIPrezime: guest.imePrezime,
-      brojStola: guest.brojStola,
+      imeIPrezime: guest.imeIPrezime ? guest.imeIPrezime : guest.imePrezime || "N/A", //ISPOSTAVILO SE da je nekad imePrezime a nekad imeIPrezime varijabla za ime i prezime gosta pa se ovdje to ispravlja
+      brojStola: guest.brojStola || 0,
       idDogadjajaa: events.id,
-      statusDolaska: guest.statusDolaska
+      statusDolaska: guest.statusDolaska || "nepoznato"
     }));
+    console.log(finalGuests, "-- ovo su podaci za slanje!");
     const temp = JSON.stringify(finalGuests);
+
+    //DELETE brisanje svih gostiju iz ovog dogadjaja u bazi
+    fetch(`http://localhost:5149/api/Gost/Gosti/${events.id}`,{
+      method: 'DELETE',
+      headers: {'Content-Type': 'application/json'},
+    }).then(()=>console.log("Izbrisani svi gosti! (DELETE poslan)", {finalGuests}));
+
     //POST REQUEST ZA GOSTE    
     fetch(`http://localhost:5149/api/Gost/Vise`,{
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(finalGuests),
-    }).then(()=>console.log("Promjene gostiju spremljene!",{temp}));
+    }).then(()=>console.log("Promjene gostiju spremljene! (POST za goste poslan)",{finalGuests}));
     
   };
 
@@ -226,28 +241,28 @@ const EditEventPage = () => {
               <ScrollView style={styles.scrollView}>
                 {/* naziv i vrsta */}
                 <Text style={styles.categoryText}>Naziv:</Text>
-                <TextInput style={styles.input} placeholder={events.naziv} onChangeText={setNaziv}></TextInput>
+                <TextInput style={styles.input} placeholder={events.naziv} value={naziv} onChangeText={setNaziv}></TextInput>
 
                 <Text style={styles.categoryText}>Vrsta:</Text>
-                <TextInput style={styles.input} placeholder={events.svrha} onChangeText={setSvrha}></TextInput>
+                <TextInput style={styles.input} placeholder={events.svrha} value={svrha} onChangeText={setSvrha}></TextInput>
 
                 {/* klijent i kontakt */}
 
                   <Text style={styles.categoryText}>Klijent:</Text>
-                  <TextInput style={styles.input} placeholder={events.klijent} onChangeText={setKlijent}></TextInput>
+                  <TextInput style={styles.input} placeholder={events.klijent} value={klijent} onChangeText={setKlijent}></TextInput>
 
                   <Text style={styles.categoryText}>Kontakt klijenta:</Text>
-                  <TextInput style={styles.input} placeholder={events.kontaktKlijenta} onChangeText={setKontaktKlijenta}></TextInput>
+                  <TextInput style={styles.input} placeholder={events.kontaktKlijenta} value={kontaktKlijenta} onChangeText={setKontaktKlijenta}></TextInput>
 
                 {/* glavni sponzor*/}
 
                   <Text style={styles.categoryText}>Kontakt glavnog sponzora:</Text>
-                  <TextInput style={styles.input} placeholder={events.kontaktSponzora} onChangeText={setKontaktSponzora}></TextInput>
+                  <TextInput style={styles.input} placeholder={events.kontaktSponzora} value={kontaktSponzora} onChangeText={setKontaktSponzora}></TextInput>
 
                 {/* napomena*/}
 
                   <Text style={styles.categoryText}>Napomena:</Text>
-                  <TextInput style={styles.input} placeholder={events.napomena} onChangeText={setNapomena}></TextInput>
+                  <TextInput style={styles.input} placeholder={events.napomena} value={napomena} onChangeText={setNapomena}></TextInput>
 
                 {/* Input za datum*/}
                   <Text style={styles.dateText}>Datum:</Text>
@@ -272,7 +287,9 @@ const EditEventPage = () => {
                 {/* Gosti*/}
                 <View style={styles.itemContainer}>
                   <Text style={styles.categoryText}>Lista gostiju:</Text>
-                  <Button title="+ Novi gost" onPress={addNewGuest}></Button>
+                  <View style={styles.addGuestView}>
+                    <Button title="+ Novi gost" onPress={addNewGuest}></Button>
+                  </View>
                   {gosti ? (
                     <FlatList data={gosti} renderItem={renderGuests} keyExtractor={(item) => item.id.toString()} ></FlatList>
                   ):
@@ -303,6 +320,9 @@ const EditEventPage = () => {
 export default EditEventPage;
 
 const styles = new StyleSheet.create({
+  addGuestView:{
+    marginBottom: 10,
+  },
 headerText:{
     color: '#e8c789',
     fontSize: 24,
