@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import Pozadina from '../ui/Pozadina';
+import SmallButton from '../ui/SmallButton';
 import { usePage } from '../../Routes';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 const BASE_URL = 'http://localhost:5149/api/Partneri'; // Zamijeni s točnim URL-om backend-a
 
@@ -44,6 +47,28 @@ export const ViewPartner = () => {
       fetchPartnerDetails(id);
     }
   }, [id]);
+  const handleExportToExcel = () => {
+    try {
+      const wb = XLSX.utils.book_new();
+      
+
+      const partnerSheet = XLSX.utils.json_to_sheet([partnerDetails]);
+      XLSX.utils.book_append_sheet(wb, partnerSheet, 'Partner');
+  
+      const arrangementsSheet = XLSX.utils.json_to_sheet(partnerDetails.aranzmani);
+      XLSX.utils.book_append_sheet(wb, arrangementsSheet, 'Aranžmani');
+  
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  
+      const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, 'Partner.xlsx');
+  
+      Alert.alert('Uspjeh', 'Excel datoteka je uspješno generirana i preuzeta.');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Greška', 'Dogodila se greška prilikom izvoza u Excel.');
+    }
+  };
 
   useEffect(() => {
     fetchPartnerDetails(id);
@@ -93,6 +118,8 @@ export const ViewPartner = () => {
             <Text style={styles.noDataText}>Nema dodanih aranžmana.</Text>
           )}
         </ScrollView>
+
+        <SmallButton title="Izvezi u Excel"style={styles.saveButton} onPress={handleExportToExcel}/>
 
         <TouchableOpacity
           style={styles.closeButton}

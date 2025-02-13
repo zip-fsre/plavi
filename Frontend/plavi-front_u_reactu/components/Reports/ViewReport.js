@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Pozadina from '../ui/Pozadina';
 import HoverButton from '../ui/Button';
 import { usePage } from '../../Routes';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 const ViewReport = () => {
   const { currentPage, setCurrentPage, pages } = usePage();
@@ -53,17 +55,14 @@ const ViewReport = () => {
     
     const fetchMedjutablicaPt1 = async (medjutablicaPt2Records) => {
       try {
-        // Extract idMedju1 from MedjutablicaPt2
         const medjutablicaPt2Ids = medjutablicaPt2Records.map(record => record.idMedju1);
         console.log('MedjutablicaPt2 Ids:', medjutablicaPt2Ids);
     
-        // Fetch all MedjutablicaPt1 records
         const response = await fetch('http://localhost:5149/api/MedjutablicaPt1');
         if (!response.ok) throw new Error('Greška prilikom dohvaćanja MedjutablicaPt1.');
         const medjutablicaPt1Records = await response.json();
         console.log('Fetched all MedjutablicaPt1 records:', medjutablicaPt1Records);
     
-        // Filter MedjutablicaPt1 records based on idMedju1 from MedjutablicaPt2
         const filteredMedjutablicaPt1Records = medjutablicaPt1Records.filter(record =>
           medjutablicaPt2Ids.includes(record.id)
         );
@@ -73,7 +72,6 @@ const ViewReport = () => {
           setLoading(false);
         }
     
-        // Fetch arrangements based on idAranzmana in the filtered MedjutablicaPt1 records
         if (filteredMedjutablicaPt1Records.length > 0) {
           fetchEvents(filteredMedjutablicaPt1Records);
         }
@@ -91,7 +89,6 @@ const ViewReport = () => {
     
         console.log('Fetched all events:', allEvents);
     
-        // Poveži događaje s MedjutablicaPt1 zapisima
         const enrichedMedjutablicaPt1 = filteredMedjutablicaPt1Records.map(record => {
           const event = allEvents.find(evt => evt.id === record.idDogadjaja);
           return {
@@ -161,6 +158,51 @@ const ViewReport = () => {
     );
   }
 
+ 
+  const handleExportToExcel = () => {
+    if (!reportData || arrangements.length === 0) {
+      Alert.alert("Info", "Nema podataka za izvoz.");
+      return;
+    }
+  
+    const wb = XLSX.utils.book_new();
+  
+    const reportInfo = [
+      {
+        'Naziv izvješća': reportData.naziv || 'N/A',
+        'Opis izvješća': reportData.opis || 'N/A',
+      }
+    ];
+  
+    const wsReportInfo = XLSX.utils.json_to_sheet(reportInfo);
+    XLSX.utils.book_append_sheet(wb, wsReportInfo, "Izvješće");
+  
+    const sheetData = arrangements.map(arr => ({
+      "Naziv aranžmana": arr.naziv,
+      "Cijena (KM)": arr.konacnaCijena,
+      "Provizija (%)": arr.dodatakNaProviziju,
+      "Datum održavanja": arr.datum ? new Date(arr.datum).toLocaleDateString() : 'N/A'
+    }));
+  
+    const wsArrangements = XLSX.utils.json_to_sheet(sheetData);
+    XLSX.utils.book_append_sheet(wb, wsArrangements, "Aranžmani");
+  
+    const summaryData = [
+      {
+        "Ukupna cijena": totalPrice,
+        "Ukupna provizija": totalCommission,
+      }
+    ];
+  
+    const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(wb, wsSummary, "Rezime");
+  
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  
+    saveAs(blob, `Izvjesce_${reportId}.xlsx`);
+  };
+  
   if (error) {
     return (
       <Pozadina>
@@ -191,11 +233,17 @@ const ViewReport = () => {
 
         <Text style={styles.totalPrice}>Ukupna cijena: {totalPrice} KM</Text>
         <Text style={styles.totalPrice}>Ukupna provizija: {totalCommission} KM</Text>
-
+      
+      <View style={styles.ostaliSuSamoDugmici}>
         <HoverButton
           title="Uredi izvješće"
           onPress={() => setCurrentPage({ ...pages['EditReport'], reportId })}
         />
+        <HoverButton
+         title="Izvezi u Excel" 
+         onPress={handleExportToExcel} 
+         />
+      </View>
       </View>
     </Pozadina>
   );
@@ -220,12 +268,20 @@ const styles = StyleSheet.create({
   },
   reportList: {
     width: '100%',
-    maxHeight: 300, // Ograničena visina za skrolanje
+    maxHeight: 300, 
     marginBottom: 10,
   },
   reportListContent: {
-    paddingBottom: 20, // Prostor za dodatni razmak na dnu
+    paddingBottom: 20, 
     alignItems: 'center',
+  },
+  ostaliSuSamoDugmici: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    alignItems: 'center',
+    width: '80%',
   },
   reportItem: {
     backgroundColor: '#f5f5dc',
