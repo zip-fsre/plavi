@@ -82,5 +82,35 @@ namespace JsonReturn.Controllers
             _context.SaveChanges();
             return _context.Gosts.Find(id);
         }
+
+        // DELETE: api/Gost/Gosti/1 - Brise sve goste za jedan dogadjaj (id je id_dogadjaja)
+        [HttpDelete("Gosti/{id}")]
+        public System.Collections.Generic.IEnumerable<JsonReturn.Models.Gost> DeleteGoste(int id)
+        {
+            var pom = _context.Gosts.ToList().Where(item => item.IdDogadjajaa == id);
+            foreach(JsonReturn.Models.Gost podatak in pom){
+                _context.Gosts.Remove(podatak);
+            }
+            _context.SaveChanges();
+            return _context.Gosts;
+        }
+
+        // POST: api/Gost/Vise
+        [HttpPost("Vise")]
+        public string CreateGosti(Gost[] Gosti)
+        {
+            if (Gosti == null)
+            {
+                return "Missing parameter: Gosti";
+            }
+            foreach(Gost Gost in Gosti){
+                _context.Gosts.Add(Gost);
+            }
+            _context.SaveChanges();
+            return "Uspjesno";
+        }
+
+
+
     }
 }

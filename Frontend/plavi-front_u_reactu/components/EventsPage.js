@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
 import Pozadina from './ui/Pozadina';
 import Event from './ui/Event'
 import { ScrollView } from 'react-native';
@@ -17,8 +17,7 @@ const EventsPage = () => {
     console.log("Dodaj događaj!");
   }
   const handleEditEvent = () => {
-    console.log("Uredi događaj! (Ovaj dogadjaj je placeholder da vidimo kako izgleda kada su sve informacije unesene)");
-
+    alert("Ovo je samo placeholder događaj koji nema veze s backendom! Ovdje je samo kao primjer kako izgleda uredno unesen događaj");
   }
 
 
@@ -49,9 +48,8 @@ const EventsPage = () => {
 
   //kartica dogadjaja (prikaz)
 const renderEvent = ({item}) => {
-
   return (
-    <View style={styles.container}>
+    <View style={styles.eventContainer}>
       <Event onPress={() => setCurrentPage({...pages['EditEventPage'], id: item.id})} naziv={item.naziv} vrsta={item.svrha} opis={item.napomena} datum={item.datum}/> {/* komponenta Event je dizajn prikaza kartice */}
     </View>
   );
@@ -66,7 +64,6 @@ const renderEvent = ({item}) => {
           </View>
           <ScrollView style={styles.partneri}>
             <FlatList data={events} renderItem={renderEvent} />
-            <Event onPress={handleEditEvent} datum='2024-01-02' naziv='Prvi događaj' vrsta='Vjenčanje' opis='Ivan Matić - 063 223 321'/>
             {/*<Event onPress={handleEditEvent} naziv='Prvi događaj' vrsta='Vjenčanje' opis='Ivan Matić - 063 223 321'/>
             <Event onPress={handleEditEvent} naziv='Drugi događaj' vrsta='Vjenčanje' opis='Ana Marić - 063 654 455'/>*/}
           
@@ -77,9 +74,23 @@ const renderEvent = ({item}) => {
 };
 
 const styles = StyleSheet.create({
+  eventContainer:{
+    flex: 1,
+    alignSelf: 'center', 
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+    margin: 10,
+    padding: 5,
+  },
+
   container: {
     flex: 1,
     alignSelf: 'center',  
+
   },
   header: {
     display: 'flex',
