@@ -6,7 +6,9 @@ import { ScrollView } from 'react-native';
 import  Button  from "./ui/Button";
 import { usePage } from '../Routes';
 import Layout from './Layout';
-
+import * as XLSX from 'xlsx'; 
+import { jsPDF } from 'jspdf';
+import { saveAs } from 'file-saver';
 
 
 const EventsPage = () => {
@@ -56,11 +58,63 @@ const renderEvent = ({item}) => {
 
 };
 
+const handleExportToExcel = () => {
+  const wb = XLSX.utils.book_new(); 
+  const ws = XLSX.utils.json_to_sheet(events); 
+  XLSX.utils.book_append_sheet(wb, ws, 'Događaji'); 
+
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+
+  const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+  const fileName = `Događaji_${new Date().toISOString()}.xlsx`;
+  saveAs(blob, fileName);
+
+  Alert.alert('Uspjeh', 'Excel datoteka je uspješno generirana i preuzeta.');
+};
+
+const handleExportToPDF = () => {
+  if (!events || events.length === 0) {
+    alert("Nema podataka za događaje.");
+    return;
+  }
+
+  const doc = new jsPDF();
+  let yOffset = 20; 
+
+  events.forEach((event, index) => {
+    if (yOffset > 250) { 
+      doc.addPage();
+      yOffset = 20; 
+    }
+
+    doc.setFontSize(18);
+    doc.text(`Naziv: ${event.naziv}`, 10, yOffset);
+
+    doc.setFontSize(12);
+
+    doc.text(`Vrsta: ${event.svrha}`, 10, yOffset + 10);
+    doc.text(`Datum: ${event.datum}`, 10, yOffset + 20);
+    doc.text(`Napomena: ${event.napomena}`, 10, yOffset + 30);
+    doc.text(`Klijent: ${event.klijent}`, 10, yOffset + 40);
+    doc.text(`Kontakt klijenta: ${event.kontaktKlijenta}`, 10, yOffset + 50);
+    doc.text(`Kontakt sponzora: ${event.kontaktSponzora}`, 10, yOffset + 60);
+    doc.line(10, yOffset + 65, 200, yOffset + 65); 
+
+    yOffset += 75; 
+  });
+
+  doc.save(`Događaji_${new Date().toISOString()}.pdf`);
+};
+
   return (
     <Pozadina>
         <View style={styles.container}>
           <View style={styles.header}>
             <Text style={styles.title}>Događaji</Text> 
+            <Button title="Izvezi u Excel" onPress={handleExportToExcel} />
+            <Button title="Izvezi u PDF" onPress={handleExportToPDF} />
+
           </View>
           <ScrollView style={styles.partneri}>
             <FlatList data={events} renderItem={renderEvent} />
@@ -132,185 +186,3 @@ const styles = StyleSheet.create({
 
 export default EventsPage;
 
-
-/*
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignSelf: 'center',  
-  },
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    gap: 190,
-  },
-  title: {
-    color: '#e8c789',
-    fontFamily: 'Alex Brush',
-    fontSize: 120,
-    marginBottom: 10,
-    textShadowColor: 'black',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 3,
-  },
-  description: {
-    color: '#e8c789',
-    fontSize: 18,
-    fontFamily: 'Monotype Corsiva',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 20,
-  },
-  menu: {
-    position: 'absolute',
-    flex: 1,
-    bottom: 15,
-    left: '5%',
-    width: '95%',
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  partneri: {
-    maxHeight: '55%',
-  },
-});
-
-export default EventsPage;
-
-*/
-/*
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignSelf: 'center',  
-  },
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    gap: 190,
-  },
-  title: {
-    color: '#e8c789',
-    fontFamily: 'Alex Brush',
-    fontSize: 120,
-    marginBottom: 10,
-    textShadowColor: 'black',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 3,
-  },
-  description: {
-    color: '#e8c789',
-    fontSize: 18,
-    fontFamily: 'Monotype Corsiva',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 20,
-  },
-  menu: {
-    position: 'absolute',
-    flex: 1,
-    bottom: 15,
-    left: '5%',
-    width: '95%',
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  partneri: {
-    maxHeight: '55%',
-  },
-});
-
-
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import Pozadina from './ui/Pozadina';
-import SmallButton from './ui/SmallButton'; 
-import HoverButton from './ui/Button';
-import Partner from './ui/Partner'
-
-const PartnersPage = () => {
-  const handleAddPartner = () => {
-    console.log("Dodaj partnera!");
-  }
-  const handleEditPartner = () => {
-    console.log("Uredi partnera!");
-  }
-
-  return (
-    <Pozadina>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Partneri</Text> 
-            <SmallButton title="Novi" onPress={handleAddPartner}/>
-          </View>
-          <ScrollView style={styles.partneri}>
-            <Partner onPress={handleEditPartner} naziv='Prvi partner' vrsta='Maneken' opis='Nisam ja za ovoga...'/>
-            <Partner onPress={handleEditPartner} naziv='Drugi partner' vrsta='Sviralo' opis='Svira svirku, brine brigu...'/>
-            <Partner onPress={handleEditPartner} naziv='Treci partner' vrsta='Plesac' opis='Rekose da udarim po Trusi, nisu znali da mi se tako zove sestra...'/>
-            <Partner onPress={handleEditPartner} naziv='Cetvrti partner' vrsta='Fotograf' opis='Slikar sa posebnim potrebama (za aparatom)'/>
-            <Partner onPress={handleEditPartner} naziv='Peti partner' vrsta='Restoran' opis='Ja sam vise ovako za pojest, popit...'/>
-            <Partner onPress={handleEditPartner} naziv='Sesti partner' vrsta='Ketering' opis='Glupi autocorrect, mislio sam ketamin...'/>
-          </ScrollView>
-        </View>
-    </Pozadina>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignSelf: 'center',
-  },
-  partneri: {
-    maxHeight: 400,
-  },
-  image: {
-    height: 30,
-    width: 30,
-  },
-  item: {
-    display: 'flex',
-    flexDirection: 'row',
-  },
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    gap: 190,
-  },
-  title: {
-    color: '#e8c789',
-    fontFamily: 'Monotype Corsiva',
-    fontSize: 70,
-    textAlign: 'left',
-    marginBottom: 10,
-    textShadowColor: 'black',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 3,
-  },
-  description: {
-    color: '#e8c789',
-    fontSize: 18,
-    fontFamily: 'Monotype Corsiva',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 20,
-  },
-  menu: {
-    position: 'absolute',
-    flex: 1,
-    bottom: 15,
-    left: '5%',
-    width: '90%',
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-});
-
-export default PartnersPage;
-*/
