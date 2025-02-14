@@ -2,14 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Pozadina from '../ui/Pozadina';
-import HoverButton from '../ui/Button';
 import '../ui/scrollbar.css';
 import { usePage } from '../../Routes';
-import Report from '../ui/Report';
+import TouchableReport from '../ui/TouchableReport';
 
 const BASE_URL = 'http://localhost:5149/api/Izvjesce';
 
-const ReportsPage = () => {
+const ExistingReports = () => {
   const { setCurrentPage, pages } = usePage();
   const [reports, setReports] = useState([]);
 
@@ -38,37 +37,32 @@ const ReportsPage = () => {
       fetchReports();
     }, [fetchReports])
   );
-
-  const handleDeleteReport = (deletedId) => {
-    setReports((prevReports) => prevReports.filter(report => report.id !== deletedId));
+   // Funkcija koja će se pozvati kada pritisneš izvješće
+   const handleReportPress = (id) => {
+    console.log('Izvješće ID:', id);
+    setCurrentPage({ ...pages['CreateReport'], reportId: id });
   };
+
 
 
   return (
     <Pozadina>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>Izvješća</Text>
-          <HoverButton
-            style={styles.createButtonContainer}
-            title="Kreiraj izvješće"
-            onPress={() => setCurrentPage(pages['ReportsPickScreen'])}
-          />
+          <Text style={styles.title}>Odaberi izvješće za predložak:</Text>
         </View>
-
-        <Text style={styles.reportsTitle}>Nedavna izvješća:</Text>
         <ScrollView
           style={styles.reportsList}
           keyboardShouldPersistTaps="handled"
         >
            {/* Renderiraj izvješća */}
            {reports.map((report) => (
-            <Report 
+            <TouchableReport
               key ={report.id}
               id={report.id} 
               naziv={report.naziv} 
               opis={report.opis} 
-              onDelete={handleDeleteReport} 
+              onPress={handleReportPress}
             />
           ))}
          </ScrollView>
@@ -136,4 +130,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ReportsPage;
+export default ExistingReports;
