@@ -1,9 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import Pozadina from '../ui/Pozadina';
+import SmallButton from '../ui/SmallButton';
 import { usePage } from '../../Routes';
+import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import { saveAs } from 'file-saver';
+
 
 const BASE_URL = 'http://localhost:5149/api/Partneri'; // Zamijeni s točnim URL-om backend-a
+
 
 export const ViewPartner = () => {
   const { currentPage, setCurrentPage, pages } = usePage();
@@ -15,6 +21,7 @@ export const ViewPartner = () => {
     provizija: '',
     aranzmani: [],
   });
+
 
   // Funkcija za dohvaćanje detalja o partneru i njegovim aranžmanima
   const fetchPartnerDetails = async (id) => {
@@ -32,6 +39,7 @@ export const ViewPartner = () => {
         ...partner,
         aranzmani,
       });
+
     } catch (error) {
       console.error(error);
       Alert.alert('Greška', 'Dogodila se greška pri dohvaćanju podataka o partneru.');
@@ -44,6 +52,63 @@ export const ViewPartner = () => {
       fetchPartnerDetails(id);
     }
   }, [id]);
+
+  const handleExportToExcel = () => {
+    try {
+      const wb = XLSX.utils.book_new();
+      
+
+      const partnerSheet = XLSX.utils.json_to_sheet([partnerDetails]);
+      XLSX.utils.book_append_sheet(wb, partnerSheet, 'Partner');
+  
+      const arrangementsSheet = XLSX.utils.json_to_sheet(partnerDetails.aranzmani);
+      XLSX.utils.book_append_sheet(wb, arrangementsSheet, 'Aranžmani');
+  
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  
+      const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, 'Partner.xlsx');
+  
+      Alert.alert('Uspjeh', 'Excel datoteka je uspješno generirana i preuzeta.');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Greška', 'Dogodila se greška prilikom izvoza u Excel.');
+    }
+  };
+
+  const handleExportToPDF = () => {
+    const data = partnerDetails;
+
+    if (!data || !data.naziv) {
+      alert("Nema podataka za partnera.");
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text(data.naziv, 10, 10);
+    doc.setFontSize(12);
+    doc.text(`Vrsta: ${data.tip}`, 10, 20);
+    doc.text(`Napomena: ${data.napomena}`, 10, 30);
+    doc.text(`Provizija: ${data.provizija}%`, 10, 40);
+
+    // odvojimo aranzmane malo od opcenitih podataka
+    doc.setFontSize(16);
+    doc.text('Aranžmani:', 10, 60);
+    doc.setFontSize(12);
+
+    data.aranzmani.forEach((pkg, index) => {
+      const yOffset = 70 + (index * 40);
+      doc.text(`Aranžman: ${pkg.naziv}`, 10, yOffset);
+      doc.text(`Opis: ${pkg.opis}`, 10, yOffset + 10);
+      doc.text(`Cijena: ${pkg.cijena} kn`, 10, yOffset + 20);
+      doc.line(10, yOffset + 25, 200, yOffset + 25); // linija između aranžmana
+    });
+
+    // Spremanje PDF-a
+    doc.save(`${data.naziv}_Detalji.pdf`);
+  };
 
   useEffect(() => {
     fetchPartnerDetails(id);
@@ -94,6 +159,8 @@ export const ViewPartner = () => {
           )}
         </ScrollView>
 
+        <SmallButton title="Izvezi u Excel"style={styles.saveButton} onPress={handleExportToExcel}/>
+        <SmallButton title="Izvezi u PDF" style={styles.saveButton} onPress={handleExportToPDF} />
         <TouchableOpacity
           style={styles.closeButton}
           onPress={() => setCurrentPage(pages['Partners'])}

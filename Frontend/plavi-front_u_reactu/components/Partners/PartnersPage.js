@@ -4,8 +4,10 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Pozadina from '../ui/Pozadina';
 import SmallButton from '../ui/SmallButton';
 import { usePage } from '../../Routes';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver'
 
-const BASE_URL = 'http://localhost:5149/api/Partneri'; // Zamijeni s točnim URL-om backend-a
+const BASE_URL = 'http://localhost:5149/api/Partneri'; 
 
 const PartnersPage = () => {
   const { setCurrentPage, pages } = usePage();
@@ -23,7 +25,7 @@ const PartnersPage = () => {
     }
   };
 
-  // Funkcija za brisanje partnera
+  
   const handleDeletePartner = async (id) => {
     try {
       const response = await fetch(`${BASE_URL}/${id}`, {
@@ -68,12 +70,61 @@ const PartnersPage = () => {
     fetchPartners();
   }, []);
 
+  
+  const handleExportToExcel = async () => {
+    try {
+      const wb = XLSX.utils.book_new();
+      
+      const partnerResponse = await fetch(BASE_URL);
+      const partners = await partnerResponse.json();
+  
+      const partnerSheet = XLSX.utils.json_to_sheet(partners);
+      XLSX.utils.book_append_sheet(wb, partnerSheet, "Partneri");
+  
+      const existingSheetNames = new Set(["Partneri"]);
+  
+      for (const partner of partners) {
+        const { id, naziv } = partner;
+        const sanitizedSheetName = `Aranzmani_${naziv}`.substring(0, 31); // Excel ne dozvoljava duže od 31 karaktera
+        let uniqueSheetName = sanitizedSheetName;
+        let counter = 1;
+  
+        while (existingSheetNames.has(uniqueSheetName)) {
+          uniqueSheetName = `${sanitizedSheetName}_${counter++}`;
+        }
+  
+        existingSheetNames.add(uniqueSheetName);
+  
+      
+        const aranzmaniResponse = await fetch(`${BASE_URL}/Aranzmani/${id}`);
+        const aranzmani = aranzmaniResponse.ok ? await aranzmaniResponse.json() : [];
+  
+        const sheetData = aranzmani.length ? aranzmani : [{ Poruka: "Nema aranžmana" }];
+        const aranzmaniSheet = XLSX.utils.json_to_sheet(sheetData);
+        XLSX.utils.book_append_sheet(wb, aranzmaniSheet, uniqueSheetName);
+      }
+  
+
+      const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      saveAs(blob, "Partneri_i_Aranzmani.xlsx");
+  
+      Alert.alert("Uspjeh", "Excel datoteka je uspješno generirana i preuzeta.");
+    } catch (error) {
+      console.error("Greška pri izvozu u Excel:", error);
+      Alert.alert("Greška", "Dogodila se greška prilikom izvoza u Excel.");
+    }
+  };
+  
+
+  
   return (
     <Pozadina>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>Partneri</Text>
           <SmallButton title="Novi" onPress={handleAddPartner} style={styles.newButton} />
+          <SmallButton title="Izvezi u Excel" style={styles.saveButton} onPress={handleExportToExcel} />        
         </View>
 
         <ScrollView style={styles.partneri}>

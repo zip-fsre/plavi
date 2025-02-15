@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from "react-native";
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
+import SmallButton from '../ui/SmallButton';
 import * as XLSX from 'xlsx';
 import { saveAs } from "file-saver";
 import Pozadina from "../ui/Pozadina";
@@ -80,9 +79,13 @@ export const EditPartner = () => {
   const handleExportToExcel = () => {
     const wb = XLSX.utils.book_new();
     const partnerSheet = XLSX.utils.json_to_sheet([partner]);
+
     XLSX.utils.book_append_sheet(wb, partnerSheet, "Partner");
+
     const arrangementsSheet = XLSX.utils.json_to_sheet(arrangements);
+
     XLSX.utils.book_append_sheet(wb, arrangementsSheet, "Aranžmani");
+    
     const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     const blob = new Blob([wbout], { type: "application/octet-stream" });
     saveAs(blob, "Partner.xlsx");

@@ -3,9 +3,12 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Pozadina from '../ui/Pozadina';
 import HoverButton from '../ui/Button';
+import SmallButton from '../ui/SmallButton';
 import '../ui/scrollbar.css';
 import { usePage } from '../../Routes';
 import Report from '../ui/Report';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 const BASE_URL = 'http://localhost:5149/api/Izvjesce';
 
@@ -43,12 +46,42 @@ const ReportsPage = () => {
     setReports((prevReports) => prevReports.filter(report => report.id !== deletedId));
   };
 
+  const handleExportReportsToExcel = async () => {
+    try {
+      const response = await fetch(BASE_URL);
+      if (!response.ok) throw new Error('Neuspješan GET zahtjev');
+
+      const reportsData = await response.json();
+      if (reportsData.length === 0) {
+        Alert.alert("Info", "Nema izvješća za izvoz.");
+        return;
+      }
+
+      const wb = XLSX.utils.book_new();
+      const sheet = XLSX.utils.json_to_sheet(reportsData);
+      XLSX.utils.book_append_sheet(wb, sheet, "Izvješća");
+      
+      const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      saveAs(blob, "Izvjesca.xlsx");
+
+      Alert.alert("Uspjeh", "Excel datoteka je uspješno generirana.");
+    } catch (error) {
+      console.error("Greška pri izvozu izvješća:", error);
+      Alert.alert("Greška", "Dogodila se greška prilikom izvoza u Excel.");
+    }
+  };
 
   return (
     <Pozadina>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>Izvješća</Text>
+          <SmallButton
+          style={styles.exportButton}
+          title="Izvezi u Excel"
+          onPress={handleExportReportsToExcel}
+        />
           <HoverButton
             style={styles.createButtonContainer}
             title="Kreiraj izvješće"
