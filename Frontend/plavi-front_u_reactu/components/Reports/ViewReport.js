@@ -171,6 +171,8 @@ const ViewReport = () => {
       {
         'Naziv izvješća': reportData.naziv || 'N/A',
         'Opis izvješća': reportData.opis || 'N/A',
+        'DatumOd': reportData.pocetak ? new Date(reportData.pocetak).toLocaleDateString() : 'N/A',
+        'DatumDo': reportData.kraj ? new Date(reportData.kraj).toLocaleDateString() : 'N/A'
       }
     ];
   
