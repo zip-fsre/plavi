@@ -9,13 +9,14 @@ import { usePage } from '../../Routes';
 import { Picker } from '@react-native-picker/picker';
 
 const CreateReport = () => {
-  const { setCurrentPage, pages } = usePage();
+  const {currentPage, setCurrentPage, pages } = usePage();
+  const { preselectedPartner, preselectedYear, reportId } = currentPage;
 
   const [reportTitle, setReportTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [selectedPartner, setSelectedPartner] = useState('');
+  const [selectedPartner, setSelectedPartner] = useState(-1);
   const [partners, setPartners] = useState([]);
   const [medjutablicaPt1, setMedjutablicaPt1] = useState([]);
   const [events, setEvents] = useState([]);
@@ -42,9 +43,67 @@ const CreateReport = () => {
     fetchData();
   }, []);
 
+
+  // Ako je proslijeđen reportId, dohvaćamo podatke izvješća
+  useEffect(() => {
+    const fetchReportData = async () => {
+      if (reportId) {
+        try {
+          const reportResponse = await fetch(`http://localhost:5149/api/Izvjesce/${reportId}`);
+          if (!reportResponse.ok) {
+            throw new Error('Greška pri dohvaćanju izvješća');
+          }
+          const reportData = await reportResponse.json();
+
+          setReportTitle(reportData.naziv);
+          setDescription(reportData.opis);
+          setSelectedPartner(reportData.odabraniPartner || -1);
+          setStartDate(reportData.pocetak ? new Date(reportData.pocetak) : null);
+          setEndDate(reportData.kraj ? new Date(reportData.kraj) : null);
+        } catch (error) {
+          console.error('Greška pri dohvaćanju izvješća:', error);
+        }
+      }
+    };
+
+    fetchReportData();
+  }, [reportId]);
+
+
+    // Postavljanje proslijeđenih vrijednosti na početku
+    useEffect(() => {
+      if (preselectedYear) {
+        const startOfYear = new Date(preselectedYear, 0, 1);
+
+         // Provjera je li odabrana trenutna godina
+        const currentYear = new Date().getFullYear();
+        let endOfYear;
+        if (preselectedYear == currentYear) {
+          // Ako je odabrana trenutna godina, postavljamo kraj na danasnji datum
+          endOfYear = new Date(); // današnji datum
+        } else {
+          // Inače, postavljamo kraj na 31.12.
+          endOfYear = new Date(preselectedYear, 11, 31);
+        }
+        setStartDate(startOfYear);
+        setEndDate(endOfYear);
+        console.log('preselectedYear:', preselectedYear);
+        console.log('End date:', endOfYear);
+      }
+  
+      if (preselectedPartner) {
+        setSelectedPartner(preselectedPartner);
+        console.log('preselectedPartner:', preselectedPartner);
+      }
+    }, [preselectedYear, preselectedPartner]);
+
   const handleGenerateReport = async () => {
     if (!reportTitle || !description) {
-      console.warn("Molimo unesite naziv i opis izvješća.");
+      alert("Molimo unesite naziv i opis izvješća.");
+      return;
+    }
+    if ((startDate && !endDate) || (!startDate && endDate)) {
+      alert("Morate odabrati oba datuma ili nijedan.");
       return;
     }
 
@@ -60,15 +119,16 @@ const CreateReport = () => {
   
     try {
 
-      let filteredPartnerData = [];
-      const startDateTime = startDate ? new Date(startDate).setHours(0, 0, 0, 0) : null;
-    const endDateTime = endDate ? new Date(endDate).setHours(23, 59, 59, 999) : null;
+      const startDateTime = startDate ? new Date(startDate) : null;
+      if (startDateTime) startDateTime.setHours(23, 59, 59, 999);
 
-    console.log('datumi:' ,startDateTime, endDateTime);
+      const endDateTime = endDate ? new Date(endDate) : null;
+      if (endDateTime) endDateTime.setHours(23, 59, 59, 999);
 
-  
+      console.log('datumi:' ,startDateTime, endDateTime);
+
       // 1. Ako je partner odabran, filtriraj prema partneru
-      if (selectedPartner) {
+      if (selectedPartner != -1) {
         const filteredPartnerDataResponse = await fetch(`http://localhost:5149/api/MedjutablicaPt1/Partner/${selectedPartner}`);
         filteredPartnerData = await filteredPartnerDataResponse.json();
         console.log("Filtered MedjutablicaPt1 by Partner:", filteredPartnerData);
@@ -79,21 +139,12 @@ const CreateReport = () => {
   
       // 2. Filtriraj događaje prema datumu ako su datumi uneseni
       const filteredEvents = startDate && endDate
-       ? events.filter(event => {
-      const eventDate = new Date(event.datum);
-      const reportStartDate = new Date(startDate);
-      const reportEndDate = new Date(endDate);
-
-      // Normalize both dates to ignore the time part by setting the time to midnight
-      reportStartDate.setHours(0, 0, 0, 0);
-      reportEndDate.setHours(23, 59, 59, 999);
-
-      // Strip the time from eventDate to compare only the date part
-      eventDate.setHours(0, 0, 0, 0);
-      console.log('Filtering event:', event, 'Start:', reportStartDate, 'End:', reportEndDate, 'Event Date:', eventDate);
-      return eventDate >= reportStartDate && eventDate <= reportEndDate;
-    })
-  : events;
+        ? events.filter(event => {
+            const eventDate = new Date(event.datum);
+            console.log('Filtering event:', event, 'Start:', startDateTime, 'End:', endDateTime, 'Event Date:', eventDate);
+            return eventDate >= startDateTime && eventDate <= endDateTime;
+          })
+        : events;
   
       console.log("Filtered Events:", filteredEvents);
   
@@ -109,9 +160,9 @@ const CreateReport = () => {
       const reportData = {
         naziv: reportTitle,
         opis: description,
-        pocetak: startDate ? new Date(startDateTime).toISOString() : null,
-        kraj: endDate ? new Date(endDateTime).toISOString() : null,
-        odabraniPartner: selectedPartner || undefined,
+        pocetak: startDateTime ? startDateTime.toISOString() : null,
+        kraj: endDateTime ? endDateTime.toISOString()  : null,
+        odabraniPartner: selectedPartner,
       };
   
       console.log("Slanje izvješća na backend:", reportData);
@@ -122,7 +173,9 @@ const CreateReport = () => {
       });
   
       if (!reportResponse.ok) {
+        const errorDetails = await reportResponse.json()
         console.error("Greška pri stvaranju izvješća! Status:", reportResponse.status);
+        console.error("Detalji greške:", errorDetails);
         alert("Došlo je do pogreške pri stvaranju izvještaja.");
         return;
       }
@@ -227,7 +280,7 @@ const CreateReport = () => {
           onValueChange={setSelectedPartner}
           style={styles.picker}
         >
-          <Picker.Item label="Odaberite partnera" value="" />
+          <Picker.Item label="Odaberite partnera" value={-1} />
           {partners.map((partner) => (
             <Picker.Item key={partner.id} label={partner.naziv} value={partner.id} />
           ))}
@@ -290,6 +343,8 @@ const styles = StyleSheet.create({
     width: '60%',
     height:40,
     marginBottom: 15,
+    borderRadius:20,
+    paddingLeft: 10,
   },
 });
 

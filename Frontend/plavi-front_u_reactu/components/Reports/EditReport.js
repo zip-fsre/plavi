@@ -20,9 +20,10 @@ const EditReport = () => {
   const [partners, setPartners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [medjutablicaPt2, setMedjutablicaPt2] = useState([]);
   const [medjutablicaPt1, setMedjutablicaPt1] = useState([]); 
   const [events, setEvents] = useState([]);
+
+ 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,7 +34,7 @@ const EditReport = () => {
         setDescription(reportData.opis);
         setStartDate(reportData.pocetak ? new Date(reportData.pocetak) : null);
         setEndDate(reportData.kraj ? new Date(reportData.kraj) : null);
-        setSelectedPartner(reportData.odabraniPartner || undefined);
+        setSelectedPartner(reportData.odabraniPartner);
       } catch (error) {
         setError('Greška pri dohvaćanju izvješća');
       } finally {
@@ -50,16 +51,6 @@ const EditReport = () => {
       }
     };
 
-    const fetchMedjutablica = async () => {
-      try {
-        const medjutablicaResponse = await fetch(`http://localhost:5149/api/Izvjesce/Podatci/${reportId}`);
-        const medjutablicaData = await medjutablicaResponse.json();
-        console.log('medjutablica2edit:', medjutablicaData);
-        setMedjutablicaPt2(medjutablicaData);
-      } catch (error) {
-        console.error('Greška pri dohvaćanju medjutablice:', error);
-      }
-    };
 
     const fetchEvents = async () => {
       try {
@@ -70,10 +61,20 @@ const EditReport = () => {
         console.error('Greška pri dohvaćanju događaja:', error);
       }
     };
+    const fetchMedjutablicaPt1 = async () => {
+      try {
+        const response = await fetch('http://localhost:5149/api/MedjutablicaPt1');
+        const medjutablicaPt1Data = await response.json();
+        console.log('medjutablicaPt1 edit:', medjutablicaPt1Data);
+        setMedjutablicaPt1(medjutablicaPt1Data);
+      } catch (error) {
+        console.error('Greška pri dohvaćanju medjutablicePt1:', error);
+      }
+    };
 
     if (reportId) {
       fetchData();
-      fetchMedjutablica();
+      fetchMedjutablicaPt1();
     }
     fetchPartners();
     fetchEvents();
@@ -84,6 +85,10 @@ const EditReport = () => {
       console.warn("Molimo unesite naziv i opis izvješća.");
       return;
     }
+    if ((startDate && !endDate) || (!startDate && endDate)) {
+      alert("Morate odabrati oba datuma ili nijedan.");
+      return;
+    }
 
     if (startDate && endDate && new Date(startDate) >= new Date(endDate)) {
       alert("Početni datum mora biti manji od završnog datuma.");
@@ -91,7 +96,8 @@ const EditReport = () => {
     }
 
     let filteredPartnerData = [];
-    if (selectedPartner) {
+    console.log('odabrani partner:', selectedPartner);
+    if (selectedPartner != -1) {
       const response = await fetch(`http://localhost:5149/api/MedjutablicaPt1/Partner/${selectedPartner}`);
       filteredPartnerData = await response.json();
     } else {
@@ -101,7 +107,7 @@ const EditReport = () => {
     const filteredEvents = startDate && endDate
       ? events.filter(event => {
           const eventDate = new Date(event.datum);
-          const reportStartDate = new Date(startDate).setHours(0, 0, 0, 0);
+          const reportStartDate = new Date(startDate).setHours(23, 59, 59, 999);
           const reportEndDate = new Date(endDate).setHours(23, 59, 59, 999);
           return eventDate >= reportStartDate && eventDate <= reportEndDate;
         })
@@ -125,14 +131,16 @@ const EditReport = () => {
           opis: description,
           pocetak: startDate ? new Date(startDate).toISOString() : null,
           kraj: endDate ? new Date(endDate).toISOString() : null,
-          odabraniPartner: selectedPartner || undefined,
+          odabraniPartner: selectedPartner,
         }),
       });
-
-      if (!response.ok) {
-        alert('Došlo je do pogreške pri ažuriranju izvješća.');
-        return;
-      }
+        console.log('response', response);
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.log('Error details:', errorData);  // Prikazuje detalje pogreške
+        } else {
+          console.log('Success:', await response.json());
+        }
 
       for (const item of filteredMedjutablicaPt1) {
         await fetch('http://localhost:5149/api/MedjutablicaPt2', {
@@ -223,11 +231,12 @@ const EditReport = () => {
 
                 {/* Picker za partnera */}
                 <Picker
+
                     selectedValue={selectedPartner}
                     onValueChange={setSelectedPartner}
                     style={styles.picker}
                 >
-                    <Picker.Item label="Odaberite partnera" value="" />
+                    <Picker.Item label="Odaberite partnera" value= {-1}/>
                     {partners.map((partner) => (
                         <Picker.Item key={partner.id} label={partner.naziv} value={partner.id} />
                     ))}
@@ -293,6 +302,8 @@ const styles = StyleSheet.create({
       width: '60%',
       height:40,
       marginBottom: 15,
+      borderRadius:20,
+      paddingLeft: 10,
     },
   });
 

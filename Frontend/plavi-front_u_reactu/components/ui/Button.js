@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-const Button = ({ title, onPress, bgColor, textColor }) => {
+const Button = ({ title, onPress, bgColor, textColor, height, width, fontSize}) => {
   const [hovered, setHovered] = useState(false);
 
   return (
     <TouchableOpacity
-    style={[styles.button, hovered && styles.buttonHover, {backgroundColor: bgColor || "#e8c789"}]}
+    style={[styles.button, hovered && styles.buttonHover, {backgroundColor: bgColor || "#e8c789",  height: height || 'auto', width: width || 'auto'}]}
     onPress={onPress}
     onMouseEnter={() => setHovered(true)} 
     onMouseLeave={() => setHovered(false)} 
   >
-  <Text style={[styles.buttonText, {color: textColor || "#222c2b"}]}>{title}</Text>
+  <Text style={[styles.buttonText, {color: textColor || "#222c2b", fontSize: fontSize || 22}]}>{title}</Text>
     </TouchableOpacity>
   );
 };
@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
