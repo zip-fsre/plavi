@@ -78,6 +78,7 @@ namespace JsonReturn.Controllers
         [HttpDelete("{id}")]
         public ActionResult<Izvjesce> DeleteIzvjesce(int id)
         {
+            DeletePodatke(id);
             var array = _context.Izvjesces.ToList();
             var pom = array.SingleOrDefault(item => item.Id == id);
             _context.Izvjesces.Remove(pom);

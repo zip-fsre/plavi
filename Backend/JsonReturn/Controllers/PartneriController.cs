@@ -77,6 +77,7 @@ namespace JsonReturn.Controllers
         [HttpDelete("{id}")]
         public ActionResult<Partneri> DeletePartneri(int id)
         {
+            DeleteAranzmane(id);
             var array = _context.Partneris.ToList();
             var pom = array.SingleOrDefault(item => item.Id == id);
             _context.Partneris.Remove(pom);
@@ -89,6 +90,26 @@ namespace JsonReturn.Controllers
         public ActionResult<IEnumerable<JsonReturn.Models.Aranzman>> GetAranzmani(int id)
         {
             return _context.Aranzmen.AsQueryable().Where(Aranzman => Aranzman.IdPartnera == id).ToList();
+        }
+
+        // DELETE: api/Partneri/Aranzmani/1 - Brise sve goste za jedan dogadjaj
+        [HttpDelete("Aranzmani/{id}")]
+        public System.Collections.Generic.IEnumerable<JsonReturn.Models.MedjutablicaPt1> DeleteAranzmane(int id)
+        {
+            var pom0 = _context.Aranzmen.ToList().Where(item => item.IdPartnera == id);
+            foreach(JsonReturn.Models.Aranzman podatak0 in pom0){
+                var pom = _context.MedjutablicaPt1s.ToList().Where(item => item.IdDogadjaja == id);
+                foreach(JsonReturn.Models.MedjutablicaPt1 podatak in pom){
+                    var pom2 = _context.MedjutablicaPt2s.ToList().Where(item => item.IdMedju1 == podatak.Id);
+                    foreach(JsonReturn.Models.MedjutablicaPt2 podatak2 in pom2){
+                        _context.MedjutablicaPt2s.Remove(podatak2);
+                    }
+                    _context.MedjutablicaPt1s.Remove(podatak);
+                }
+                _context.Aranzmen.Remove(podatak0);
+            }
+            _context.SaveChanges();
+            return _context.MedjutablicaPt1s;
         }
     }
 }

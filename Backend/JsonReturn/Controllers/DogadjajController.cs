@@ -81,9 +81,11 @@ namespace JsonReturn.Controllers
         [HttpDelete("{id}")]
         public ActionResult<Dogadjaj> DeleteDogadjaj(int id)
         {
+            DeleteGoste(id);
+            DeleteMedju1(id);
             var array = _context.Dogadjajs.ToList();
-            var pom = array.SingleOrDefault(item => item.Id == id);
-            _context.Dogadjajs.Remove(pom);
+            var pom3 = array.SingleOrDefault(item => item.Id == id);
+            _context.Dogadjajs.Remove(pom3);
             _context.SaveChanges();
             return _context.Dogadjajs.Find(id);
         }
@@ -95,11 +97,39 @@ namespace JsonReturn.Controllers
             return _context.MedjutablicaPt1s.AsQueryable().Where(MedjutablicaPt1s => MedjutablicaPt1s.IdDogadjaja == id).ToList();
         }
 
-        // Get: api/Dogadjaj/Partners
+        // Get: api/Dogadjaj/Gosti/1
         [HttpGet("Gosti/{id}")]
         public ActionResult<IEnumerable<JsonReturn.Models.Gost>> GetGosti(int id)
         {
             return _context.Gosts.AsQueryable().Where(Gosts => Gosts.IdDogadjajaa == id).ToList();
+        }
+
+        // DELETE: api/Dogadjaj/Gosti/1 - Brise sve goste za jedan dogadjaj
+        [HttpDelete("Gosti/{id}")]
+        public System.Collections.Generic.IEnumerable<JsonReturn.Models.Gost> DeleteGoste(int id)
+        {
+            var pom = _context.Gosts.ToList().Where(item => item.IdDogadjajaa == id);
+            foreach(JsonReturn.Models.Gost podatak in pom){
+                _context.Gosts.Remove(podatak);
+            }
+            _context.SaveChanges();
+            return _context.Gosts;
+        }
+
+        // DELETE: api/Dogadjaj/Aranzmani/1
+        [HttpDelete("Aranzmani/{id}")]
+        public System.Collections.Generic.IEnumerable<JsonReturn.Models.MedjutablicaPt1> DeleteMedju1(int id)
+        {
+            var pom = _context.MedjutablicaPt1s.ToList().Where(item => item.IdDogadjaja == id);
+            foreach(JsonReturn.Models.MedjutablicaPt1 podatak in pom){
+                var pom2 = _context.MedjutablicaPt2s.ToList().Where(item => item.IdMedju1 == podatak.Id);
+                foreach(JsonReturn.Models.MedjutablicaPt2 podatak2 in pom2){
+                    _context.MedjutablicaPt2s.Remove(podatak2);
+                }
+                _context.MedjutablicaPt1s.Remove(podatak);
+            }
+            _context.SaveChanges();
+            return _context.MedjutablicaPt1s;
         }
     }
 }
