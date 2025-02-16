@@ -93,6 +93,14 @@ namespace JsonReturn.Controllers
         {
             var array = _context.Aranzmen.ToList();
             var pom = array.SingleOrDefault(item => item.Id == id);
+            var pom2 = _context.MedjutablicaPt1s.ToList().Where(item => item.IdAranzmana == id);
+            foreach(JsonReturn.Models.MedjutablicaPt1 podatak in pom2){
+                var pom3 = _context.MedjutablicaPt2s.ToList().Where(item => item.IdMedju1 == podatak.Id);
+                foreach(JsonReturn.Models.MedjutablicaPt2 podatak2 in pom3){
+                    _context.MedjutablicaPt2s.Remove(podatak2);
+                }
+                _context.MedjutablicaPt1s.Remove(podatak);
+            }
             _context.Aranzmen.Remove(pom);
             _context.SaveChanges();
             return _context.Aranzmen.Find(id);

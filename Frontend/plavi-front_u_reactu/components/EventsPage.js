@@ -51,7 +51,7 @@ const EventsPage = () => {
 const renderEvent = ({item}) => {
   return (
     <View style={styles.eventContainer}>
-      <Event onPress={() => setCurrentPage({...pages['EditEventPage'], id: item.id})} naziv={item.naziv} vrsta={item.svrha} opis={item.napomena} datum={item.datum}/> {/* komponenta Event je dizajn prikaza kartice */}
+      <Event onPress={() => setCurrentPage({...pages['EditEventPage'], id: item.id})} naziv={item.naziv} vrsta={item.svrha} opis={item.napomena} datum={item.datum}/>
     </View>
   );
 
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   partneri: {
-    maxHeight: '60%',
+    maxHeight: 500,
   },
 });
 
