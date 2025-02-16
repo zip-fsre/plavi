@@ -5,7 +5,6 @@ import { usePage } from "../../Routes";
 import * as DocumentPicker from "expo-document-picker"; 
 import * as XLSX from "xlsx"; 
 import SmallButton from "../ui/SmallButton";
-import { useForm } from "react-hook-form";
 
 const BASE_URL = "http://localhost:5149/api"; // URL backend-a
 
@@ -48,10 +47,7 @@ export const PartnerExcel= () => {
   const { template, templateAranzmani, partnerId } = currentPage;
 
   const [arrangements, setArrangements] = useState([{ naziv: "", opis: "", cijena: "" }]);
-  const [naziv, setNaziv] = useState("");
-  const [vrsta, setVrsta] = useState("");
-  const [napomena, setNapomena] = useState("");
-  const [provizija, setProvizija] = useState("");
+  
 
   useEffect(() => {
     if(partnerId){
@@ -179,7 +175,7 @@ const handleFileUpload = async () => {
         const firstSheet = workbook.SheetNames[0];
         const partnerData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
 
-        console.log("✅ Podaci o partneru:", partnerData); // Ispisujemo partner podatke
+        console.log("Podaci o partneru:", partnerData); 
 
         if (partnerData.length === 0) {
           console.error("Greška: Nema podataka o partneru.");
@@ -187,7 +183,7 @@ const handleFileUpload = async () => {
         }
 
         const firstPartner = partnerData[0];
-        console.log("✅ Podaci za prvog partnera:", firstPartner); // Ispisujemo prvi partner
+        console.log("Podaci za prvog partnera:", firstPartner); 
 
         const partnerId = firstPartner["id"];
 
@@ -202,19 +198,19 @@ const handleFileUpload = async () => {
             cijena: arr["cijena"] ? arr["cijena"].toString() : "",
           }));
 
-        // Provjeravamo što dolazi u firstPartner
-        console.log("✅ Popunjeni podaci za partnera:", firstPartner);
-
-        // Postavljanje podataka u state
-        setNaziv(firstPartner["naziv"] || "");
-        setVrsta(firstPartner["tip"] || "");
-        setNapomena(firstPartner["napomena"] || "");
-        setProvizija(firstPartner["provizija"] ? firstPartner["provizija"].toString() : "");
-
-        // Postavljanje aranžmana
+        console.log("Popunjeni podaci za partnera:", firstPartner);
+        setNewPartner((prev) => ({
+          ...prev, 
+          naziv: firstPartner["naziv"] || "",
+          vrsta: firstPartner["tip"] || "",
+          napomena: firstPartner["napomena"] || "",
+          provizija: firstPartner["provizija"] ? firstPartner["provizija"].toString() : "",
+        }));
+        
+        console.log("Partner nakon učitavanja:", newPartner);
         setArrangements(partnerArrangements);
 
-        console.log("✅ Učitani aranžmani:", partnerArrangements);
+        console.log("Učitani aranžmani:", partnerArrangements);
       } catch (parseError) {
         console.error("Greška pri obradi podataka iz Excela:", parseError);
       }
