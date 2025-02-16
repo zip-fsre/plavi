@@ -1,20 +1,22 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Pozadina from '../ui/Pozadina';
-import HoverButton from '../ui/Button';
 import SmallButton from '../ui/SmallButton';
 import '../ui/scrollbar.css';
 import { usePage } from '../../Routes';
 import Report from '../ui/Report';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const BASE_URL = 'http://localhost:5149/api/Izvjesce';
 
 const ReportsPage = () => {
   const { setCurrentPage, pages } = usePage();
   const [reports, setReports] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredReports, setFilteredReports] = useState([]);
 
    // Funkcija za dohvat izvješća sa servera
    const fetchReports = useCallback(async () => {
@@ -26,24 +28,40 @@ const ReportsPage = () => {
       const sortedReports = data.sort((a, b) => b.id - a.id);
 
       setReports(sortedReports); // Spremi podatke u state
+      setFilteredReports(sortedReports);
     } catch (error) {
       console.error(error);
       alert('Ne mogu dohvatiti izvješća. Pokušajte kasnije.');
     }
   }, []);
 
-  useEffect(() => {
-    fetchReports();
-  }, [fetchReports]);
-
   useFocusEffect(
     useCallback(() => {
       fetchReports();
     }, [fetchReports])
   );
+  // Funkcija za uklanjanje dijakritika
+  const removeDiacritics = (text) => {
+    return text
+      .normalize("NFD") // Razdvaja slova i dijakritičke znakove
+      .replace(/[\u0300-\u036f]/g, ""); // Briše dijakritičke znakove
+  };
+
+   // Pretraga izvješća
+   const handleSearch = (query) => {
+    setSearchQuery(query);
+    const trimmedQuery = removeDiacritics(query.trim().toLowerCase());
+    const filtered = reports.filter(
+      (report) =>
+        removeDiacritics(report.naziv.toLowerCase()).includes(trimmedQuery) ||
+      removeDiacritics(report.opis.toLowerCase()).includes(trimmedQuery)
+    );
+    setFilteredReports(filtered);
+  };
 
   const handleDeleteReport = (deletedId) => {
     setReports((prevReports) => prevReports.filter(report => report.id !== deletedId));
+    setFilteredReports((prevReports) => prevReports.filter((report) => report.id !== deletedId));
   };
 
   const handleExportReportsToExcel = async () => {
@@ -82,11 +100,22 @@ const ReportsPage = () => {
           title="Izvezi u Excel"
           onPress={handleExportReportsToExcel}
         />
-          <HoverButton
+          <SmallButton
             style={styles.createButtonContainer}
             title="Kreiraj izvješće"
             onPress={() => setCurrentPage(pages['ReportsPickScreen'])}
           />
+        </View>
+
+         {/* TextInput za pretragu */}
+         <View style={styles.searchContainer}>
+         <Icon name="search" size={20} color="#222c2b" style={styles.searchIcon} />
+         <TextInput
+          style={styles.searchInput}
+          placeholder="Pretraži izvješća..."
+          value={searchQuery}
+          onChangeText={handleSearch}
+        />
         </View>
 
         <Text style={styles.reportsTitle}>Nedavna izvješća:</Text>
@@ -95,7 +124,7 @@ const ReportsPage = () => {
           keyboardShouldPersistTaps="handled"
         >
            {/* Renderiraj izvješća */}
-           {reports.map((report) => (
+           {(searchQuery ? filteredReports : reports).map((report) => (
             <Report 
               key ={report.id}
               id={report.id} 
@@ -166,6 +195,32 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
     fontFamily: 'Monotype Corsiva',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '40%',
+    alignSelf: 'center',
+    backgroundColor: '#95997e',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    height: 44,
+    marginBottom: 15,
+    marginTop: 15,
+    paddingLeft: 20,
+    opacity: 0.6,
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 18,
+    color: '#222c2b',
+    borderRadius: 20,
+    height: 40,
+    paddingLeft: 10,
   },
 });
 
