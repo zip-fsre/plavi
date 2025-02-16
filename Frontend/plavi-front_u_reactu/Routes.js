@@ -14,6 +14,9 @@ import  EditPartner from './components/Partners/EditPartnerPage';
 import ReportsPickScreen from './components/Reports/ReportsPickScreen';
 import ExistingReports from './components/Reports/ExistingReports';
 import ReportTemplates from './components/Reports/ReportTemplates';
+import PartnersPickScreen from './components/Partners/PartnersPickScreen';
+import ExistingPartners from './components/Partners/ExistingPartners';
+import PartnerTemplates from './components/Partners/PartnerTemplates';
 
 
 
@@ -36,6 +39,9 @@ export const RoutesProvider = ({ children }) => {
     ReportsPickScreen: { component: ReportsPickScreen, options: { headerShown: false }},
     ExistingReports: { component: ExistingReports, options: { headerShown: false }},
     ReportTemplates: { component: ReportTemplates, options: { headerShown: false }},
+    PartnersPickScreen: { component: PartnersPickScreen, options: { headerShown: false }},
+    ExistingPartners: { component: ExistingPartners, options: { headerShown: false }},
+    PartnerTemplates: { component: PartnerTemplates, options: { headerShown: false }},
   };
 
   const [currentPage, setCurrentPage] = useState(pages['Home']);

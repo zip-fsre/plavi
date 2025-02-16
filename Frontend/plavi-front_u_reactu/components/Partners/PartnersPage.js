@@ -56,7 +56,7 @@ const PartnersPage = () => {
   };
 
   const handleAddPartner = () => {
-    setCurrentPage(pages['AddPartner']);
+    setCurrentPage(pages['PartnersPickScreen']);
   };
 
   const handleEditPartner = (partner) => {
