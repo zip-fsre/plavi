@@ -4,43 +4,43 @@ import { useFocusEffect } from '@react-navigation/native';
 import Pozadina from '../ui/Pozadina';
 import '../ui/scrollbar.css';
 import { usePage } from '../../Routes';
-import TouchablePartner from '../ui/TouchablePartner';
+import TouchableDogadjaj from '../ui/TouchableDogadjaj';
 
-const BASE_URL = 'http://localhost:5149/api/Partneri';
+const BASE_URL = 'http://localhost:5149/api/Dogadjaj';
 
-const ExistingPartners = () => {
+const ExistingEvents = () => {
   const { currentPage, setCurrentPage, pages } = usePage();
-  const [partneri, setPartneri] = useState([]);
+  const [dogadjaji, setDogadjaji] = useState([]);
 
-   // Funkcija za dohvat partnere sa servera
-   const fetchPartneri = useCallback(async () => {
+   // Funkcija za dohvat dogadjaje sa servera
+   const fetchDogadjaji = useCallback(async () => {
     try {
       const response = await fetch(BASE_URL);
       if (!response.ok) throw new Error('Neuspješan GET zahtjev');
       const data = await response.json();
 
-      const sortedPartneri = data.sort((a, b) => b.id - a.id);
+      const sortedDogadjaji = data.sort((a, b) => b.id - a.id);
 
-      setPartneri(sortedPartneri); // Spremi podatke u state
+      setDogadjaji(sortedDogadjaji); // Spremi podatke u state
     } catch (error) {
       console.error(error);
-      alert('Ne mogu dohvatiti partnere. Pokušajte kasnije.');
+      alert('Ne mogu dohvatiti dogadjaje. Pokušajte kasnije.');
     }
   }, []);
 
   useEffect(() => {
-    fetchPartneri();
-  }, [fetchPartneri]);
+    fetchDogadjaji();
+  }, [fetchDogadjaji]);
 
   useFocusEffect(
     useCallback(() => {
-      fetchPartneri();
-    }, [fetchPartneri])
+      fetchDogadjaji();
+    }, [fetchDogadjaji])
   );
-   // Funkcija koja će se pozvati kada pritisneš partnera
-   const handlePartnerPress = (id) => {
-    console.log('Partner ID:', id);
-    setCurrentPage({ ...pages['AddPartner'], partnerId: id });
+   // Funkcija koja će se pozvati kada pritisneš dogadjdaje
+   const handleDogadjajPress = (id) => {
+    console.log('Dogadjaj ID:', id);
+    setCurrentPage({ ...pages['createEvent'], dogadjajId: id });
   };
 
 
@@ -49,20 +49,20 @@ const ExistingPartners = () => {
     <Pozadina>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>Odaberi partnera za predložak:</Text>
+          <Text style={styles.title}>Odaberi dogadjaj za predložak:</Text>
         </View>
         <ScrollView
           style={styles.reportsList}
           keyboardShouldPersistTaps="handled"
         >
-           {/* Renderiraj partnere */}
-           {partneri.map((partner) => (
-            <TouchablePartner
-              key ={partner.id}
-              id={partner.id} 
-              naziv={partner.naziv} 
-              opis={partner.opis} 
-              onPress={handlePartnerPress}
+           {/* Renderiraj izvješća */}
+           {dogadjaji.map((dogadjaj) => (
+            <TouchableDogadjaj
+              key={dogadjaj.id}
+              id={dogadjaj.id} 
+              naziv={dogadjaj.naziv} 
+              vrsta={dogadjaj.vrsta} 
+              onPress={handleDogadjajPress}
             />
           ))}
          </ScrollView>
@@ -130,4 +130,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ExistingPartners;
+export default ExistingEvents;

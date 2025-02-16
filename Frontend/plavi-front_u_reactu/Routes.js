@@ -1,10 +1,10 @@
 import React, { createContext, useState, useContext } from 'react';
-import EventsPage from "./components/EventsPage";
-import CreateEventPage from './components/CreateEventPage';
+import EventsPage from "./components/Events/EventsPage";
+import CreateEventPage from './components/Events/CreateEventPage';
 import PartnersPage from './components/Partners/PartnersPage';
 import ReportsPage from './components/Reports/ReportsPage';
 import HomePage from './components/HomePage';
-import EditEventPage from './components/EditEventPage';
+import EditEventPage from './components/Events/EditEventPage';
 import ViewReport from './components/Reports/ViewReport';
 import CreateReport from './components/Reports/CreateReport';
 import EditReport from './components/Reports/EditReport';
@@ -19,6 +19,9 @@ import PartnersPickScreen from './components/Partners/PartnersPickScreen';
 import ExistingPartners from './components/Partners/ExistingPartners';
 import PartnerTemplates from './components/Partners/PartnerTemplates';
 import PartnerExcel from './components/Partners/PartnerExcel';
+import EventsPickScreen from './components/Events/EventsPickScreen';
+import ExistingEvents from './components/Events/ExistingEvents';
+import EventTemplates from './components/Events/EventTemplates';
 
 
 const Routes = createContext();
@@ -45,6 +48,9 @@ export const RoutesProvider = ({ children }) => {
     ExistingPartners: { component: ExistingPartners, options: { headerShown: false }},
     PartnerTemplates: { component: PartnerTemplates, options: { headerShown: false }},
     PartnerExcel: { component: PartnerExcel, options: { headerShown: false }},
+    EventsPickScreen: { component: EventsPickScreen, options: { headerShown: false }},
+    ExistingEvents: { component: ExistingEvents, options: { headerShown: false }},
+    EventTemplates: { component: EventTemplates, options: { headerShown: false }},
   };
 
   const [currentPage, setCurrentPage] = useState(pages['Home']);

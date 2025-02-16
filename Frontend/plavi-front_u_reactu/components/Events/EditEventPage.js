@@ -1,12 +1,12 @@
 import react, {useEffect, useState} from "react"
-import Pozadina from "./ui/Pozadina";
+import Pozadina from "../ui/Pozadina";
 import { View, Text, StyleSheet, FlatList, TextInput, ScrollView, TouchableOpacity } from "react-native";
-import { usePage } from '../Routes';
-import Event from './ui/Event'
+import { usePage } from '../../Routes';
+import Event from '../ui/Event'
 import DatePicker from 'react-datepicker';
-import Button from "./ui/Button";
-import Guest from "./ui/Guest";
-import Partner from "./ui/DogadjajPartner"
+import Button from "../ui/Button";
+import Guest from "../ui/Guest";
+import Partner from "../ui/DogadjajPartner"
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 

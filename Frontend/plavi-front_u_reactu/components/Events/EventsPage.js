@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
-import Pozadina from './ui/Pozadina';
-import Event from './ui/Event'
+import Pozadina from '../ui/Pozadina';
+import Event from '../ui/Event'
 import { ScrollView } from 'react-native';
-import  Button  from "./ui/Button";
-import { usePage } from '../Routes';
-import Layout from './Layout';
+import  Button  from "../ui/Button";
+import { usePage } from '../../Routes';
+import Layout from '../Layout';
 import * as XLSX from 'xlsx'; 
 import { jsPDF } from 'jspdf';
 import { saveAs } from 'file-saver';

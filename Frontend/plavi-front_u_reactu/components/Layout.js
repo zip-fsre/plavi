@@ -27,7 +27,7 @@ const Layout = () => {
       <View style={styles.menu}>
         <HoverButton title="Početna" onPress={() => setCurrentPage(pages['Home'])} />
         <HoverButton title="Popis događaja" onPress={() => setCurrentPage(pages['Events'])} />
-        <HoverButton title="Stvori događaj" onPress={() => setCurrentPage(pages['createEvent'])} />
+        <HoverButton title="Stvori događaj" onPress={() => setCurrentPage(pages['EventsPickScreen'])} />
         <HoverButton title="Partneri" onPress={() => setCurrentPage(pages['Partners'])}/>
         <HoverButton title="Izvješća" onPress={() => setCurrentPage(pages['Reports'])} />
       </View>
