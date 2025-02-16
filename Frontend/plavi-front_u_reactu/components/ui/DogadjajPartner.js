@@ -103,43 +103,47 @@ const Partner = ({NaziviPartnera, Izmjena, KonacnaCijena, idPartnera, idOdabrano
     return(
     <View style={styles.categoryText}>
         <View style={styles.container}><div>
-        <Text style={styles.numberStyle}>{redniBroj}.</Text>
-        <Picker
-            mode="dropdown"
-            selectedValue={selectedPartner}
-            onValueChange={handlePartnerChange}>
-        {NaziviPartnera.map((item, index) => {
-            return (<Picker.Item label={item} value={index} key={index}/>) 
-        })}
-        </Picker>
-        <Picker
-            mode="dropdown"
-            selectedValue={selectedAranzman}
-            onValueChange={handleAranzmanChange}>
-        {Aranzmani.map((item, index) => {
-            return (<Picker.Item label={item} value={index} key={index}/>) 
-        })}
-        </Picker></div><div>
-        <Text style={styles.PartnerStatus}>Provizija: </Text>
-      <TextInput style={styles.numInput} value={updatedPartnera.Provizija} 
-      onChangeText={(text) => {handleChange("Provizija", text);
-        }} placeholder="0"/>
-        <Text style={styles.PartnerStatus}>Cijena: </Text>
-      <TextInput style={styles.numInput} value={updatedPartnera.KonacnaCijena} 
-      onChangeText={(text) => {handleChange("KonacnaCijena", text);
-        }} placeholder="0"/></div><div>
-          <Text style={styles.PartnerStatus}>Izmjena: </Text>
-      <TextInput style={styles.nameInput} value={updatedPartnera.Izmjena} 
-      onChangeText={(text) => {handleChange("Izmjena", text);
-        }} placeholder="Unesite izmjene ako ih ima..."/>
-      <Text style={styles.PartnerStatus}>Status dolaska:</Text>
+          <Text style={styles.numberStyle}>{redniBroj}.</Text>
+          <Picker
+              style={styles.naziviPartnera}
+              mode="dropdown"
+              selectedValue={selectedPartner}
+              onValueChange={handlePartnerChange}>
+          {NaziviPartnera.map((item, index) => {
+              return (<Picker.Item label={item} value={index} key={index}/>) 
+          })}
+          </Picker>
+          <Picker
+              mode="dropdown"
+              selectedValue={selectedAranzman}
+              style={styles.aranzmaniDropdown}
+              onValueChange={handleAranzmanChange}>
+          {Aranzmani.map((item, index) => {
+              return (<Picker.Item label={item} value={index} key={index}/>) 
+          })}
+          </Picker></div><div>
+          <Text style={styles.PartnerStatus}>Provizija:</Text>
+        <TextInput style={styles.numInput} value={updatedPartnera.Provizija} 
+        onChangeText={(text) => {handleChange("Provizija", text);
+          }} placeholder="0"/>
+          <Text style={styles.percentageIcon}>%</Text>
+          <Text style={styles.PartnerStatus}>Cijena: </Text>
+        <TextInput style={styles.numInputPrice} value={updatedPartnera.KonacnaCijena} 
+        onChangeText={(text) => {handleChange("KonacnaCijena", text);
+          }} placeholder="0"/></div><div>
+            <Text style={styles.PartnerStatus}>Izmjena: </Text>
+        <TextInput style={styles.nameInput} value={updatedPartnera.Izmjena} 
+        onChangeText={(text) => {handleChange("Izmjena", text);
+          }} placeholder="Unesite izmjene ako ih ima..."/>
+        <Text style={styles.PartnerStatus}>Status dolaska:</Text>
 
-        {/* Picker za partnera */}
-        <Picker selectedValue={updatedPartnera.StatusPartnera} onValueChange={(value) => {handleChange("StatusPartnera", value)}} style={styles.picker}> {/* ; handleChange({field:"Provizija", value:value});*/}
-            {statusi.map((statusi, index) => (
-                <Picker.Item key={index} label={statusi} value={statusi} />
-            ))}
-        </Picker></div></View>
+          {/* Picker za partnera */}
+          <Picker selectedValue={updatedPartnera.StatusPartnera} onValueChange={(value) => {handleChange("StatusPartnera", value)}} style={styles.pickerComing}> {/* ; handleChange({field:"Provizija", value:value});*/}
+              {statusi.map((statusi, index) => (
+                  <Picker.Item key={index} label={statusi} value={statusi} />
+              ))}
+          </Picker></div>
+        </View>
     </View>
     );
 };
@@ -147,7 +151,70 @@ const Partner = ({NaziviPartnera, Izmjena, KonacnaCijena, idPartnera, idOdabrano
 export default Partner;
 
 const styles = new StyleSheet.create({
+    pickerComing:{
+      backgroundColor: '#222c2b',
+      fontFamily: 'Monotype Corsiva',
+      color: '#e8c789',
+      width: 110,
+      height:40,
+      borderRadius: 5, 
+      marginBottom: 15,
+      borderWidth: 1, 
+      borderColor: "#e8c789",
+      marginRight: 0,
+      marginLeft: 10,
+      fontSize: 18,
 
+    },
+
+    aranzmaniDropdown:{
+      backgroundColor: '#222c2b',
+      fontFamily: 'Monotype Corsiva',
+      color: '#e8c789',
+      width: '30%',
+      height: 40,
+      minWidth: 200,
+      borderRadius: 5, 
+      marginBottom: 25,
+      marginTop: 20,
+      marginLeft: 10,
+      borderWidth: 1, 
+      borderColor: "#e8c789",
+      marginRight: 0,
+      fontSize: 18,
+
+    },
+
+    naziviPartnera:{
+      backgroundColor: '#222c2b',
+      fontFamily: 'Monotype Corsiva',
+      color: '#e8c789',
+      width: '30%',
+      height: 40,
+      minWidth: 200,
+      borderRadius: 5, 
+      marginBottom: 15,
+      marginLeft: 10,
+      borderWidth: 1, 
+      borderColor: "#e8c789",
+      marginRight: 0,
+      fontSize: 18,
+    },
+
+    percentageIcon:{
+      marginLeft:0,
+      marginRight:10,
+      color: '#e8c789',
+      fontSize: 24,
+      fontFamily: 'Monotype Corsiva',
+      textAlign: 'center',
+      lineHeight: 24,
+      marginBottom: 20,
+      textShadowColor: 'black',
+      textShadowOffset: { width: 2, height: 2 },
+      textShadowRadius: 3,
+      alignContent: "center",
+    },
     PartnerStatus:{
         color: '#e8c789',
         fontSize: 24,
@@ -229,6 +296,22 @@ const styles = new StyleSheet.create({
         textShadowOffset: { width: 2, height: 2 },
         textShadowRadius: 3,
         width: 40,
+        borderRadius: 5, 
+        borderWidth: 1, 
+        borderColor: "#e8c789",
+        marginRight: 5,
+      },
+      numInputPrice:{
+        color: '#e8c789',
+        fontSize: 24,
+        fontFamily: 'Monotype Corsiva',
+        textAlign: 'center',
+        marginBottom: 20,
+        marginLeft: 5,
+        textShadowColor: 'black',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 3,
+        width: 100,
         borderRadius: 5, 
         borderWidth: 1, 
         borderColor: "#e8c789",

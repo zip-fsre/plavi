@@ -205,10 +205,10 @@ const EditEventPage = () => {
 
   const renderPartners = ({item, index }) => {
     return (
-     <View style={styles.guestStyle}>
+     <View style={styles.partnerStyle}>
        <Partner NaziviPartnera={item.NaziviPartnera} listaProvizija={ProvizijePartnera} Izmjena={item.Izmjena} idPartnera={item.id} idOdabranogPartnera={item.idOdabranogPartnera} KonacnaCijena={item.KonacnaCijena} Provizija={item.Provizija} StatusPartnera={item.StatusPartnera} listaIdeva={item.listaIdeva} redniBroj={index+1} OdabraniAranzmanId={item.OdabraniAranzmanId} sendUpdateToParent={handleDataFromChildPartner} />
-       <TouchableOpacity onPress={() => handleDeletePartner(item.id)}>
-         <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
+       <TouchableOpacity onPress={() => handleDeletePartner(item.id)} style={styles.deletePartnerButton}>
+         <Icon name="delete" size={34} color="#e8c789" style={styles.deleteIcon} />
        </TouchableOpacity>
      </View>
       );
@@ -420,8 +420,6 @@ const EditEventPage = () => {
                   }
                 </View>
 
-                <Text style={styles.categoryText}>Lista partnera:</Text>
-                <FlatList data={events.gosts} renderItem={renderPartners}></FlatList>
                 
                 <View style={styles.buttons}>
                   <Button title="Spremi promjene" onPress={saveChanges}></Button>
@@ -443,6 +441,12 @@ const EditEventPage = () => {
 export default EditEventPage;
 
 const styles = new StyleSheet.create({
+  deletePartnerButton: {
+    margin: "auto",
+    marginLeft: 0,
+    marginRight: 0,
+  },
+
   addGuestView:{
     marginBottom: 10,
   },
@@ -563,6 +567,25 @@ title: {
     borderRadius: 5, 
     color: '#e8c789' , 
     fontFamily: 'Monotype Corsiva', 
+  },
+
+  partnerStyle: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: "center",
+    gap: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 15,
+    borderRadius: 25,
+    elevation: 5,
+    margin: 10,
+    marginLeft: 30,
+    marginRight: 30,
+    padding: 5,
+    borderWidth: 2,
+    borderColor: "#e8c789",
   },
 
 
