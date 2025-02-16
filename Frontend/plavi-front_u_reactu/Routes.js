@@ -15,7 +15,10 @@ import ReportsPickScreen from './components/Reports/ReportsPickScreen';
 import ExistingReports from './components/Reports/ExistingReports';
 import ReportTemplates from './components/Reports/ReportTemplates';
 import ReportExcel from './components/Reports/ReportExcel';
-
+import PartnersPickScreen from './components/Partners/PartnersPickScreen';
+import ExistingPartners from './components/Partners/ExistingPartners';
+import PartnerTemplates from './components/Partners/PartnerTemplates';
+import PartnerExcel from './components/Partners/PartnerExcel';
 
 
 const Routes = createContext();
@@ -38,6 +41,10 @@ export const RoutesProvider = ({ children }) => {
     ExistingReports: { component: ExistingReports, options: { headerShown: false }},
     ReportTemplates: { component: ReportTemplates, options: { headerShown: false }},
     ReportExcel: { component: ReportExcel, options: { headerShown: false }},
+    PartnersPickScreen: { component: PartnersPickScreen, options: { headerShown: false }},
+    ExistingPartners: { component: ExistingPartners, options: { headerShown: false }},
+    PartnerTemplates: { component: PartnerTemplates, options: { headerShown: false }},
+    PartnerExcel: { component: PartnerExcel, options: { headerShown: false }},
   };
 
   const [currentPage, setCurrentPage] = useState(pages['Home']);

@@ -90,7 +90,7 @@ namespace JsonReturn.Controllers
             return _context.Dogadjajs.Find(id);
         }
 
-        // Get: api/Dogadjaj/Partners
+        // Get: api/Dogadjaj/Partners/1
         [HttpGet("Partners/{id}")]
         public ActionResult<IEnumerable<JsonReturn.Models.MedjutablicaPt1>> GetPartneri(int id)
         {
@@ -114,6 +114,14 @@ namespace JsonReturn.Controllers
             }
             _context.SaveChanges();
             return _context.Gosts;
+        }
+
+        // DELETE: api/Dogadjaj/Aranzmani/1
+        [HttpDelete("Partnere/{id}")]
+        public string DeletePartnere(int id)
+        {
+            DeleteMedju1(id);
+            return "Uspjeh!";
         }
 
         // DELETE: api/Dogadjaj/Aranzmani/1

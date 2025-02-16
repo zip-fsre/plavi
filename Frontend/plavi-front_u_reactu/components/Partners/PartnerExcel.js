@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from "react-native";
 import Pozadina from "../ui/Pozadina";
 import { usePage } from "../../Routes";
+import * as DocumentPicker from "expo-document-picker"; 
+import * as XLSX from "xlsx"; 
+import SmallButton from "../ui/SmallButton";
+import { useForm } from "react-hook-form";
 
 const BASE_URL = "http://localhost:5149/api"; // URL backend-a
 
@@ -32,7 +36,7 @@ const ArrangementInput = ({ arrangement, index, onChange }) => (
   </View>
 );
 
-export const AddPartner = () => {
+export const PartnerExcel= () => {
   const { currentPage, pages, setCurrentPage } = usePage();
   const [newPartner, setNewPartner] = useState({
     naziv: "",
@@ -44,6 +48,10 @@ export const AddPartner = () => {
   const { template, templateAranzmani, partnerId } = currentPage;
 
   const [arrangements, setArrangements] = useState([{ naziv: "", opis: "", cijena: "" }]);
+  const [naziv, setNaziv] = useState("");
+  const [vrsta, setVrsta] = useState("");
+  const [napomena, setNapomena] = useState("");
+  const [provizija, setProvizija] = useState("");
 
   useEffect(() => {
     if(partnerId){
@@ -131,43 +139,135 @@ export const AddPartner = () => {
   };
 
   const handleAddArrangement = () => {
-    setArrangements([...arrangements, { naziv: "", opis: "", cijena: "" }]);
-  };
+  setArrangements([...arrangements, { naziv: "", opis: "", cijena: "" }]);
+};
 
+
+
+
+const handleFileUpload = async () => {
+  try {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: [
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-excel",
+      ],
+      copyToCacheDirectory: true,
+    });
+
+    if (result.canceled) {
+      console.log("Odabir datoteke otkazan");
+      return;
+    }
+
+    const file = result.assets[0];
+
+    if (!file) {
+      console.error("Greška: Nema odabrane datoteke.");
+      return;
+    }
+
+    const response = await fetch(file.uri);
+    const blob = await response.blob();
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const binaryString = e.target.result;
+        const workbook = XLSX.read(binaryString, { type: "binary" });
+
+        const firstSheet = workbook.SheetNames[0];
+        const partnerData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+
+        console.log("✅ Podaci o partneru:", partnerData); // Ispisujemo partner podatke
+
+        if (partnerData.length === 0) {
+          console.error("Greška: Nema podataka o partneru.");
+          return;
+        }
+
+        const firstPartner = partnerData[0];
+        console.log("✅ Podaci za prvog partnera:", firstPartner); // Ispisujemo prvi partner
+
+        const partnerId = firstPartner["id"];
+
+        const secondSheet = workbook.SheetNames[1];
+        const arrangementsData = XLSX.utils.sheet_to_json(workbook.Sheets[secondSheet]);
+
+        const partnerArrangements = arrangementsData
+          .filter((arr) => arr["idPartnera"] === partnerId)
+          .map((arr) => ({
+            naziv: arr["naziv"] || "",
+            opis: arr["opis"] || "",
+            cijena: arr["cijena"] ? arr["cijena"].toString() : "",
+          }));
+
+        // Provjeravamo što dolazi u firstPartner
+        console.log("✅ Popunjeni podaci za partnera:", firstPartner);
+
+        // Postavljanje podataka u state
+        setNaziv(firstPartner["naziv"] || "");
+        setVrsta(firstPartner["tip"] || "");
+        setNapomena(firstPartner["napomena"] || "");
+        setProvizija(firstPartner["provizija"] ? firstPartner["provizija"].toString() : "");
+
+        // Postavljanje aranžmana
+        setArrangements(partnerArrangements);
+
+        console.log("✅ Učitani aranžmani:", partnerArrangements);
+      } catch (parseError) {
+        console.error("Greška pri obradi podataka iz Excela:", parseError);
+      }
+    };
+
+    reader.readAsBinaryString(blob);
+  } catch (error) {
+    console.error("Greška pri učitavanju datoteke:", error);
+  }
+};
+
+  
+  
   return (
     <Pozadina>
       <View style={styles.container}>
         <Text style={styles.title}>Novi partner</Text>
+        <SmallButton title="Učitaj Excel" onPress={ handleFileUpload} />
+
         <ScrollView style={styles.scrollView}>
-          <TextInput
-            style={styles.input}
-            placeholder="Naziv partnera"
-            placeholderTextColor="#ccc"
-            value={newPartner.naziv}
-            onChangeText={(text) => setNewPartner({ ...newPartner, naziv: text })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Vrsta partnera"
-            placeholderTextColor="#ccc"
-            value={newPartner.vrsta}
-            onChangeText={(text) => setNewPartner({ ...newPartner, vrsta: text })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Provizija partnera"
-            placeholderTextColor="#ccc"
-            value={newPartner.provizija}
-            onChangeText={(text) => setNewPartner({ ...newPartner, provizija: text })}
-            keyboardType="numeric"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Napomena"
-            placeholderTextColor="#ccc"
-            value={newPartner.napomena}
-            onChangeText={(text) => setNewPartner({ ...newPartner, napomena: text })}
-          />
+        <TextInput
+         style={styles.input}
+         placeholder="Naziv partnera"
+         placeholderTextColor="#ccc"
+         value={newPartner.naziv}
+         onChangeText={(text) => setNewPartner({ ...newPartner, naziv: text })}
+        />
+
+        <TextInput
+         style={styles.input}
+         placeholder="Vrsta partnera"
+         placeholderTextColor="#ccc"
+         value={newPartner.vrsta}
+         onChangeText={(text) => setNewPartner({ ...newPartner, vrsta: text })}
+        />
+
+        <TextInput
+         style={styles.input}
+         placeholder="Provizija partnera"
+         placeholderTextColor="#ccc"
+         value={newPartner.provizija}
+         onChangeText={(text) => setNewPartner({ ...newPartner, provizija: text })}
+         keyboardType="numeric"
+        />
+
+        <TextInput
+        style={styles.input}
+        placeholder="Napomena"
+        placeholderTextColor="#ccc"
+        value={newPartner.napomena}
+        onChangeText={(text) => setNewPartner({ ...newPartner, napomena: text })}
+        />
+
 
           <View style={styles.subtitleContainer}>
             <Text style={styles.subtitle}>Aranžmani</Text>
@@ -183,16 +283,16 @@ export const AddPartner = () => {
 
           {arrangements.map((arrangement, index) => (
             <ArrangementInput
-              key={index}
-              arrangement={arrangement}
-              index={index}
-              onChange={(idx, field, value) => {
-                const updatedArrangements = [...arrangements];
-                updatedArrangements[idx][field] = value;
-                setArrangements(updatedArrangements);
-              }}
-            />
-          ))}
+                 key={index}
+                 arrangement={arrangement}
+                 index={index}
+                 onChange={(idx, field, value) => {
+                  const updatedArrangements = [...arrangements];
+                  updatedArrangements[idx][field] = value;
+                  setArrangements(updatedArrangements);
+                 }}
+                />
+            ))}
         </ScrollView>
       </View>
     </Pozadina>
@@ -211,4 +311,4 @@ const styles = StyleSheet.create({
   input: { borderWidth: 1, borderColor: "#e8c789", padding: 10, marginVertical: 10, borderRadius: 5 },
 });
 
-export default AddPartner;
+export default PartnerExcel;
