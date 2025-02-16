@@ -60,7 +60,7 @@ const CreateEventPage = () => {
     pom2.forEach(element => {
       SviPartneri.push(element.naziv);
       IdeviPartnera.push(element.id);
-      ProvizijePartnera.push(element.id);
+      ProvizijePartnera.push(element.provizija);
     });
     return SviPartneri;
   }
@@ -216,8 +216,7 @@ const CreateEventPage = () => {
   return (
       <Pozadina>
           <View style={styles.container}>
-              <Text style={styles.title}>Uredi događaj</Text> 
-              <Text style={styles.headerText}>Id: </Text>
+              <Text style={styles.title}>Stvori događaj</Text> 
               <>
               <ScrollView style={styles.scrollView}>
                 {/* naziv i vrsta */}

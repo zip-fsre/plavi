@@ -62,7 +62,7 @@ const EditEventPage = () => {
       pom2.forEach(element => {
         SviPartneri.push(element.naziv);
         IdeviPartnera.push(element.id);
-        ProvizijePartnera.push(element.id);
+        ProvizijePartnera.push(element.provizija);
       });
       return SviPartneri;
     }
