@@ -1,18 +1,18 @@
 import react, {useEffect, useState} from "react"
-import Pozadina from "./ui/Pozadina";
+import Pozadina from "../ui/Pozadina";
 import { View, Text, StyleSheet, FlatList, TextInput, ScrollView, TouchableOpacity } from "react-native";
-import { usePage } from '../Routes';
+import { usePage } from '../../Routes';
 import DatePicker from 'react-datepicker';
-import Button from "./ui/Button";
-import Guest from "./ui/Guest";
-import Partner from "./ui/DogadjajPartner"
+import Button from "../ui/Button";
+import Guest from "../ui/Guest";
+import Partner from "../ui/DogadjajPartner"
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 
 
 const CreateEventPage = () => {
     const { currentPage, setCurrentPage, pages } = usePage();
-    const { id } = currentPage;
+    const { id, dogadjajId, template, templatePartneri } = currentPage;
     const IdeviPartnera = [-1];
     const ProvizijePartnera = [-1];
     
@@ -65,12 +65,8 @@ const CreateEventPage = () => {
     return SviPartneri;
   }
   const SviPartneri = fetchPartners();
-    
-  //dohvat podataka po učitavanju stranice
-  useEffect(() => {
-  }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
 
-
+  //prebaci promijenjene podatke iz uredjeniGost u gosti array (zapravo zamijeni podatke kod gosta o kojem je rijec)
   useEffect(() => {
     if (gosti && gosti.length > 0) {
       // Provjeri postoji li stvarna promjena
@@ -92,6 +88,93 @@ const CreateEventPage = () => {
         setPartneri(updatedPartneri); 
     }
   }, [uredjeniPartner]);
+  
+
+  //BROJI KOLIKO IMA PRIKAZANIH GOSTIJU
+  useEffect(() => {
+    if (gosti && gosti.length > 0) {
+        const maxId = Math.max(...gosti.map(gost => gost.id)); // Pronađi najveći postojeći ID (upitna potreba za ovim ali eto)
+        setBrojGostiju(maxId); // Postavi globalni broj gostiju na najveći ID
+    }
+}, [gosti]);
+
+  //funkcija koja kupi evente iz backenda
+  const fetchEventData = async () => {
+    try {
+      const response = await fetch(`http://localhost:5149/api/Dogadjaj/${dogadjajId}`); //da ovo radi treba koristiti ` navodnike (desni alt+7)
+      const data = await response.json();
+      setEvents(data);
+      setStartDateInput(data.datum);
+      setNaziv(data.naziv);
+      setSvrha(data.svrha);
+      setKlijent(data.klijent);
+      setKontaktKlijenta(data.kontaktKlijenta);
+      setKontaktSponzora(data.kontaktSponzora);
+      setNapomena(data.napomena);
+      return data;
+    }
+    catch (error) {
+      console.error(error);
+    }
+  }
+
+  //funkcija koja kupi goste iz backenda
+  const getGuests = async () => {
+    try {
+      /*const response = await fetch(`http://localhost:5149/api/Gost/${id}`); //da ovo radi treba koristiti ` navodnike (desni alt+7)*/
+      const response = await fetch(`http://localhost:5149/api/Dogadjaj/Gosti/${dogadjajId}`);
+      const data = await response.json();
+      setGosti(data);
+      return data;
+    }
+    catch (error) {
+      console.error(error);
+    }
+
+  }
+
+  //funkcija koja kupi partnere iz backenda
+  const getPartners = async () => {
+    try {
+      /*const response = await fetch(`http://localhost:5149/api/Gost/${id}`); //da ovo radi treba koristiti ` navodnike (desni alt+7)*/
+      const response = await fetch(`http://localhost:5149/api/Dogadjaj/Partners/${dogadjajId}`);
+      const data = await response.json();
+      SviPartneri.then((value) => {
+        let i = 1;
+        data.forEach(element => {
+          let pom = {id: i, redniBroj: i, Izmjena: element.izmjena, KonacnaCijena: element.konacnaCijena, NaziviPartnera: value, OdabraniAranzmanId: element.idAranzmana, Provizija: element.dodatakNaProviziju, StatusPartnera: element.statusPartnera, idOdabranogPartnera: element.idPartnera, listaIdeva: IdeviPartnera}
+          i++;
+          partneri.push(pom);
+        });
+        setBrojPartnera(i);
+      });
+      return data;
+    }
+    catch (error) {
+      console.error(error);
+    }
+  }
+    
+  //dohvat podataka po učitavanju stranice
+  useEffect(() => {
+    if(dogadjajId){
+      fetchEventData();
+      getGuests();
+      getPartners();
+    }
+    else if(template){
+      setEvents(template);
+      SviPartneri.then((value) => {
+        let i = 1;
+        templatePartneri.forEach(element => {
+          let pom = {id: i, redniBroj: i, Izmjena: element.Izmjena, KonacnaCijena: element.konacnaCijena, NaziviPartnera: value, OdabraniAranzmanId: element.IdAranzmana, Provizija: element.dodatakNaProviziju, StatusPartnera: element.statusPartnera, idOdabranogPartnera: element.IdPartnera, listaIdeva: IdeviPartnera}
+          i++;
+          partneri.push(pom);
+        });
+        setBrojPartnera(i);
+      });
+    }
+  }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
 
 
   /* prikazuje sve goste u guest listi */
@@ -109,16 +192,15 @@ const CreateEventPage = () => {
 
   /* prikazuje sve goste u guest listi */
   const renderPartners = ({item, index }) => {
-
     return (
      <View style={styles.partnerStyle}>
-       <Partner idPartnera={item.id} NaziviPartnera={item.NaziviPartnera} listaIdeva={IdeviPartnera} listaProvizija={ProvizijePartnera} redniBroj={index+1} sendUpdateToParent={handleDataFromChildPartner} />
-       <TouchableOpacity onPress={() => handleDeletePartner(item.id)}>
-         <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
+       <Partner NaziviPartnera={item.NaziviPartnera} listaProvizija={ProvizijePartnera} Izmjena={item.Izmjena} idPartnera={item.id} idOdabranogPartnera={item.idOdabranogPartnera} KonacnaCijena={item.KonacnaCijena} Provizija={item.Provizija} StatusPartnera={item.StatusPartnera} listaIdeva={item.listaIdeva} redniBroj={index+1} OdabraniAranzmanId={item.OdabraniAranzmanId} sendUpdateToParent={handleDataFromChildPartner} />
+       <TouchableOpacity onPress={() => handleDeletePartner(item.id)} style={styles.deletePartnerButton}>
+         <Icon name="delete" size={34} color="#e8c789" style={styles.deleteIcon} />
        </TouchableOpacity>
      </View>
-    );
-   };
+      );
+    }
 
 
 

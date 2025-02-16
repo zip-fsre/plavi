@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
-import Pozadina from './ui/Pozadina';
-import Event from './ui/Event'
+import { View, Text, StyleSheet, FlatList, Alert, TextInput } from 'react-native';
+import Pozadina from '../ui/Pozadina';
+import Event from '../ui/Event'
 import { ScrollView } from 'react-native';
-import  Button  from "./ui/Button";
-import { usePage } from '../Routes';
-import Layout from './Layout';
+import  Button  from "../ui/Button";
+import { usePage } from '../../Routes';
+import Layout from '../Layout';
 import * as XLSX from 'xlsx'; 
 import { jsPDF } from 'jspdf';
 import { saveAs } from 'file-saver';
@@ -14,6 +14,7 @@ import { saveAs } from 'file-saver';
 const EventsPage = () => {
   const {currentPage, setCurrentPage, pages} = usePage();
   const [events, setEvents] = useState([]);
+  const [trazeniDogadjaji, setTrazeniDogadjaji] = useState("");
 
   const handleAddEvent = () => {
     console.log("Dodaj događaj!");
@@ -49,11 +50,16 @@ const EventsPage = () => {
 
   //kartica dogadjaja (prikaz)
 const renderEvent = ({item}) => {
+
+
+if (item.naziv.toLocaleLowerCase().includes(trazeniDogadjaji.toLocaleLowerCase()) ) {
   return (
     <View style={styles.eventContainer}>
       <Event onPress={() => setCurrentPage({...pages['EditEventPage'], id: item.id})} naziv={item.naziv} vrsta={item.svrha} opis={item.napomena} datum={item.datum}/>
     </View>
   );
+}
+
 
 };
 
@@ -106,6 +112,8 @@ const handleExportToPDF = () => {
   doc.save(`Događaji_${new Date().toISOString()}.pdf`);
 };
 
+
+
   return (
     <Pozadina>
         <View style={styles.container}>
@@ -113,8 +121,12 @@ const handleExportToPDF = () => {
             <Text style={styles.title}>Događaji</Text> 
             <Button title="Izvezi u Excel" onPress={handleExportToExcel} />
             <Button title="Izvezi u PDF" onPress={handleExportToPDF} />
-
           </View>
+          <TextInput
+                placeholder="Pretražite događaje"
+                onChangeText={(unos)=>{setTrazeniDogadjaji(unos)}}
+                style={styles.searchInput}
+          />
           <ScrollView style={styles.partneri}>
             <FlatList data={events} renderItem={renderEvent} />
             {/*<Event onPress={handleEditEvent} naziv='Prvi događaj' vrsta='Vjenčanje' opis='Ivan Matić - 063 223 321'/>
@@ -127,6 +139,19 @@ const handleExportToPDF = () => {
 };
 
 const styles = StyleSheet.create({
+  searchInput:{
+    borderWidth: 1, 
+    borderColor: "#e8c789",
+    padding: 10, 
+    margin: "auto", 
+    marginTop: 20, 
+    width: 400,
+    fontSize: 20, 
+    borderRadius: 5, 
+    color: '#e8c789' , 
+    fontFamily: 'Monotype Corsiva', 
+  },
+
   eventContainer:{
     flex: 1,
     alignSelf: 'center', 
