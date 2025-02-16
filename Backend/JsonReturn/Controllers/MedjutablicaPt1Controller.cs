@@ -92,5 +92,20 @@ namespace JsonReturn.Controllers
         {
             return _context.MedjutablicaPt1s.AsQueryable().Where(Podatci => Podatci.IdPartnera == id).ToList();
         }
+
+        // POST: api/MedjutablicaPt1/Vise
+        [HttpPost("Vise")]
+        public string CreateMedju1(MedjutablicaPt1[] Podaci)
+        {
+            if (Podaci == null)
+            {
+                return "Missing parameter: Podaci";
+            }
+            foreach(MedjutablicaPt1 Podatak in Podaci){
+                _context.MedjutablicaPt1s.Add(Podatak);
+            }
+            _context.SaveChanges();
+            return "Uspjesno";
+        }
     }
 }

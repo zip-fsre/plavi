@@ -42,7 +42,6 @@ const EventsPage = () => {
     async function fetchEvents() {
       const data = await getEvents(); // Dohvat podataka kada se getEvents odradi
       setEvents(data); 
-      console.log(data);
     }
     fetchEvents(); 
   }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)

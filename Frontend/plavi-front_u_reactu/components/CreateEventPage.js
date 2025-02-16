@@ -5,6 +5,7 @@ import { usePage } from '../Routes';
 import DatePicker from 'react-datepicker';
 import Button from "./ui/Button";
 import Guest from "./ui/Guest";
+import Partner from "./ui/DogadjajPartner"
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 
@@ -12,7 +13,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 const CreateEventPage = () => {
     const { currentPage, setCurrentPage, pages } = usePage();
     const { id } = currentPage;
-
+    const IdeviPartnera = [-1];
+    const ProvizijePartnera = [-1];
     
     //opcenite varijable o dogadjaju
     const [startDate, setStartDateInput] = useState('');
@@ -26,9 +28,17 @@ const CreateEventPage = () => {
     const [gosti, setGosti] = useState([]); //gosti koje povucemo iz baze, a kasnije i "finalna" lista gostiju koju saljemo u bazu
     const [brojGostiju, setBrojGostiju] = useState(0); //racuna koliko je gostiju zbog postavljanja ID-eva u Flatlisti (nije najtocnije jer i ne mora biti posto se ID ne salje u bazu, ovo je samo za prikaz na frontu kada se generira novi gost)
     const [uredjeniGost, setUredjeniGost] = useState(""); //sluzi za komunikaciju child i parent komponente (Guest.js i ovaj EditEventPage.js)
+    //varijable o partnerima
+    const [partneri, setPartneri] = useState([]); //partneri koje povucemo iz baze, a kasnije i "finalna" lista partnera koju saljemo u bazu
+    const [brojPartnera, setBrojPartnera] = useState(0); //racuna koliko je partnera zbog postavljanja ID-eva u Flatlisti (nije najtocnije jer i ne mora biti posto se ID ne salje u bazu, ovo je samo za prikaz na frontu kada se generira novi gost)
+    const [uredjeniPartner, setUredjeniPartner] = useState(""); //sluzi za komunikaciju child i parent komponente (DogadjajPartner.js i ovaj CreateEventPage.js)
 
-    const handeDataFromChildGuest = (data) => {
+    const handleDataFromChildGuest = (data) => {
       setUredjeniGost(data);
+    };
+
+    const handleDataFromChildPartner = (data) => {
+      setUredjeniPartner(data);
     };
     
 
@@ -42,6 +52,19 @@ const CreateEventPage = () => {
       kontaktSponzora: kontaktSponzora,
       napomena: napomena
     });
+
+  const fetchPartners = async () => {
+    const pom = (await fetch("http://localhost:5149/api/Partneri"));
+    const pom2 = await pom.json();
+    const SviPartneri = ["Odaberite partnera"];
+    pom2.forEach(element => {
+      SviPartneri.push(element.naziv);
+      IdeviPartnera.push(element.id);
+      ProvizijePartnera.push(element.id);
+    });
+    return SviPartneri;
+  }
+  const SviPartneri = fetchPartners();
     
   //dohvat podataka po učitavanju stranice
   useEffect(() => {
@@ -59,19 +82,43 @@ const CreateEventPage = () => {
     }
   }, [uredjeniGost]);
 
+  useEffect(() => {
+    if (partneri && partneri.length > 0) {
+      // Provjeri postoji li stvarna promjena
+      const updatedPartneri = partneri.map((partner) =>
+        partner.id === uredjeniPartner.id ? uredjeniPartner : partner 
+      );
+  
+        setPartneri(updatedPartneri); 
+    }
+  }, [uredjeniPartner]);
+
 
   /* prikazuje sve goste u guest listi */
   const renderGuests = ({item, index }) => {
 
    return (
     <View style={styles.guestStyle}>
-      <Guest idGosta={item.id} statusDolaska={item.statusDolaska} brojStola={item.brojStola} imePrezime={item.imeIPrezime} redniBroj={index+1} sendUpdateToParent={handeDataFromChildGuest} />
+      <Guest idGosta={item.id} statusDolaska={item.statusDolaska} brojStola={item.brojStola} imePrezime={item.imeIPrezime} redniBroj={index+1} sendUpdateToParent={handleDataFromChildGuest} />
       <TouchableOpacity onPress={() => handleDeleteGuest(item.id)}>
         <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
       </TouchableOpacity>
     </View>
    );
   };
+
+  /* prikazuje sve goste u guest listi */
+  const renderPartners = ({item, index }) => {
+
+    return (
+     <View style={styles.partnerStyle}>
+       <Partner idPartnera={item.id} NaziviPartnera={item.NaziviPartnera} listaIdeva={IdeviPartnera} listaProvizija={ProvizijePartnera} redniBroj={index+1} sendUpdateToParent={handleDataFromChildPartner} />
+       <TouchableOpacity onPress={() => handleDeletePartner(item.id)}>
+         <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
+       </TouchableOpacity>
+     </View>
+    );
+   };
 
 
 
@@ -80,12 +127,28 @@ const CreateEventPage = () => {
     setGosti(prevGosti => prevGosti.filter(guest => guest.id !== guestId));
   };
 
+  const handleDeletePartner = (partnerId) => {
+    // brise partnera LOKALNO iz arraya partneri
+    setPartneri(prevPartneri => prevPartneri.filter(partner => partner.id !== partnerId));
+  };
+
   const addNewGuest = () => {
     setGosti(prevGosti => {
         const newId = brojGostiju + 1;
         setBrojGostiju(newId);
-        return [...prevGosti, { id: newId, imeIPrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1, idDogadjajaa: events.id, sendUpdateToParent: handeDataFromChildGuest}];
+        return [...prevGosti, { id: newId, imeIPrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1, idDogadjajaa: events.id, sendUpdateToParent: handleDataFromChildGuest}];
     });
+  };
+
+  const addNewPartner = () => {
+    SviPartneri.then((value) => {
+      setPartneri(prevPartneri => {
+      const newId = brojPartnera + 1;
+      setBrojPartnera(newId);
+      return [...prevPartneri, { id: newId, NaziviPartnera: value, listaIdeva: IdeviPartnera, listaProvizija: ProvizijePartnera, idDogadjajaa: events.id, sendUpdateToParent: handleDataFromChildPartner}];
+  });
+    });
+    
   };
   
   const handleCreate = async () => {
@@ -127,14 +190,34 @@ const CreateEventPage = () => {
     }).then(() => {
       console.log("Promjene gostiju spremljene! (POST za goste poslan)",{finalGuests});
     });
-  }
 
+    const finalPartners = partneri.map(partner => ({
+      idPartnera: partner.idOdabranogPartnera,
+      idAranzmana: partner.OdabraniAranzmanId || 0,
+      idDogadjaja: mydata.id,
+      statusPartnera: partner.StatusPartnera || "nepoznato",
+      izmjena: partner.Izmjena || "",
+      konacnaCijena: Number(partner.KonacnaCijena) || 0,
+      dodatakNaProviziju: Number(partner.Provizija) || 0
+    }));
+
+    fetch(`http://localhost:5149/api/MedjutablicaPt1/Vise`,{
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(finalPartners),
+    }).then(() => {
+      console.log("Promjene partnera spremljene! (POST za partnere poslan)",{finalPartners});
+      setCurrentPage(pages['Events']);
+    });
+
+
+  }
 
   return (
       <Pozadina>
           <View style={styles.container}>
               <Text style={styles.title}>Uredi događaj</Text> 
-              <Text style={styles.headerText}>Id: {id}</Text>
+              <Text style={styles.headerText}>Id: </Text>
               <>
               <ScrollView style={styles.scrollView}>
                 {/* naziv i vrsta */}
@@ -178,7 +261,15 @@ const CreateEventPage = () => {
 
                 {/* PARTNERI SADA SLIJEDE BOŽE POMOZI */}
                 <View style={styles.itemContainer}>
-                  <Text> </Text>
+                  <Text style={styles.categoryText}>Lista partnera:</Text>
+                  <View style={styles.addGuestView}>
+                    <Button title="+ Novi partner" onPress={addNewPartner}></Button>
+                  </View>
+                  {partneri ? (
+                    <FlatList data={partneri} renderItem={renderPartners} keyExtractor={(item) => item.id.toString()} ></FlatList>
+                  ):
+                    <Text style={styles.categoryText}>Nema partnera</Text>
+                  }
                 </View>
 
 
@@ -194,8 +285,6 @@ const CreateEventPage = () => {
                     <Text style={styles.categoryText}>Nema gostiju</Text>
                   }
                 </View>
-
-                <Text style={styles.categoryText}>Lista partnera:</Text>
                 
                 <View style={styles.buttons}>
                   <Button title="Napravi događaj" onPress={handleCreate}></Button>
@@ -332,6 +421,25 @@ title: {
     borderRadius: 5, 
     color: '#e8c789' , 
     fontFamily: 'Monotype Corsiva', 
+  },
+
+  partnerStyle: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: "center",
+    gap: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 15,
+    borderRadius: 25,
+    elevation: 5,
+    margin: 10,
+    marginLeft: 30,
+    marginRight: 30,
+    padding: 5,
+    borderWidth: 2,
+    borderColor: "#e8c789",
   },
 
 
