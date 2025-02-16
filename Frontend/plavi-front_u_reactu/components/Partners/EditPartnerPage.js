@@ -5,10 +5,11 @@ import * as XLSX from 'xlsx';
 import { saveAs } from "file-saver";
 import Pozadina from "../ui/Pozadina";
 import { usePage } from "../../Routes";
+import Icon from "react-native-vector-icons/MaterialIcons"; 
 
-const BASE_URL = "http://localhost:5149/api"; // Točan URL backend-a
+const BASE_URL = "http://localhost:5149/api"; 
 
-const ArrangementInput = ({ arrangement, index, onChange }) => (
+const ArrangementInput = ({ arrangement, index, onChange, onDelete }) => (
   <View style={styles.arrangementContainer}>
     <TextInput
       style={styles.input}
@@ -24,14 +25,20 @@ const ArrangementInput = ({ arrangement, index, onChange }) => (
       value={arrangement.opis}
       onChangeText={(text) => onChange(index, "opis", text)}
     />
-    <TextInput
-      style={styles.input}
-      placeholder="Cijena aranžmana"
-      placeholderTextColor="#ccc"
-      value={arrangement.cijena}
-      onChangeText={(text) => onChange(index, "cijena", text)}
-      keyboardType="numeric"
-    />
+    <View style={styles.priceAndDeleteContainer}>
+      <TextInput
+        style={[styles.input, styles.priceInput]}
+        placeholder="Cijena aranžmana"
+        placeholderTextColor="#ccc"
+        value={arrangement.cijena}
+        onChangeText={(text) => onChange(index, "cijena", text)}
+        keyboardType="numeric"
+      />
+      {/* Gumb za brisanje pored cijene */}
+      <TouchableOpacity style={styles.deleteButton} onPress={() => onDelete(index)}>
+        <Icon name="delete" size={24} color="#d9534f" />
+      </TouchableOpacity>
+    </View>
   </View>
 );
 
@@ -62,7 +69,6 @@ export const EditPartner = () => {
           provizija: String(data.provizija), 
         });
 
-        
         const arrangementsResponse = await fetch(`${BASE_URL}/Partneri/Aranzmani/${id}`);
         if (!arrangementsResponse.ok) throw new Error("Neuspjelo dohvaćanje aranžmana.");
         
@@ -76,6 +82,7 @@ export const EditPartner = () => {
 
     handleFetchPartner();
   }, [id]);
+
   const handleExportToExcel = () => {
     const wb = XLSX.utils.book_new();
     const partnerSheet = XLSX.utils.json_to_sheet([partner]);
@@ -159,7 +166,39 @@ export const EditPartner = () => {
     }
   };
 
+  const handleDeleteArrangement = async (index) => {
+    console.log("Pokušaj brisanja aranžmana s indexom:", index);
   
+    const aranzmanZaBrisanje = arrangements[index];
+  
+    if (!aranzmanZaBrisanje) {
+      console.error("Greška: Aranžman na ovom indexu ne postoji!");
+      return;
+    }
+  
+    if (aranzmanZaBrisanje.id) {
+      try {
+        console.log(`Šaljem DELETE zahtjev za ID: ${aranzmanZaBrisanje.id}`);
+        const response = await fetch(`${BASE_URL}/Aranzman/${aranzmanZaBrisanje.id}`, {
+          method: "DELETE",
+        });
+  
+        if (!response.ok) {
+          throw new Error("Greška pri brisanju aranžmana iz baze.");
+        }
+  
+        console.log(`Aranžman ID ${aranzmanZaBrisanje.id} uspješno obrisan iz baze.`);
+      } catch (error) {
+        console.error("Greška pri brisanju aranžmana:", error);
+        return;
+      }
+    }
+  
+    const updatedArrangements = arrangements.filter((_, i) => i !== index);
+    console.log("Novo stanje aranžmana nakon brisanja:", updatedArrangements);
+    setArrangements(updatedArrangements);
+  };
+
   const handleAddArrangement = () => {
     setArrangements([...arrangements, { naziv: "", opis: "", cijena: "" }]);
   };
@@ -224,6 +263,7 @@ export const EditPartner = () => {
                 updatedArrangements[idx][field] = value;
                 setArrangements(updatedArrangements);
               }}
+              onDelete={handleDeleteArrangement} 
             />
           ))}
         </ScrollView>
@@ -231,7 +271,6 @@ export const EditPartner = () => {
     </Pozadina>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: { flex: 1, alignSelf: "center", width: "90%", paddingTop: 20, maxHeight: '80%', maxWidth: '70%' },
@@ -245,6 +284,25 @@ const styles = StyleSheet.create({
   saveButtonText: { fontFamily: 'Monotype Corsiva', fontSize: 24, },
   saveButton: { backgroundColor: "#e8c789", fontFamily: 'Monotype Corsiva', padding: 10, borderRadius: 5, marginLeft: 10 },
   input: { borderWidth: 1, marginLeft: 25, borderColor: "#e8c789", maxWidth: '80%', padding: 10, fontSize: 20, marginVertical: 10, borderRadius: 5, color: '#e8c789' , fontFamily: 'Monotype Corsiva', },
+  deleteButton: {
+    marginLeft: 10, 
+  },
+  arrangementContainer: {
+    flexDirection: "column",
+    marginBottom: 20,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#e8c789",
+    borderRadius: 5,
+  },
+  priceAndDeleteContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  priceInput: {
+    flex: 1, 
+  },
 });
 
 export default EditPartner;
