@@ -6,6 +6,7 @@ import Event from './ui/Event'
 import DatePicker from 'react-datepicker';
 import Button from "./ui/Button";
 import Guest from "./ui/Guest";
+import Partner from "./ui/DogadjajPartner"
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 
@@ -13,27 +14,59 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 const EditEventPage = () => {
     const { currentPage, setCurrentPage, pages } = usePage();
     const { id } = currentPage;
+    const IdeviPartnera = [-1];
+    const ProvizijePartnera = [-1];
 
     /* varijable za pohranu lokalno (onChange se mijenjaju) pa slanje dalje u bazu */
-    const [events, setEvents] = useState(); //trenutno uredjivani dogadjaj i podaci o njemu
     //opcenite varijable o dogadjaju
-    const [startDate, setStartDateInput] = useState();
-    const [naziv, setNaziv] = useState();
-    const [svrha, setSvrha] = useState();
-    const [klijent, setKlijent] = useState();
-    const [kontaktKlijenta, setKontaktKlijenta] = useState();
-    const [kontaktSponzora, setKontaktSponzora] = useState();
-    const [napomena, setNapomena] = useState(); 
+    const [startDate, setStartDateInput] = useState("");
+    const [naziv, setNaziv] = useState("");
+    const [svrha, setSvrha] = useState("");
+    const [klijent, setKlijent] = useState("");
+    const [kontaktKlijenta, setKontaktKlijenta] = useState("");
+    const [kontaktSponzora, setKontaktSponzora] = useState("");
+    const [napomena, setNapomena] = useState(""); 
     //varijable o gostima
     const [gosti, setGosti] = useState([]); //gosti koje povucemo iz baze, a kasnije i "finalna" lista gostiju koju saljemo u bazu
     const [brojGostiju, setBrojGostiju] = useState(0); //racuna koliko je gostiju zbog postavljanja ID-eva u Flatlisti (nije najtocnije jer i ne mora biti posto se ID ne salje u bazu, ovo je samo za prikaz na frontu kada se generira novi gost)
     const [uredjeniGost, setUredjeniGost] = useState(""); //sluzi za komunikaciju child i parent komponente (Guest.js i ovaj EditEventPage.js)
-    
+    //varijable o partnerima
+    const [partneri, setPartneri] = useState([]); //partneri koje povucemo iz baze, a kasnije i "finalna" lista partnera koju saljemo u bazu
+    const [brojPartnera, setBrojPartnera] = useState(0); //racuna koliko je partnera zbog postavljanja ID-eva u Flatlisti (nije najtocnije jer i ne mora biti posto se ID ne salje u bazu, ovo je samo za prikaz na frontu kada se generira novi partner)
+    const [uredjeniPartner, setUredjeniPartner] = useState(""); //sluzi za komunikaciju child i parent komponente (DogadjajPartner.js i ovaj EditEventPage.js)
+
 
     //sluzi za mijenjanje uredjenog gosta iz child komponente Guest.js
     const handeDataFromChildGuest = (data) => {
       setUredjeniGost(data);
     };
+
+    const handleDataFromChildPartner = (data) => {
+      setUredjeniPartner(data);
+    };
+
+    const [events, setEvents] = useState({
+      startDate: startDate,
+      naziv: naziv,
+      svrha: svrha,
+      klijent: klijent,
+      kontaktKlijenta: kontaktKlijenta,
+      kontaktSponzora: kontaktSponzora,
+      napomena: napomena
+    });
+
+    const fetchPartners = async () => {
+      const pom = (await fetch("http://localhost:5149/api/Partneri"));
+      const pom2 = await pom.json();
+      const SviPartneri = ["Odaberite partnera"];
+      pom2.forEach(element => {
+        SviPartneri.push(element.naziv);
+        IdeviPartnera.push(element.id);
+        ProvizijePartnera.push(element.id);
+      });
+      return SviPartneri;
+    }
+    const SviPartneri = fetchPartners();
   
     //prebaci promijenjene podatke iz uredjeniGost u gosti array (zapravo zamijeni podatke kod gosta o kojem je rijec)
     useEffect(() => {
@@ -46,6 +79,17 @@ const EditEventPage = () => {
           setGosti(updatedGuests); 
       }
     }, [uredjeniGost]);
+
+    useEffect(() => {
+      if (partneri && partneri.length > 0) {
+        // Provjeri postoji li stvarna promjena
+        const updatedPartneri = partneri.map((partner) =>
+          partner.id === uredjeniPartner.id ? uredjeniPartner : partner 
+        );
+    
+          setPartneri(updatedPartneri); 
+      }
+    }, [uredjeniPartner]);
     
 
     const showChanges = () => {
@@ -69,8 +113,6 @@ const EditEventPage = () => {
       if (!(napomena == undefined || napomena == "")) {
         events.napomena = napomena;
       }
-
-      console.log(events);
       
       
     };
@@ -117,13 +159,35 @@ const EditEventPage = () => {
     }
 
   }
-    
+
+  //funkcija koja kupi partnere iz backenda
+  const getPartners = async () => {
+    try {
+      /*const response = await fetch(`http://localhost:5149/api/Gost/${id}`); //da ovo radi treba koristiti ` navodnike (desni alt+7)*/
+      const response = await fetch(`http://localhost:5149/api/Dogadjaj/Partners/${id}`);
+      const data = await response.json();
+      SviPartneri.then((value) => {
+        let i = 1;
+        data.forEach(element => {
+          let pom = {id: i, redniBroj: i, Izmjena: element.izmjena, KonacnaCijena: element.konacnaCijena, NaziviPartnera: value, OdabraniAranzmanId: element.idAranzmana, Provizija: element.dodatakNaProviziju, StatusPartnera: element.statusPartnera, idOdabranogPartnera: element.idPartnera, listaIdeva: IdeviPartnera}
+          i++;
+          partneri.push(pom);
+        });
+        setBrojPartnera(i);
+      });
+      return data;
+    }
+    catch (error) {
+      console.error(error);
+    }
+
+  }    
     
   //dohvat podataka po učitavanju stranice
   useEffect(() => {
     getEvents();
     getGuests();
-
+    getPartners();
   }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
 
   /* prikazuje sve goste u guest listi */
@@ -139,12 +203,19 @@ const EditEventPage = () => {
    );
   };
 
-  const renderPartners = () => {
-      console.log("Ova tipka ce ispisati partnere");
-  };
+  const renderPartners = ({item, index }) => {
+    return (
+     <View style={styles.guestStyle}>
+       <Partner NaziviPartnera={item.NaziviPartnera} listaProvizija={ProvizijePartnera} Izmjena={item.Izmjena} idPartnera={item.id} idOdabranogPartnera={item.idOdabranogPartnera} KonacnaCijena={item.KonacnaCijena} Provizija={item.Provizija} StatusPartnera={item.StatusPartnera} listaIdeva={item.listaIdeva} redniBroj={index+1} OdabraniAranzmanId={item.OdabraniAranzmanId} sendUpdateToParent={handleDataFromChildPartner} />
+       <TouchableOpacity onPress={() => handleDeletePartner(item.id)}>
+         <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
+       </TouchableOpacity>
+     </View>
+      );
+    }
 
   /* sprema promjene u bazu */
-  const saveChanges = () => {
+  const saveChanges = async () => {
     if (!(naziv == undefined || naziv == "")) {
       events.naziv = naziv;
     }
@@ -166,7 +237,7 @@ const EditEventPage = () => {
     events.datum = new Date(startDate).toISOString().split('T')[0];
     
     // Simple POST request with fetch - ZA DOGADJAJE
-    fetch(`http://localhost:5149/api/Dogadjaj/${id}`, { 
+    await fetch(`http://localhost:5149/api/Dogadjaj/${id}`, { 
       method: 'POST', 
       //body: '{"naziv": "neko ime"}',/      
       body: JSON.stringify({
@@ -180,31 +251,54 @@ const EditEventPage = () => {
       //referrerPolicy: "no-referrer",
     }).then(() => console.log("POST za događaj gotov (spremljen)!!!"));
 
-    
-
-    console.log(gosti, "-- ovo su gosti i podaci pred slanje!");
-
     const finalGuests = gosti.map(guest => ({
       imeIPrezime: guest.imeIPrezime ? guest.imeIPrezime : guest.imePrezime || "N/A", //ISPOSTAVILO SE da je nekad imePrezime a nekad imeIPrezime varijabla za ime i prezime gosta pa se ovdje to ispravlja
       brojStola: guest.brojStola || 0,
       idDogadjajaa: events.id,
       statusDolaska: guest.statusDolaska || "nepoznato"
     }));
-    console.log(finalGuests, "-- ovo su podaci za slanje!");
-    const temp = JSON.stringify(finalGuests);
 
     //DELETE brisanje svih gostiju iz ovog dogadjaja u bazi
-    fetch(`http://localhost:5149/api/Gost/Gosti/${events.id}`,{
+    await fetch(`http://localhost:5149/api/Gost/Gosti/${events.id}`,{
       method: 'DELETE',
       headers: {'Content-Type': 'application/json'},
     }).then(()=>console.log("Izbrisani svi gosti! (DELETE poslan)", {finalGuests}));
 
     //POST REQUEST ZA GOSTE    
-    fetch(`http://localhost:5149/api/Gost/Vise`,{
+    await fetch(`http://localhost:5149/api/Gost/Vise`,{
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(finalGuests),
-    }).then(()=>console.log("Promjene gostiju spremljene! (POST za goste poslan)",{finalGuests}));
+    }).then(() => {
+      console.log("Promjene gostiju spremljene! (POST za goste poslan)",{finalGuests});
+    });
+
+
+    const finalPartners = partneri.map(partner => ({
+      idPartnera: partner.idOdabranogPartnera,
+      idAranzmana: partner.OdabraniAranzmanId || 0,
+      idDogadjaja: events.id,
+      statusPartnera: partner.StatusPartnera || "nepoznato",
+      izmjena: partner.Izmjena || "",
+      konacnaCijena: Number(partner.KonacnaCijena) || 0,
+      dodatakNaProviziju: Number(partner.Provizija) || 0
+    }));
+
+    //DELETE brisanje svih partnera iz ovog dogadjaja u bazi
+    await fetch(`http://localhost:5149/api/Dogadjaj/Partnere/${events.id}`,{
+      method: 'DELETE',
+      headers: {'Content-Type': 'application/json'},
+    }).then(()=>console.log("Izbrisani svi partneri! (DELETE poslan)", {finalPartners}));
+
+    //POST REQUEST ZA PARTNERE    
+    await fetch(`http://localhost:5149/api/MedjutablicaPt1/Vise`,{
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(finalPartners),
+    }).then(() => {
+      console.log("Promjene partnera spremljene! (POST za partnere poslan)",{finalPartners});
+      setCurrentPage(pages['Events']);
+    });
     
   };
 
@@ -222,12 +316,27 @@ const EditEventPage = () => {
     setGosti(prevGosti => prevGosti.filter(guest => guest.id !== guestId));
   };
 
+  const handleDeletePartner = (partnerId) => {
+    // brise partnera LOKALNO iz arraya partneri
+    setPartneri(prevPartneri => prevPartneri.filter(partner => partner.id !== partnerId));
+  };
+
   const addNewGuest = () => {
     setGosti(prevGosti => {
         const newId = brojGostiju + 1;
         setBrojGostiju(newId);
         return [...prevGosti, { id: newId, imeIPrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1, idDogadjajaa: events.id, sendUpdateToParent: handeDataFromChildGuest}];
     });
+  };
+
+  const addNewPartner = () => {
+    SviPartneri.then((value) => {
+      setPartneri(prevPartneri => {
+      setBrojPartnera(brojPartnera + 1);
+      return [...prevPartneri, { id: brojPartnera, NaziviPartnera: value, listaIdeva: IdeviPartnera, Tip: "Neki tip", listaProvizija: ProvizijePartnera, idDogadjajaa: events.id, sendUpdateToParent: handleDataFromChildPartner}];
+  });
+    });
+    
   };
   
 
@@ -285,6 +394,18 @@ const EditEventPage = () => {
                   <Text> </Text>
                 </View>
 
+                {/* PARTNERI SADA SLIJEDE BOŽE POMOZI */}
+                <View style={styles.itemContainer}>
+                  <Text style={styles.categoryText}>Lista partnera:</Text>
+                  <View style={styles.addGuestView}>
+                    <Button title="+ Novi partner" onPress={addNewPartner}></Button>
+                  </View>
+                  {partneri ? (
+                    <FlatList data={partneri} renderItem={renderPartners} keyExtractor={(item) => item.id.toString()} ></FlatList>
+                  ):
+                    <Text style={styles.categoryText}>Nema partnera</Text>
+                  }
+                </View>
 
                 {/* Gosti*/}
                 <View style={styles.itemContainer}>

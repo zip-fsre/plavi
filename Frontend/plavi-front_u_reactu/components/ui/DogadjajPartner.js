@@ -1,25 +1,25 @@
 import react, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
+import { Text, Button, View, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 
-const Partner = ({NaziviPartnera, Izmjena, KonacnaCijena, idPartnera, idOdabranogPartnera, listaIdeva, StatusPartnera, Provizija, OdabraniAranzmanId, redniBroj, sendUpdateToParent }) => {
+const Partner = ({NaziviPartnera, Izmjena, KonacnaCijena, idPartnera, idOdabranogPartnera, listaIdeva, StatusPartnera, Provizija, listaProvizija, OdabraniAranzmanId, redniBroj, sendUpdateToParent }) => {
     const [statusi] = useState(["Nepotvrđen", "Potvrđen","Ne dolazi"]);
     const [updatedPartnera, setUpdatedPartnera] = useState({
-      NaziviPartnera: NaziviPartnera || "",
+      NaziviPartnera: NaziviPartnera || [""],
       Izmjena: Izmjena || "",
       KonacnaCijena: KonacnaCijena || 0,
       OdabraniAranzmanId: OdabraniAranzmanId || 0,
-      StatusPartnera: StatusPartnera || 1,
-      Provizija: 0,
+      StatusPartnera: StatusPartnera || "Nepotvrđen",
+      Provizija: Provizija || 0,
       redniBroj: redniBroj || "",
       id: idPartnera || "",
       idOdabranogPartnera: idOdabranogPartnera || -1,
+      listaIdeva: listaIdeva || [],
       });
     const [selectedPartner, setSelectedPartner] = useState('');
     const [selectedAranzman, setSelectedAranzman] = useState('');
-    const [test, setTest] = useState(0);
 
     const [Aranzmani, setAranzmani] = useState(["Odaberite aranzman"]);
     const [IdAranzmana, setIdAranzmana] = useState([0]);
@@ -30,11 +30,13 @@ const Partner = ({NaziviPartnera, Izmjena, KonacnaCijena, idPartnera, idOdabrano
     const handleChange = (field, value) => {
       setUpdatedPartnera((prevState) => ({ ...prevState, [field]: value })); //Ažuriraj samo određeno polje
     };
+    
 
     const handlePartnerChange = (value) => {
-        console.log('Partner Selected:', value);
+        handleChange("OdabraniAranzmanId", 0);
+        setSelectedAranzman(0)
         setSelectedPartner(value);
-        handleChange("Provizija", Provizija[value]);
+        handleChange("Provizija", listaProvizija[value]);
         handleChange("idOdabranogPartnera", listaIdeva[value]);
         fetchAranzmane(listaIdeva[value]);
       };
@@ -53,16 +55,50 @@ const Partner = ({NaziviPartnera, Izmjena, KonacnaCijena, idPartnera, idOdabrano
       }
 
       const handleAranzmanChange = (value) => {
-        console.log('Aranzman Selected:', value);
-        console.log('Id Aranzmana:', IdAranzmana);
         handleChange("OdabraniAranzmanId", IdAranzmana[value]);
         handleChange("KonacnaCijena", CijeneAranzmana[value]);
         setSelectedAranzman(value);
       };
 
+      const pronadjiPartnera = () => {
+        for (let i = 0; i < listaIdeva.length; i++) {
+          if (listaIdeva[i] === idOdabranogPartnera) return i;
+        }
+        return -1;
+      }
+
+      const pronadjiAranzman = async () => {
+        let i = 1;
+        while(true){
+          if(IdAranzmana[i] == OdabraniAranzmanId){
+            setSelectedAranzman(i);
+            return i;
+          }
+          i++;
+        }
+      }
+
+      useEffect(() => {
+        if(idOdabranogPartnera){
+          pom = pronadjiPartnera();
+          setSelectedPartner(pom);
+          fetchAranzmane(idOdabranogPartnera);
+        }
+      }, []);
+
+      useEffect(() => {
+        if(OdabraniAranzmanId && IdAranzmana.length > 1){
+          pronadjiAranzman();
+        }
+      }, [IdAranzmana]);
+
     useEffect(() => {
       sendUpdateToParent(updatedPartnera); // proslijedi update parent komponenti nakon izmjene bilo cega u updatedPartnera
     },[updatedPartnera]);
+
+    useEffect(() => {
+  }, [listaIdeva]);
+    
 
     return(
     <View style={styles.categoryText}>
@@ -77,7 +113,6 @@ const Partner = ({NaziviPartnera, Izmjena, KonacnaCijena, idPartnera, idOdabrano
         })}
         </Picker>
         <Picker
-            key={test}
             mode="dropdown"
             selectedValue={selectedAranzman}
             onValueChange={handleAranzmanChange}>
