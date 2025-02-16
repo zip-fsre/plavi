@@ -111,7 +111,7 @@ const CreateEventPage = () => {
   const renderPartners = ({item, index }) => {
 
     return (
-     <View style={styles.guestStyle}>
+     <View style={styles.partnerStyle}>
        <Partner idPartnera={item.id} NaziviPartnera={item.NaziviPartnera} listaIdeva={IdeviPartnera} listaProvizija={ProvizijePartnera} redniBroj={index+1} sendUpdateToParent={handleDataFromChildPartner} />
        <TouchableOpacity onPress={() => handleDeletePartner(item.id)}>
          <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
@@ -421,6 +421,25 @@ title: {
     borderRadius: 5, 
     color: '#e8c789' , 
     fontFamily: 'Monotype Corsiva', 
+  },
+
+  partnerStyle: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: "center",
+    gap: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 15,
+    borderRadius: 25,
+    elevation: 5,
+    margin: 10,
+    marginLeft: 30,
+    marginRight: 30,
+    padding: 5,
+    borderWidth: 2,
+    borderColor: "#e8c789",
   },
 
 
