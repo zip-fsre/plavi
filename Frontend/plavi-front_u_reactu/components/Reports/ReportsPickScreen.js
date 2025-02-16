@@ -6,9 +6,7 @@ import { View, StyleSheet } from "react-native";
 
 const ReportsPickScreen = () => {
     const { currentPage, setCurrentPage, pages } = usePage();
-    const handleImport = () =>{
-        console.log('Import iz Excela');
-    }
+   
     return(
         <Pozadina>
             <View style={styles.container}>
@@ -46,11 +44,11 @@ const ReportsPickScreen = () => {
                     
                         <HoverButton 
                          title="Import iz Excela" 
-                         onPress={handleImport} 
                          style={styles.button} 
                          height={'90%'} 
                          width={'48%'}
-                         fontSize={30}>
+                         fontSize={30}
+                         onPress={() => setCurrentPage(pages['ReportExcel'])}>
                         </HoverButton>
                     
                 </View>
