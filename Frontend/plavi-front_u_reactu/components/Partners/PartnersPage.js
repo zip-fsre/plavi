@@ -46,7 +46,7 @@ const PartnersPage = () => {
 
   // Funkcija za dodavanje novog partnera
   const handleAddPartner = () => {
-    setCurrentPage(pages['AddPartner']);
+    setCurrentPage(pages['PartnersPickScreen']);
   };
 
   // Funkcija za uređivanje partnera

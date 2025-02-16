@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from "react-native";
 import Pozadina from "../ui/Pozadina";
 import { usePage } from "../../Routes";
@@ -33,15 +33,47 @@ const ArrangementInput = ({ arrangement, index, onChange }) => (
 );
 
 export const AddPartner = () => {
-  const { pages, setCurrentPage } = usePage();
+  const { currentPage, pages, setCurrentPage } = usePage();
   const [newPartner, setNewPartner] = useState({
     naziv: "",
     vrsta: "",
     napomena: "",
     provizija: "",
   });
+  
+  const { template, templateAranzmani, partnerId } = currentPage;
 
   const [arrangements, setArrangements] = useState([{ naziv: "", opis: "", cijena: "" }]);
+
+  useEffect(() => {
+    if(partnerId){
+      fetchPartnerData();
+    }
+    else if(template){
+      setNewPartner(template);
+      setArrangements(templateAranzmani);
+    }
+  }, []);
+
+  const fetchPartnerData = async () => {
+    const response = await fetch(`http://localhost:5149/api/Partneri/${partnerId}`);
+    const data = await response.json();
+
+    setNewPartner({naziv: data.naziv, vrsta: data.tip, napomena: data.napomena, provizija: data.provizija});
+    fetchAranzmaniData();
+  }
+
+  const fetchAranzmaniData = async () => {
+    const response = await fetch(`http://localhost:5149/api/Partneri/Aranzmani/${partnerId}`);
+    const data = await response.json();
+
+    const aranzmen = data.map(aranzman => ({
+      naziv: aranzman.naziv,
+      opis: aranzman.opis,
+      cijena: aranzman.cijena
+    }));
+    setArrangements(aranzmen);
+  }
 
   // Funkcija koja prvo dodaje partnera, zatim aranžmane koji mu pripadaju
   const handleCreatePartner = async () => {
