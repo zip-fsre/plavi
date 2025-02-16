@@ -6,13 +6,15 @@ import DatePicker from 'react-datepicker';
 import Button from "./ui/Button";
 import Guest from "./ui/Guest";
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Partner from "./ui/DogadjajPartner"
 
 
 
 const CreateEventPage = () => {
     const { currentPage, setCurrentPage, pages } = usePage();
     const { id } = currentPage;
-
+    const IdeviPartnera = [-1];
+    const ProvizijePartnera = [-1];
     
     //opcenite varijable o dogadjaju
     const [startDate, setStartDateInput] = useState('');
@@ -26,9 +28,17 @@ const CreateEventPage = () => {
     const [gosti, setGosti] = useState([]); //gosti koje povucemo iz baze, a kasnije i "finalna" lista gostiju koju saljemo u bazu
     const [brojGostiju, setBrojGostiju] = useState(0); //racuna koliko je gostiju zbog postavljanja ID-eva u Flatlisti (nije najtocnije jer i ne mora biti posto se ID ne salje u bazu, ovo je samo za prikaz na frontu kada se generira novi gost)
     const [uredjeniGost, setUredjeniGost] = useState(""); //sluzi za komunikaciju child i parent komponente (Guest.js i ovaj EditEventPage.js)
+    //varijable o gostima
+    const [partneri, setPartneri] = useState([]); //gosti koje povucemo iz baze, a kasnije i "finalna" lista gostiju koju saljemo u bazu
+    const [brojPartnera, setBrojPartnera] = useState(0); //racuna koliko je gostiju zbog postavljanja ID-eva u Flatlisti (nije najtocnije jer i ne mora biti posto se ID ne salje u bazu, ovo je samo za prikaz na frontu kada se generira novi gost)
+    const [uredjeniPartner, setUredjeniPartner] = useState(""); //sluzi za komunikaciju child i parent komponente (Guest.js i ovaj EditEventPage.js)
 
-    const handeDataFromChildGuest = (data) => {
+    const handleDataFromChildGuest = (data) => {
       setUredjeniGost(data);
+    };
+
+    const handleDataFromChildPartner = (data) => {
+      setUredjeniPartner(data);
     };
     
 
@@ -42,6 +52,19 @@ const CreateEventPage = () => {
       kontaktSponzora: kontaktSponzora,
       napomena: napomena
     });
+
+  const fetchPartners = async () => {
+    const pom = (await fetch("http://localhost:5149/api/Partneri"));
+    const pom2 = await pom.json();
+    const SviPartneri = ["Odaberite partnera"];
+    pom2.forEach(element => {
+      SviPartneri.push(element.naziv);
+      IdeviPartnera.push(element.id);
+      ProvizijePartnera.push(element.id);
+    });
+    return SviPartneri;
+  }
+  const SviPartneri = fetchPartners();
     
   //dohvat podataka po učitavanju stranice
   useEffect(() => {
@@ -59,19 +82,43 @@ const CreateEventPage = () => {
     }
   }, [uredjeniGost]);
 
+  useEffect(() => {
+    if (partneri && partneri.length > 0) {
+      // Provjeri postoji li stvarna promjena
+      const updatedPartneri = partneri.map((partner) =>
+        partner.id === uredjeniPartner.id ? uredjeniPartner : partner 
+      );
+  
+        setPartneri(updatedPartneri); 
+    }
+  }, [uredjeniPartner]);
+
 
   /* prikazuje sve goste u guest listi */
   const renderGuests = ({item, index }) => {
 
    return (
     <View style={styles.guestStyle}>
-      <Guest idGosta={item.id} statusDolaska={item.statusDolaska} brojStola={item.brojStola} imePrezime={item.imeIPrezime} redniBroj={index+1} sendUpdateToParent={handeDataFromChildGuest} />
+      <Guest idGosta={item.id} statusDolaska={item.statusDolaska} brojStola={item.brojStola} imePrezime={item.imeIPrezime} redniBroj={index+1} sendUpdateToParent={handleDataFromChildGuest} />
       <TouchableOpacity onPress={() => handleDeleteGuest(item.id)}>
         <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
       </TouchableOpacity>
     </View>
    );
   };
+
+  /* prikazuje sve goste u guest listi */
+  const renderPartners = ({item, index }) => {
+
+    return (
+     <View style={styles.guestStyle}>
+       <Partner idPartnera={item.id} NaziviPartnera={item.NaziviPartnera} listaIdeva={IdeviPartnera} Tip={item.Tip} Provizija={ProvizijePartnera} redniBroj={index+1} sendUpdateToParent={handleDataFromChildPartner} />
+       <TouchableOpacity onPress={() => handleDeletePartner(item.id)}>
+         <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
+       </TouchableOpacity>
+     </View>
+    );
+   };
 
 
 
@@ -80,13 +127,44 @@ const CreateEventPage = () => {
     setGosti(prevGosti => prevGosti.filter(guest => guest.id !== guestId));
   };
 
+  const handleDeletePartner = (partnerId) => {
+    // brise partnera LOKALNO iz arraya partneri
+    setGosti(prevPartneri => prevPartneri.filter(partner => partner.id !== partnerId));
+  };
+
   const addNewGuest = () => {
     setGosti(prevGosti => {
         const newId = brojGostiju + 1;
         setBrojGostiju(newId);
-        return [...prevGosti, { id: newId, imeIPrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1, idDogadjajaa: events.id, sendUpdateToParent: handeDataFromChildGuest}];
+        return [...prevGosti, { id: newId, imeIPrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1, idDogadjajaa: events.id, sendUpdateToParent: handleDataFromChildGuest}];
     });
   };
+
+  const addNewPartner = () => {
+    SviPartneri.then((value) => {
+      setPartneri(prevPartneri => {
+      const newId = brojPartnera + 1;
+      setBrojPartnera(newId);
+      return [...prevPartneri, { id: newId, NaziviPartnera: value, listaIdeva: IdeviPartnera, Tip: "Neki tip", Provizija: ProvizijePartnera, idDogadjajaa: events.id, sendUpdateToParent: handleDataFromChildPartner}];
+  });
+    });
+    
+  };
+
+  const DebugOutput = () => {
+
+    const finalPartners = partneri.map(partner => ({
+      IdPartnera: partner.idOdabranogPartnera,
+      IdAranzmana: partner.OdabraniAranzmanId || 0,
+      idDogadjaja: 15,
+      StatusPartnera: partner.StatusPartnera || "nepoznato",
+      Izmjena: partner.Izmjena || "",
+      KonacnaCijena: partner.KonacnaCijena || 0,
+      DodatakNaProviziju: partner.Provizija || 0
+    }));
+
+    console.log(finalPartners);
+  }
   
   const handleCreate = async () => {
     setEvents({
@@ -127,6 +205,29 @@ const CreateEventPage = () => {
     }).then(() => {
       console.log("Promjene gostiju spremljene! (POST za goste poslan)",{finalGuests});
     });
+
+    const finalPartners = partneri.map(partner => ({
+      idPartnera: partner.idOdabranogPartnera,
+      idAranzmana: partner.OdabraniAranzmanId || 0,
+      idDogadjaja: mydata.id,
+      statusPartnera: partner.StatusPartnera || "nepoznato",
+      izmjena: partner.Izmjena || "",
+      konacnaCijena: Number(partner.KonacnaCijena) || 0,
+      dodatakNaProviziju: Number(partner.Provizija) || 0
+    }));
+
+    console.log(finalPartners);
+
+    fetch(`http://localhost:5149/api/MedjutablicaPt1/Vise`,{
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(finalPartners),
+    }).then(() => {
+      console.log("Promjene partnera spremljene! (POST za partnere poslan)",{finalPartners});
+      setCurrentPage(pages['Events']);
+    });
+
+
   }
 
 
@@ -134,7 +235,7 @@ const CreateEventPage = () => {
       <Pozadina>
           <View style={styles.container}>
               <Text style={styles.title}>Uredi događaj</Text> 
-              <Text style={styles.headerText}>Id: {id}</Text>
+              <Text style={styles.headerText}>Id: </Text>
               <>
               <ScrollView style={styles.scrollView}>
                 {/* naziv i vrsta */}
@@ -178,7 +279,16 @@ const CreateEventPage = () => {
 
                 {/* PARTNERI SADA SLIJEDE BOŽE POMOZI */}
                 <View style={styles.itemContainer}>
-                  <Text> </Text>
+                  <Text style={styles.categoryText}>Lista partnera:</Text>
+                  <View style={styles.addGuestView}>
+                    <Button title="Debug" onPress={DebugOutput}></Button>
+                    <Button title="+ Novi partner" onPress={addNewPartner}></Button>
+                  </View>
+                  {partneri ? (
+                    <FlatList data={partneri} renderItem={renderPartners} keyExtractor={(item) => item.id.toString()} ></FlatList>
+                  ):
+                    <Text style={styles.categoryText}>Nema partnera</Text>
+                  }
                 </View>
 
 
@@ -194,8 +304,6 @@ const CreateEventPage = () => {
                     <Text style={styles.categoryText}>Nema gostiju</Text>
                   }
                 </View>
-
-                <Text style={styles.categoryText}>Lista partnera:</Text>
                 
                 <View style={styles.buttons}>
                   <Button title="Napravi događaj" onPress={handleCreate}></Button>

@@ -212,8 +212,10 @@ const EditEventPage = () => {
   const deleteEvent = () => {
     // Simple DELETE request with fetch
     fetch(`http://localhost:5149/api/Dogadjaj/${id}`, { method: 'DELETE' })
-    .then(() => console.log("Uspješno obrisano!!!"));
-    setCurrentPage(pages['Events']);
+    .then(() => {
+      console.log("Uspješno obrisano!!!");
+      setCurrentPage(pages['Events']);
+    });
   };
   const handleDeleteGuest = (guestId) => {
     // brise gosta LOKALNO iz arraya gosti
