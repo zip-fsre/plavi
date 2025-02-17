@@ -48,7 +48,7 @@ const EventsPickScreen = () => {
                          height={'90%'} 
                          width={'48%'}
                          fontSize={30}
-                         onPress={() => setCurrentPage(pages['EventExcel'])}>
+                         onPress={() => setCurrentPage(pages['ExcelEvent'])}>
                         </HoverButton>
                     
                 </View>
