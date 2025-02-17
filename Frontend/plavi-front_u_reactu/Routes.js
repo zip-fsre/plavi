@@ -23,7 +23,6 @@ import EventsPickScreen from './components/Events/EventsPickScreen';
 import ExistingEvents from './components/Events/ExistingEvents';
 import EventTemplates from './components/Events/EventTemplates';
 import ExcelEvent from './components/Events/ExcelEvent';
-import EventDetailsPage from './components/Events/EventDetailsPage';
 
 const Routes = createContext();
 
@@ -53,7 +52,6 @@ export const RoutesProvider = ({ children }) => {
     ExistingEvents: { component: ExistingEvents, options: { headerShown: false }},
     EventTemplates: { component: EventTemplates, options: { headerShown: false }},
     ExcelEvent: { component: ExcelEvent, options: { headerShown: false }},
-    EventDetailsPage: { component: EventDetailsPage, options: { headerShown: false }},
   };
 
   const [currentPage, setCurrentPage] = useState(pages['Home']);

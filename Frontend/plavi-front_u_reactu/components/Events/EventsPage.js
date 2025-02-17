@@ -50,12 +50,7 @@ const EventsPage = () => {
     fetchEvents(); 
   }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
   
-  const handleViewEvent = (event) => {
-    setCurrentPage({
-      ...pages['EventDetailsPage'],
-      id: event.id,
-    });
-  };
+  
   //kartica dogadjaja (prikaz)
 const renderEvent = ({item}) => {
 
@@ -63,9 +58,6 @@ const renderEvent = ({item}) => {
 if (item.naziv.toLocaleLowerCase().includes(trazeniDogadjaji.toLocaleLowerCase()) ) {
   return (
     <View style={styles.eventContainer}>
-       <TouchableOpacity onPress={() => handleViewEvent(event)}>
-          <Icon name="info" size={24} color="#e8c789" style={styles.viewIcon} />
-        </TouchableOpacity>
       <Event onPress={() => setCurrentPage({...pages['EditEventPage'], id: item.id})} naziv={item.naziv} vrsta={item.svrha} opis={item.napomena} datum={item.datum}/>
     </View>
   );

@@ -1,6 +1,6 @@
 import react, {useEffect, useState} from "react"
 import Pozadina from "../ui/Pozadina";
-import { View, Text, StyleSheet, FlatList, TextInput, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, FlatList, TextInput, ScrollView, TouchableOpacity , Alert} from "react-native";
 import { usePage } from '../../Routes';
 import Event from '../ui/Event'
 import DatePicker from 'react-datepicker';
@@ -8,6 +8,9 @@ import Button from "../ui/Button";
 import Guest from "../ui/Guest";
 import Partner from "../ui/DogadjajPartner"
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+
 
 
 
@@ -190,6 +193,77 @@ const EditEventPage = () => {
     getPartners();
   }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
 
+
+  const handleExportToExcel = () => {
+    if (!events) {
+      Alert.alert("Info", "Nema odabranog događaja.");
+      return;
+    }
+  
+    if (!gosti.length && !partneri.length) {
+      Alert.alert("Info", "Nema podataka za izvoz.");
+      return;
+    }
+  
+    const wb = XLSX.utils.book_new();
+  
+    const eventInfo = [{
+      'Naziv događaja': events.naziv || 'N/A',
+      'Svrha': events.svrha || 'N/A',
+      'Klijent': events.klijent || 'N/A',
+      'Kontakt klijenta': events.kontaktKlijenta || 'N/A',
+      'Kontakt sponzora': events.kontaktSponzora || 'N/A',
+      'Napomena': events.napomena || 'N/A',
+      'Datum': events.datum ? new Date(events.datum).toLocaleDateString() : 'N/A',
+    }];
+  
+    const wsEventInfo = XLSX.utils.json_to_sheet(eventInfo);
+    XLSX.utils.book_append_sheet(wb, wsEventInfo, "Događaj");
+  
+    
+    if (gosti.length) {
+      const guestsData = gosti.map(guest => ({
+        "ID Gosta": guest.id,
+        "Ime i prezime": guest.imeIPrezime || 'N/A',
+        "Broj stola": guest.brojStola || 'N/A',
+        "Status dolaska": guest.statusDolaska || 'N/A',
+      }));
+  
+      const wsGuests = XLSX.utils.json_to_sheet(guestsData);
+      XLSX.utils.book_append_sheet(wb, wsGuests, "Gosti");
+    }
+  
+    if (partneri.length) {
+      const partnersData = partneri.map(partner => ({
+        "ID Partnera": partner.idOdabranogPartnera || 'N/A',
+        "Naziv partnera": partner.NaziviPartnera && partner.idOdabranogPartnera
+          ? partner.NaziviPartnera[partner.idOdabranogPartnera]
+          : 'N/A',
+        "Konačna cijena": partner.KonacnaCijena || 'N/A',
+        "Provizija": partner.Provizija || 'N/A',
+        "Status partnera": partner.StatusPartnera || 'N/A',
+      }));
+  
+      const wsPartners = XLSX.utils.json_to_sheet(partnersData);
+      XLSX.utils.book_append_sheet(wb, wsPartners, "Partneri");
+    }
+  
+    const summaryData = [{
+      "Ukupan broj gostiju": gosti.length,
+      "Ukupan broj partnera": partneri.length,
+    }];
+  
+    const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(wb, wsSummary, "Rezime");
+  
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  
+    saveAs(blob, `Dogadjaj_${events.id || 'N/A'}.xlsx`);
+  
+    Alert.alert("Uspjeh", "Excel datoteka je uspješno generirana i preuzeta.");
+  };
+  
   /* prikazuje sve goste u guest listi */
   const renderGuests = ({item, index }) => {
 
@@ -345,6 +419,8 @@ const EditEventPage = () => {
       <Pozadina>
           <View style={styles.container}>
               <Text style={styles.title}>Uredi događaj</Text> 
+              <Button title="Export to Excel" onPress={handleExportToExcel} />
+
               <Text style={styles.headerText}>Id: {id}</Text>
               
               {events ? ( //ispis kada se dohvati podaci

@@ -10,6 +10,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as DocumentPicker from 'expo-document-picker';
 import * as XLSX from 'xlsx';
 import SmallButton from "../ui/SmallButton";
+import { Alert } from 'react-native'
 
 
 
@@ -44,61 +45,94 @@ const ExcelEvent = () => {
     const handleDataFromChildPartner = (data) => {
       setUredjeniPartner(data);
     };
+    const handleFileUpload = async () => {
+      try {
+        const result = await DocumentPicker.getDocumentAsync({
+          type: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'],
+          copyToCacheDirectory: true,
+        });
     
-    const handleExcelImport = async () => {
-        try {
-            const result = await DocumentPicker.getDocumentAsync({
-                type: '*/*', // Accept any file type, or you can specify '.xls', '.xlsx'
-            });
-    
-            // Check if the user selected a file or cancelled the action
-            if (result.type === 'cancel') {
-                console.log('No file selected');
-                return;
-            }
-    
-            // Fetch the file URI and create a fetch request to read it
-            const fileUri = result.uri;
-    
-            // Fetch the file as a blob
-            const response = await fetch(fileUri);
-            const fileBlob = await response.blob();
-    
-            // Read the file as binary string
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const binaryStr = event.target.result;
-                    const workBook = XLSX.read(binaryStr, { type: 'binary' });
-    
-                    // Assuming you want to process the first sheet
-                    const sheetName = workBook.SheetNames[0];
-                    const worksheet = workBook.Sheets[sheetName];
-    
-                    // Convert sheet to JSON format
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
-    
-                    // Check if the sheet has data
-                    if (jsonData.length === 0) {
-                        console.log('No data in the sheet');
-                        return;
-                    }
-    
-                    // Set the parsed data into state
-                    setExcelData(jsonData);
-                    console.log('Excel Data:', jsonData);
-                } catch (error) {
-                    console.error('Error parsing the Excel file:', error);
-                }
-            };
-    
-            // Start reading the blob as a binary string
-            reader.readAsBinaryString(fileBlob);
-        } catch (error) {
-            console.error('Error importing Excel file:', error);
+        if (result.canceled) {
+          console.log('Odabir datoteke otkazan');
+          return;
         }
+    
+        const file = result.assets[0];
+    
+        if (!file) {
+          console.error('Greška: Nema odabrane datoteke.');
+          return;
+        }
+    
+        const response = await fetch(file.uri);
+        const blob = await response.blob();
+    
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const binaryString = e.target.result;
+          const workbook = XLSX.read(binaryString, { type: 'binary' });
+    
+          const sheetNames = workbook.SheetNames;
+          console.log('Nazivi listova u Excelu:', sheetNames);
+    
+          // Mapping event, guests, partners, and summary
+          const eventSheet = sheetNames.includes('Događaj') ? workbook.Sheets['Događaj'] : null;
+          const guestsSheet = sheetNames.includes('Gosti') ? workbook.Sheets['Gosti'] : null;
+          const partnersSheet = sheetNames.includes('Partneri') ? workbook.Sheets['Partneri'] : null;
+          const summarySheet = sheetNames.includes('Rezime') ? workbook.Sheets['Rezime'] : null;
+    
+          if (eventSheet) {
+            const eventData = XLSX.utils.sheet_to_json(eventSheet);
+            console.log('Podaci iz lista Događaj:', eventData);
+            if (eventData.length > 0) {
+              const event = eventData[0]; // Assuming only one event
+              setNaziv(event.naziv || '');
+              setSvrha(event.svrha || '');
+              setKlijent(event.klijent || '');
+              setKontaktKlijenta(event.kontaktKlijenta || '');
+              setKontaktSponzora(event.kontaktSponzora || '');
+              setNapomena(event.napomena || '');
+              setStartDateInput(event.datum ? new Date(event.datum) : '');
+            }
+          }
+    
+          if (guestsSheet) {
+            const guestsData = XLSX.utils.sheet_to_json(guestsSheet);
+            console.log('Podaci iz lista Gosti:', guestsData);
+            setGosti(guestsData.map((guest, index) => ({
+              id: index + 1, // Assuming new IDs for guests
+              imeIPrezime: guest.imeIPrezime || 'N/A',
+              brojStola: guest.brojStola || 0,
+              statusDolaska: guest.statusDolaska || 'Nepotvrđen',
+            })));
+          }
+    
+          if (partnersSheet) {
+            const partnerData = XLSX.utils.sheet_to_json(partnersSheet);
+            console.log('Podaci iz lista Partneri:', partnerData);
+            setPartneri(partnerData.map((partner, index) => ({
+              id: index + 1, // Assuming new IDs for partners
+              NaziviPartnera: partner.NazivPartnera || 'N/A',
+              Provizija: partner.provizija || 0,
+              StatusPartnera: partner.statusPartnera || 'Neaktivno',
+              KonacnaCijena: partner.konacnaCijena || 0,
+              // Additional fields mapping as needed
+            })));
+          }
+    
+          if (summarySheet) {
+            const summaryData = XLSX.utils.sheet_to_json(summarySheet);
+            console.log('Podaci iz lista Rezime:', summaryData);
+          }
+        };
+    
+        reader.readAsBinaryString(blob);
+      } catch (error) {
+        console.error('Greška pri učitavanju datoteke:', error);
+      }
     };
-
+    
+    
     /* varijable za pohranu lokalno (onChange se mijenjaju) pa slanje dalje u bazu */
     const [events, setEvents] = useState({
       startDate: startDate,
@@ -356,7 +390,7 @@ const ExcelEvent = () => {
       <Pozadina>
           <View style={styles.container}>
               <Text style={styles.title}>Stvori događaj</Text> 
-              <SmallButton title="Importiraj Excel" onPress={handleExcelImport} />
+              <SmallButton title="Importiraj Excel" onPress={handleFileUpload} />
               <>
               <ScrollView style={styles.scrollView}>
                 {/* naziv i vrsta */}
