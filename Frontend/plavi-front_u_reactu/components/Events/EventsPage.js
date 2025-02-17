@@ -166,6 +166,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     margin: 10,
     padding: 5,
+    maxHeight: 400,
   },
 
   container: {

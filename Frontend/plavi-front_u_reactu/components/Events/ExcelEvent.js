@@ -75,7 +75,6 @@ const ExcelEvent = () => {
           const sheetNames = workbook.SheetNames;
           console.log('Nazivi listova u Excelu:', sheetNames);
     
-          // Mapping event, guests, partners, and summary
           const eventSheet = sheetNames.includes('Događaj') ? workbook.Sheets['Događaj'] : null;
           const guestsSheet = sheetNames.includes('Gosti') ? workbook.Sheets['Gosti'] : null;
           const partnersSheet = sheetNames.includes('Partneri') ? workbook.Sheets['Partneri'] : null;
@@ -85,7 +84,7 @@ const ExcelEvent = () => {
             const eventData = XLSX.utils.sheet_to_json(eventSheet);
             console.log('Podaci iz lista Događaj:', eventData);
             if (eventData.length > 0) {
-              const event = eventData[0]; // Assuming only one event
+              const event = eventData[0]; 
               setNaziv(event.naziv || '');
               setSvrha(event.svrha || '');
               setKlijent(event.klijent || '');
@@ -100,7 +99,7 @@ const ExcelEvent = () => {
             const guestsData = XLSX.utils.sheet_to_json(guestsSheet);
             console.log('Podaci iz lista Gosti:', guestsData);
             setGosti(guestsData.map((guest, index) => ({
-              id: index + 1, // Assuming new IDs for guests
+              id: index + 1, 
               imeIPrezime: guest.imeIPrezime || 'N/A',
               brojStola: guest.brojStola || 0,
               statusDolaska: guest.statusDolaska || 'Nepotvrđen',
@@ -111,12 +110,11 @@ const ExcelEvent = () => {
             const partnerData = XLSX.utils.sheet_to_json(partnersSheet);
             console.log('Podaci iz lista Partneri:', partnerData);
             setPartneri(partnerData.map((partner, index) => ({
-              id: index + 1, // Assuming new IDs for partners
+              id: index + 1, 
               NaziviPartnera: partner.NazivPartnera || 'N/A',
               Provizija: partner.provizija || 0,
               StatusPartnera: partner.statusPartnera || 'Neaktivno',
               KonacnaCijena: partner.konacnaCijena || 0,
-              // Additional fields mapping as needed
             })));
           }
     
