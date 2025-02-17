@@ -227,9 +227,10 @@ const handleFileUpload = async () => {
   return (
     <Pozadina>
       <View style={styles.container}>
+        <View style={styles.header}>
         <Text style={styles.title}>Novi partner</Text>
         <SmallButton title="Učitaj Excel" onPress={ handleFileUpload} />
-
+        </View>
         <ScrollView style={styles.scrollView}>
         <TextInput
          style={styles.input}
@@ -296,15 +297,42 @@ const handleFileUpload = async () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignSelf: "center", width: "90%", paddingTop: 20, maxHeight: "80%" },
-  title: { fontSize: 48, color: "#e8c789", marginBottom: 20 },
+  container: { flex: 1, alignSelf: "center", width: "90%", paddingTop: 20, maxHeight: '80%', maxWidth: '70%' },
+  title: { fontSize: 48, fontFamily: 'Alex Brush', color: "#e8c789", marginBottom: 20 },
   subtitleContainer: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
-  subtitle: { fontSize: 30, color: "#e8c789" },
+  subtitle: { fontSize: 30, color: "#e8c789" , fontFamily: 'Alex Brush', },
+  header: {display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    maxWidth: '70%',
+    marginBottom: 10,
+    marginLeft: 20,},
   buttonGroup: { flexDirection: "row" },
-  scrollView: { maxHeight: 500 },
-  addButton: { backgroundColor: "#e8c789", padding: 10, borderRadius: 5, marginLeft: 10 },
-  saveButton: { backgroundColor: "#e8c789", padding: 10, borderRadius: 5, marginLeft: 10 },
-  input: { borderWidth: 1, borderColor: "#e8c789", padding: 10, marginVertical: 10, borderRadius: 5 },
+  scrollView: { maxHeight: 500 , },
+  addButton: { backgroundColor: "#e8c789", fontFamily: 'Monotype Corsiva', padding: 10, borderRadius: 5, marginLeft: 10 },
+  addButtonText: { fontFamily: 'Monotype Corsiva', fontSize: 24, },
+  saveButtonText: { fontFamily: 'Monotype Corsiva', fontSize: 24, },
+  saveButton: { backgroundColor: "#e8c789", fontFamily: 'Monotype Corsiva', padding: 10, borderRadius: 5, marginLeft: 10 },
+  input: { borderWidth: 1, marginLeft: 25, borderColor: "#e8c789", maxWidth: '80%', padding: 10, fontSize: 20, marginVertical: 10, borderRadius: 5, color: '#e8c789' , fontFamily: 'Monotype Corsiva', },
+  deleteButton: {
+    marginLeft: 10, 
+  },
+  arrangementContainer: {
+    flexDirection: "column",
+    marginBottom: 20,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#e8c789",
+    borderRadius: 5,
+  },
+  priceAndDeleteContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  priceInput: {
+    flex: 1, 
+  },
 });
 
 export default PartnerExcel;

@@ -168,6 +168,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignSelf: 'center',
     width: '90%',
+    maxHeight: 600,
   },
   partneri: {
     maxHeight: 500,
