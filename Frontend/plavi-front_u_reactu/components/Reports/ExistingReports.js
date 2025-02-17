@@ -73,7 +73,6 @@ const ExistingReports = () => {
 
         </View>
          {/* TextInput za pretragu */}
-          <View style={styles.searchContainer}>
           <Icon name="search" size={20} color="#222c2b" style={styles.searchIcon} />
           <TextInput
           style={styles.searchInput}
@@ -81,7 +80,6 @@ const ExistingReports = () => {
           value={searchQuery}
           onChangeText={handleSearch}
         />
-        </View>
 
         <ScrollView
           style={styles.reportsList}
@@ -178,13 +176,18 @@ const styles = StyleSheet.create({
   searchIcon: {
     marginRight: 10,
   },
-  searchInput: {
-    flex: 1,
-    fontSize: 18,
-    color: '#222c2b',
-    borderRadius: 20,
-    height: 40,
-    paddingLeft: 10,
+  searchInput:{
+    borderWidth: 1, 
+    borderColor: "#e8c789",
+    padding: 10, 
+    margin: "auto", 
+    marginTop: 20, 
+    marginBottom: 20,
+    width: 400,
+    fontSize: 20, 
+    borderRadius: 5, 
+    color: '#e8c789' , 
+    fontFamily: 'Monotype Corsiva', 
   },
 });
 

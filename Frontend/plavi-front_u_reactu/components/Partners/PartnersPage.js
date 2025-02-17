@@ -131,7 +131,6 @@ const PartnersPage = () => {
         <TextInput
           style={styles.searchInput}
           placeholder="Traži partnera po imenu..."
-          placeholderTextColor="#ccc"
           value={searchText}
           onChangeText={handleSearch}
         />
@@ -207,17 +206,18 @@ const styles = StyleSheet.create({
     elevation: 5,
     width: '60%',
   },
-  searchInput: {
-    borderWidth: 1,
-    borderColor: '#e8c789',
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 5,
-    color: '#e8c789',
-    marginBottom: 5,
-    textShadowColor: 'black',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+  searchInput:{
+    borderWidth: 1, 
+    borderColor: "#e8c789",
+    padding: 10, 
+    margin: "auto", 
+    marginTop: 20,
+    marginBottom: 20, 
+    width: 400,
+    fontSize: 20, 
+    borderRadius: 5, 
+    color: '#e8c789' , 
+    fontFamily: 'Monotype Corsiva', 
   },
   partnerTextContainer: {
     flex: 1,
