@@ -303,9 +303,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 30,
+    fontSize: 40,
     color: '#e8c789',
-    fontFamily: 'Monotype Corsiva',
+    fontFamily: 'Alex Brush',
     marginBottom: 20,
   },
   description: {
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 18,
-    color: 'red',
+    color: '#e8c789',
     marginBottom: 20,
   },
 });

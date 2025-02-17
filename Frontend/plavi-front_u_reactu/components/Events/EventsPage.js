@@ -166,12 +166,12 @@ const styles = StyleSheet.create({
     elevation: 5,
     margin: 10,
     padding: 5,
-    maxHeight: 400,
   },
 
   container: {
     flex: 1,
     alignSelf: 'center',  
+    maxHeight: 600,
 
   },
   header: {

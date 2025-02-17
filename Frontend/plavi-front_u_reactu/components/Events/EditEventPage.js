@@ -552,7 +552,7 @@ headerText:{
       textShadowRadius: 3,
       },
 scrollView:{
-  maxHeight: 500,
+  maxHeight: 400,
   width: 800,
   },
 dateText:{

@@ -139,6 +139,7 @@ const ReportsPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    maxHeight: 600,
   },
   header: {
     display: 'flex',
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
   title: {
     color: '#e8c789',
     fontFamily: 'Alex Brush',
-    fontSize: 48,
+    fontSize: 64,
     textAlign: 'left',
     marginBottom: 10,
     textShadowColor: 'black',
@@ -188,10 +189,9 @@ const styles = StyleSheet.create({
   reportsTitle: {
     fontSize: 25,
     color: '#e8c789',
-    fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
     textAlign: 'center',
-    fontFamily: 'Monotype Corsiva',
+    fontFamily: 'Alex Brush',
   },
   searchContainer: {
     flexDirection: 'row',

@@ -257,9 +257,9 @@ const styles = StyleSheet.create({
       alignItems: 'center',
     },
     title: {
-      fontSize: 30,
+      fontSize: 40,
       color: '#e8c789',
-      fontFamily: 'Monotype Corsiva',
+      fontFamily: 'Alex Brush',
       marginBottom: 20,
     },
     label: {
@@ -277,9 +277,9 @@ const styles = StyleSheet.create({
       marginBottom: 15,
       paddingLeft: 10,
       backgroundColor: '#95997e',
-      fontSize: 18,
-      opacity: 0.6,
-      color: '#222c2b',
+      fontSize: 20,
+      opacity: 0.8,
+      color: '#222c2b',//'#222c2b',
     },
     datesContainer: {
       flexDirection: 'row', 
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     },
     picker: {
       backgroundColor: '#95997e',
-      opacity: 0.6,
+      opacity: 0.8,
       color: '#222c2b',
       width: '60%',
       height:40,
