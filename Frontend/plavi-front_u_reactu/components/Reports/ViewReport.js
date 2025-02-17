@@ -44,7 +44,6 @@ const ViewReport = () => {
           const selectedPartner = partners.find(p => p.id === data.odabraniPartner);
           if (!selectedPartner) {
               console.warn("Odabrani partner nije pronađen.");
-              return;
           }
   
           console.log("Odabrani partner:", selectedPartner);
