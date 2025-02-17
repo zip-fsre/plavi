@@ -17,25 +17,48 @@ const ViewReport = () => {
   const [error, setError] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0);
   const [totalCommission, setTotalCommission] = useState(0);
+  const [selectedPartner, setSelectedPartner] = useState(null);
+
+  
 
   useEffect(() => {
     if (!reportId) return;
 
+   
     const fetchReport = async () => {
       try {
-        console.log('Fetching report for reportId:', reportId);
-        const response = await fetch(`http://localhost:5149/api/Izvjesce/${reportId}`);
-        if (!response.ok) throw new Error('Greška prilikom dohvaćanja izvješća.');
-        const data = await response.json();
-        console.log('Fetched report data:', data);
-        setReportData(data);
-        fetchMedjutablicaPt2(data.id);
+          console.log('Fetching report for reportId:', reportId);
+          const response = await fetch(`http://localhost:5149/api/Izvjesce/${reportId}`);
+          if (!response.ok) throw new Error('Greška prilikom dohvaćanja izvješća.');
+  
+          const data = await response.json();
+          console.log('Fetched report data:', data);
+          setReportData(data);  
+  
+          const partnersResponse = await fetch("http://localhost:5149/api/Partneri");
+          if (!partnersResponse.ok) throw new Error('Greška prilikom dohvaćanja partnera.');
+  
+          const partners = await partnersResponse.json();
+          console.log("Fetched partners:", partners);
+  
+          const selectedPartner = partners.find(p => p.id === data.odabraniPartner);
+          if (!selectedPartner) {
+              console.warn("Odabrani partner nije pronađen.");
+          }
+  
+          console.log("Odabrani partner:", selectedPartner);
+
+          setSelectedPartner(selectedPartner);
+  
+          fetchMedjutablicaPt2(data.id);
+  
       } catch (err) {
-        setError(err.message);
-        console.error('Error fetching report:', err);
-        setLoading(false);
+          setError(err.message);
+          console.error('Error fetching report:', err);
+          setLoading(false);
       }
-    };
+  };
+  
 
     const fetchMedjutablicaPt2 = async (reportId) => {
       try {
@@ -67,19 +90,21 @@ const ViewReport = () => {
           medjutablicaPt2Ids.includes(record.id)
         );
         console.log('Filtered MedjutablicaPt1 records:', filteredMedjutablicaPt1Records);
+    
         if (filteredMedjutablicaPt1Records.length === 0) {
           setError("Nema dostupnih aranžmana za ovo izvješće.");
           setLoading(false);
         }
     
         if (filteredMedjutablicaPt1Records.length > 0) {
-          fetchEvents(filteredMedjutablicaPt1Records);
+          fetchEvents(filteredMedjutablicaPt1Records); // Prosljeđivanje podataka u fetchEvents
         }
       } catch (err) {
         setError(err.message);
         console.error('Error fetching MedjutablicaPt1:', err);
       }
     };
+    
 
     const fetchEvents = async (filteredMedjutablicaPt1Records) => {
       try {
@@ -89,6 +114,7 @@ const ViewReport = () => {
     
         console.log('Fetched all events:', allEvents);
     
+        // Ovo sada koristi filteredMedjutablicaPt1Records
         const enrichedMedjutablicaPt1 = filteredMedjutablicaPt1Records.map(record => {
           const event = allEvents.find(evt => evt.id === record.idDogadjaja);
           return {
@@ -106,15 +132,14 @@ const ViewReport = () => {
       }
     };
     
-
     
+
     const fetchArrangements = async (enrichedMedjutablicaPt1) => {
       try {
         const response = await fetch('http://localhost:5149/api/Aranzman');
         if (!response.ok) throw new Error('Greška prilikom dohvaćanja aranžmana.');
         const allArrangements = await response.json();
     
-        // Mapiraj podatke tako da sačuvaš konacnaCijena iz MedjutablicaPt1
         const finalArrangements = enrichedMedjutablicaPt1.map(record => {
           const aranzman = allArrangements.find(arr => arr.id === record.idAranzmana);
           return {
@@ -158,23 +183,29 @@ const ViewReport = () => {
     );
   }
 
- 
+
+  
   const handleExportToExcel = () => {
-    if (!reportData || arrangements.length === 0) {
+    if (!reportData) {
+      Alert.alert("Info", "Nema odabranog izvješća.");
+      return;
+    }
+  
+    if (!arrangements.length) {
       Alert.alert("Info", "Nema podataka za izvoz.");
       return;
     }
   
+    const partner = selectedPartner;
+  
     const wb = XLSX.utils.book_new();
   
-    const reportInfo = [
-      {
-        'Naziv izvješća': reportData.naziv || 'N/A',
-        'Opis izvješća': reportData.opis || 'N/A',
-        'DatumOd': reportData.pocetak ? new Date(reportData.pocetak).toLocaleDateString() : 'N/A',
-        'DatumDo': reportData.kraj ? new Date(reportData.kraj).toLocaleDateString() : 'N/A'
-      }
-    ];
+    const reportInfo = [{
+      'Naziv izvješća': reportData.naziv || 'N/A',
+      'Opis izvješća': reportData.opis || 'N/A',
+      'DatumOd': reportData.pocetak ? new Date(reportData.pocetak).toLocaleDateString() : 'N/A',
+      'DatumDo': reportData.kraj ? new Date(reportData.kraj).toLocaleDateString() : 'N/A'
+    }];
   
     const wsReportInfo = XLSX.utils.json_to_sheet(reportInfo);
     XLSX.utils.book_append_sheet(wb, wsReportInfo, "Izvješće");
@@ -189,12 +220,23 @@ const ViewReport = () => {
     const wsArrangements = XLSX.utils.json_to_sheet(sheetData);
     XLSX.utils.book_append_sheet(wb, wsArrangements, "Aranžmani");
   
-    const summaryData = [
-      {
-        "Ukupna cijena": totalPrice,
-        "Ukupna provizija": totalCommission,
-      }
-    ];
+    if (partner) {
+      const partnerInfo = [{
+        "ID Partnera": partner.id || 'N/A',
+        "Naziv partnera": partner.naziv || 'N/A',
+        "Tip": partner.tip || 'N/A',
+        "Napomena": partner.napomena || 'N/A',
+        "Provizija": partner.provizija ? partner.provizija.toString() : 'N/A'
+      }];
+  
+      const wsPartner = XLSX.utils.json_to_sheet(partnerInfo);
+      XLSX.utils.book_append_sheet(wb, wsPartner, "Partner");
+    }
+  
+    const summaryData = [{
+      "Ukupna cijena": totalPrice,
+      "Ukupna provizija": totalCommission,
+    }];
   
     const wsSummary = XLSX.utils.json_to_sheet(summaryData);
     XLSX.utils.book_append_sheet(wb, wsSummary, "Rezime");
@@ -204,6 +246,9 @@ const ViewReport = () => {
   
     saveAs(blob, `Izvjesce_${reportId}.xlsx`);
   };
+  
+  
+  
   
   if (error) {
     return (

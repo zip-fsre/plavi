@@ -9,6 +9,9 @@ import Layout from '../Layout';
 import * as XLSX from 'xlsx'; 
 import { jsPDF } from 'jspdf';
 import { saveAs } from 'file-saver';
+import { TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 
 
 const EventsPage = () => {
@@ -47,7 +50,7 @@ const EventsPage = () => {
     fetchEvents(); 
   }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
   
-
+  
   //kartica dogadjaja (prikaz)
 const renderEvent = ({item}) => {
 
@@ -163,6 +166,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     margin: 10,
     padding: 5,
+    maxHeight: 400,
   },
 
   container: {

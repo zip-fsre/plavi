@@ -1,53 +1,137 @@
 import react, {useEffect, useState} from "react"
 import Pozadina from "../ui/Pozadina";
-import { View, Text, StyleSheet, FlatList, TextInput, ScrollView, TouchableOpacity , Alert} from "react-native";
+import { View, Text, StyleSheet, FlatList, TextInput, ScrollView, TouchableOpacity } from "react-native";
 import { usePage } from '../../Routes';
-import Event from '../ui/Event'
 import DatePicker from 'react-datepicker';
 import Button from "../ui/Button";
 import Guest from "../ui/Guest";
 import Partner from "../ui/DogadjajPartner"
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
+import * as DocumentPicker from 'expo-document-picker';
+import * as XLSX from 'xlsx';
+import SmallButton from "../ui/SmallButton";
+import { Alert } from 'react-native'
 
 
 
-
-const EditEventPage = () => {
+const ExcelEvent = () => {
     const { currentPage, setCurrentPage, pages } = usePage();
-    const { id } = currentPage;
+    const { id, dogadjajId, template, templatePartneri } = currentPage;
     const IdeviPartnera = [-1];
     const ProvizijePartnera = [-1];
-
-    /* varijable za pohranu lokalno (onChange se mijenjaju) pa slanje dalje u bazu */
+    const [excelData, setExcelData] = useState(null);
+    
     //opcenite varijable o dogadjaju
-    const [startDate, setStartDateInput] = useState("");
-    const [naziv, setNaziv] = useState("");
-    const [svrha, setSvrha] = useState("");
-    const [klijent, setKlijent] = useState("");
-    const [kontaktKlijenta, setKontaktKlijenta] = useState("");
-    const [kontaktSponzora, setKontaktSponzora] = useState("");
-    const [napomena, setNapomena] = useState(""); 
+    const [startDate, setStartDateInput] = useState('');
+    const [naziv, setNaziv] = useState('');
+    const [svrha, setSvrha] = useState('');
+    const [klijent, setKlijent] = useState('');
+    const [kontaktKlijenta, setKontaktKlijenta] = useState('');
+    const [kontaktSponzora, setKontaktSponzora] = useState('');
+    const [napomena, setNapomena] = useState(''); 
     //varijable o gostima
     const [gosti, setGosti] = useState([]); //gosti koje povucemo iz baze, a kasnije i "finalna" lista gostiju koju saljemo u bazu
     const [brojGostiju, setBrojGostiju] = useState(0); //racuna koliko je gostiju zbog postavljanja ID-eva u Flatlisti (nije najtocnije jer i ne mora biti posto se ID ne salje u bazu, ovo je samo za prikaz na frontu kada se generira novi gost)
     const [uredjeniGost, setUredjeniGost] = useState(""); //sluzi za komunikaciju child i parent komponente (Guest.js i ovaj EditEventPage.js)
     //varijable o partnerima
     const [partneri, setPartneri] = useState([]); //partneri koje povucemo iz baze, a kasnije i "finalna" lista partnera koju saljemo u bazu
-    const [brojPartnera, setBrojPartnera] = useState(0); //racuna koliko je partnera zbog postavljanja ID-eva u Flatlisti (nije najtocnije jer i ne mora biti posto se ID ne salje u bazu, ovo je samo za prikaz na frontu kada se generira novi partner)
-    const [uredjeniPartner, setUredjeniPartner] = useState(""); //sluzi za komunikaciju child i parent komponente (DogadjajPartner.js i ovaj EditEventPage.js)
+    const [brojPartnera, setBrojPartnera] = useState(0); //racuna koliko je partnera zbog postavljanja ID-eva u Flatlisti (nije najtocnije jer i ne mora biti posto se ID ne salje u bazu, ovo je samo za prikaz na frontu kada se generira novi gost)
+    const [uredjeniPartner, setUredjeniPartner] = useState(""); //sluzi za komunikaciju child i parent komponente (DogadjajPartner.js i ovaj CreateEventPage.js)
 
-
-    //sluzi za mijenjanje uredjenog gosta iz child komponente Guest.js
-    const handeDataFromChildGuest = (data) => {
+    const handleDataFromChildGuest = (data) => {
       setUredjeniGost(data);
     };
 
     const handleDataFromChildPartner = (data) => {
       setUredjeniPartner(data);
     };
-
+    const handleFileUpload = async () => {
+      try {
+        const result = await DocumentPicker.getDocumentAsync({
+          type: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'],
+          copyToCacheDirectory: true,
+        });
+    
+        if (result.canceled) {
+          console.log('Odabir datoteke otkazan');
+          return;
+        }
+    
+        const file = result.assets[0];
+    
+        if (!file) {
+          console.error('Greška: Nema odabrane datoteke.');
+          return;
+        }
+    
+        const response = await fetch(file.uri);
+        const blob = await response.blob();
+    
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const binaryString = e.target.result;
+          const workbook = XLSX.read(binaryString, { type: 'binary' });
+    
+          const sheetNames = workbook.SheetNames;
+          console.log('Nazivi listova u Excelu:', sheetNames);
+    
+          const eventSheet = sheetNames.includes('Događaj') ? workbook.Sheets['Događaj'] : null;
+          const guestsSheet = sheetNames.includes('Gosti') ? workbook.Sheets['Gosti'] : null;
+          const partnersSheet = sheetNames.includes('Partneri') ? workbook.Sheets['Partneri'] : null;
+          const summarySheet = sheetNames.includes('Rezime') ? workbook.Sheets['Rezime'] : null;
+    
+          if (eventSheet) {
+            const eventData = XLSX.utils.sheet_to_json(eventSheet);
+            console.log('Podaci iz lista Događaj:', eventData);
+            if (eventData.length > 0) {
+              const event = eventData[0]; 
+              setNaziv(event.naziv || '');
+              setSvrha(event.svrha || '');
+              setKlijent(event.klijent || '');
+              setKontaktKlijenta(event.kontaktKlijenta || '');
+              setKontaktSponzora(event.kontaktSponzora || '');
+              setNapomena(event.napomena || '');
+              setStartDateInput(event.datum ? new Date(event.datum) : '');
+            }
+          }
+    
+          if (guestsSheet) {
+            const guestsData = XLSX.utils.sheet_to_json(guestsSheet);
+            console.log('Podaci iz lista Gosti:', guestsData);
+            setGosti(guestsData.map((guest, index) => ({
+              id: index + 1, 
+              imeIPrezime: guest.imeIPrezime || 'N/A',
+              brojStola: guest.brojStola || 0,
+              statusDolaska: guest.statusDolaska || 'Nepotvrđen',
+            })));
+          }
+    
+          if (partnersSheet) {
+            const partnerData = XLSX.utils.sheet_to_json(partnersSheet);
+            console.log('Podaci iz lista Partneri:', partnerData);
+            setPartneri(partnerData.map((partner, index) => ({
+              id: index + 1, 
+              NaziviPartnera: partner.NazivPartnera || 'N/A',
+              Provizija: partner.provizija || 0,
+              StatusPartnera: partner.statusPartnera || 'Neaktivno',
+              KonacnaCijena: partner.konacnaCijena || 0,
+            })));
+          }
+    
+          if (summarySheet) {
+            const summaryData = XLSX.utils.sheet_to_json(summarySheet);
+            console.log('Podaci iz lista Rezime:', summaryData);
+          }
+        };
+    
+        reader.readAsBinaryString(blob);
+      } catch (error) {
+        console.error('Greška pri učitavanju datoteke:', error);
+      }
+    };
+    
+    
+    /* varijable za pohranu lokalno (onChange se mijenjaju) pa slanje dalje u bazu */
     const [events, setEvents] = useState({
       startDate: startDate,
       naziv: naziv,
@@ -58,80 +142,55 @@ const EditEventPage = () => {
       napomena: napomena
     });
 
-    const fetchPartners = async () => {
-      const pom = (await fetch("http://localhost:5149/api/Partneri"));
-      const pom2 = await pom.json();
-      const SviPartneri = ["Odaberite partnera"];
-      pom2.forEach(element => {
-        SviPartneri.push(element.naziv);
-        IdeviPartnera.push(element.id);
-        ProvizijePartnera.push(element.provizija);
-      });
-      return SviPartneri;
+  const fetchPartners = async () => {
+    const pom = (await fetch("http://localhost:5149/api/Partneri"));
+    const pom2 = await pom.json();
+    const SviPartneri = ["Odaberite partnera"];
+    pom2.forEach(element => {
+      SviPartneri.push(element.naziv);
+      IdeviPartnera.push(element.id);
+      ProvizijePartnera.push(element.provizija);
+    });
+    return SviPartneri;
+  }
+  const SviPartneri = fetchPartners();
+
+  //prebaci promijenjene podatke iz uredjeniGost u gosti array (zapravo zamijeni podatke kod gosta o kojem je rijec)
+  useEffect(() => {
+    if (gosti && gosti.length > 0) {
+      // Provjeri postoji li stvarna promjena
+      const updatedGuests = gosti.map((guest) =>
+        guest.id === uredjeniGost.id ? uredjeniGost : guest 
+      );
+  
+        setGosti(updatedGuests); 
     }
-    const SviPartneri = fetchPartners();
+  }, [uredjeniGost]);
+
+  useEffect(() => {
+    if (partneri && partneri.length > 0) {
+      // Provjeri postoji li stvarna promjena
+      const updatedPartneri = partneri.map((partner) =>
+        partner.id === uredjeniPartner.id ? uredjeniPartner : partner 
+      );
   
-    //prebaci promijenjene podatke iz uredjeniGost u gosti array (zapravo zamijeni podatke kod gosta o kojem je rijec)
-    useEffect(() => {
-      if (gosti && gosti.length > 0) {
-        // Provjeri postoji li stvarna promjena
-        const updatedGuests = gosti.map((guest) =>
-          guest.id === uredjeniGost.id ? uredjeniGost : guest 
-        );
-    
-          setGosti(updatedGuests); 
-      }
-    }, [uredjeniGost]);
-
-    useEffect(() => {
-      if (partneri && partneri.length > 0) {
-        // Provjeri postoji li stvarna promjena
-        const updatedPartneri = partneri.map((partner) =>
-          partner.id === uredjeniPartner.id ? uredjeniPartner : partner 
-        );
-    
-          setPartneri(updatedPartneri); 
-      }
-    }, [uredjeniPartner]);
-    
-
-    const showChanges = () => {
-      events.datum = startDate;
-
-      if (!(naziv == undefined || naziv == "")) {
-        events.naziv = naziv;
-      }
-      if (!(svrha == undefined || svrha == "")) {
-        events.svrha = svrha;
-      }
-      if (!(klijent == undefined || klijent == "")) {
-        events.klijent = klijent;
-      }
-      if (!(kontaktKlijenta == undefined || kontaktKlijenta == "")) {
-        events.kontaktKlijenta = kontaktKlijenta;
-      }
-      if (!(kontaktSponzora == undefined || kontaktSponzora == "")) {
-        events.kontaktSponzora = kontaktSponzora;
-      }
-      if (!(napomena == undefined || napomena == "")) {
-        events.napomena = napomena;
-      }
-      
-      
-    };
-
-    //BROJI KOLIKO IMA PRIKAZANIH GOSTIJU
-    useEffect(() => {
-      if (gosti && gosti.length > 0) {
-          const maxId = Math.max(...gosti.map(gost => gost.id)); // Pronađi najveći postojeći ID (upitna potreba za ovim ali eto)
-          setBrojGostiju(maxId); // Postavi globalni broj gostiju na najveći ID
-      }
-  }, [gosti]);
+        setPartneri(updatedPartneri); 
+    }
+  }, [uredjeniPartner]);
   
+
+  //BROJI KOLIKO IMA PRIKAZANIH GOSTIJU
+  useEffect(() => {
+    if (gosti && gosti.length > 0) {
+        const maxId = Math.max(...gosti.map(gost => gost.id)); // Pronađi najveći postojeći ID (upitna potreba za ovim ali eto)
+        setBrojGostiju(maxId); // Postavi globalni broj gostiju na najveći ID
+    }
+}, [gosti]);
+
   //funkcija koja kupi evente iz backenda
-  const getEvents = async () => {
+  const fetchEventData = async () => {
     try {
-      const response = await fetch(`http://localhost:5149/api/Dogadjaj/${id}`); //da ovo radi treba koristiti ` navodnike (desni alt+7)
+      const response = await fetch(`http://localhost:5149/api/Dogadjaj/${dogadjajId}`); //da ovo radi treba koristiti ` navodnike (desni alt+7)
       const data = await response.json();
       setEvents(data);
       setStartDateInput(data.datum);
@@ -147,12 +206,12 @@ const EditEventPage = () => {
       console.error(error);
     }
   }
-  
+
   //funkcija koja kupi goste iz backenda
   const getGuests = async () => {
     try {
       /*const response = await fetch(`http://localhost:5149/api/Gost/${id}`); //da ovo radi treba koristiti ` navodnike (desni alt+7)*/
-      const response = await fetch(`http://localhost:5149/api/Dogadjaj/Gosti/${id}`);
+      const response = await fetch(`http://localhost:5149/api/Dogadjaj/Gosti/${dogadjajId}`);
       const data = await response.json();
       setGosti(data);
       return data;
@@ -167,7 +226,7 @@ const EditEventPage = () => {
   const getPartners = async () => {
     try {
       /*const response = await fetch(`http://localhost:5149/api/Gost/${id}`); //da ovo radi treba koristiti ` navodnike (desni alt+7)*/
-      const response = await fetch(`http://localhost:5149/api/Dogadjaj/Partners/${id}`);
+      const response = await fetch(`http://localhost:5149/api/Dogadjaj/Partners/${dogadjajId}`);
       const data = await response.json();
       SviPartneri.then((value) => {
         let i = 1;
@@ -183,93 +242,36 @@ const EditEventPage = () => {
     catch (error) {
       console.error(error);
     }
-
-  }    
+  }
     
   //dohvat podataka po učitavanju stranice
   useEffect(() => {
-    getEvents();
-    getGuests();
-    getPartners();
+    if(dogadjajId){
+      fetchEventData();
+      getGuests();
+      getPartners();
+    }
+    else if(template){
+      setEvents(template);
+      SviPartneri.then((value) => {
+        let i = 1;
+        templatePartneri.forEach(element => {
+          let pom = {id: i, redniBroj: i, Izmjena: element.Izmjena, KonacnaCijena: element.konacnaCijena, NaziviPartnera: value, OdabraniAranzmanId: element.IdAranzmana, Provizija: element.dodatakNaProviziju, StatusPartnera: element.statusPartnera, idOdabranogPartnera: element.IdPartnera, listaIdeva: IdeviPartnera}
+          i++;
+          partneri.push(pom);
+        });
+        setBrojPartnera(i);
+      });
+    }
   }, []); // Hint: prazan [] pokreće samo jednom funkciju (pri učitavanju stranice)
 
 
-  const handleExportToExcel = () => {
-    if (!events) {
-      Alert.alert("Info", "Nema odabranog događaja.");
-      return;
-    }
-  
-    if (!gosti.length && !partneri.length) {
-      Alert.alert("Info", "Nema podataka za izvoz.");
-      return;
-    }
-  
-    const wb = XLSX.utils.book_new();
-  
-    const eventInfo = [{
-      'Naziv događaja': events.naziv || 'N/A',
-      'Svrha': events.svrha || 'N/A',
-      'Klijent': events.klijent || 'N/A',
-      'Kontakt klijenta': events.kontaktKlijenta || 'N/A',
-      'Kontakt sponzora': events.kontaktSponzora || 'N/A',
-      'Napomena': events.napomena || 'N/A',
-      'Datum': events.datum ? new Date(events.datum).toLocaleDateString() : 'N/A',
-    }];
-  
-    const wsEventInfo = XLSX.utils.json_to_sheet(eventInfo);
-    XLSX.utils.book_append_sheet(wb, wsEventInfo, "Događaj");
-  
-    
-    if (gosti.length) {
-      const guestsData = gosti.map(guest => ({
-        "ID Gosta": guest.id,
-        "Ime i prezime": guest.imeIPrezime || 'N/A',
-        "Broj stola": guest.brojStola || 'N/A',
-        "Status dolaska": guest.statusDolaska || 'N/A',
-      }));
-  
-      const wsGuests = XLSX.utils.json_to_sheet(guestsData);
-      XLSX.utils.book_append_sheet(wb, wsGuests, "Gosti");
-    }
-  
-    if (partneri.length) {
-      const partnersData = partneri.map(partner => ({
-        "ID Partnera": partner.idOdabranogPartnera || 'N/A',
-        "Naziv partnera": partner.NaziviPartnera && partner.idOdabranogPartnera
-          ? partner.NaziviPartnera[partner.idOdabranogPartnera]
-          : 'N/A',
-        "Konačna cijena": partner.KonacnaCijena || 'N/A',
-        "Provizija": partner.Provizija || 'N/A',
-        "Status partnera": partner.StatusPartnera || 'N/A',
-      }));
-  
-      const wsPartners = XLSX.utils.json_to_sheet(partnersData);
-      XLSX.utils.book_append_sheet(wb, wsPartners, "Partneri");
-    }
-  
-    const summaryData = [{
-      "Ukupan broj gostiju": gosti.length,
-      "Ukupan broj partnera": partneri.length,
-    }];
-  
-    const wsSummary = XLSX.utils.json_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(wb, wsSummary, "Rezime");
-  
-    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-  
-    saveAs(blob, `Dogadjaj_${events.id || 'N/A'}.xlsx`);
-  
-    Alert.alert("Uspjeh", "Excel datoteka je uspješno generirana i preuzeta.");
-  };
-  
   /* prikazuje sve goste u guest listi */
   const renderGuests = ({item, index }) => {
 
    return (
     <View style={styles.guestStyle}>
-      <Guest idGosta={item.id} statusDolaska={item.statusDolaska} brojStola={item.brojStola} imePrezime={item.imeIPrezime} redniBroj={index+1} sendUpdateToParent={handeDataFromChildGuest} />
+      <Guest idGosta={item.id} statusDolaska={item.statusDolaska} brojStola={item.brojStola} imePrezime={item.imeIPrezime} redniBroj={index+1} sendUpdateToParent={handleDataFromChildGuest} />
       <TouchableOpacity onPress={() => handleDeleteGuest(item.id)}>
         <Icon name="delete" size={24} color="#e8c789" style={styles.deleteIcon} />
       </TouchableOpacity>
@@ -277,6 +279,7 @@ const EditEventPage = () => {
    );
   };
 
+  /* prikazuje sve goste u guest listi */
   const renderPartners = ({item, index }) => {
     return (
      <View style={styles.partnerStyle}>
@@ -288,103 +291,8 @@ const EditEventPage = () => {
       );
     }
 
-  /* sprema promjene u bazu */
-  const saveChanges = async () => {
-    if (!(naziv == undefined || naziv == "")) {
-      events.naziv = naziv;
-    }
-    if (!(svrha == undefined || svrha == "")) {
-      events.svrha = svrha;
-    }
-    if (!(klijent == undefined || klijent == "")) {
-      events.klijent = klijent;
-    }
-    if (!(kontaktKlijenta == undefined || kontaktKlijenta == "")) {
-      events.kontaktKlijenta = kontaktKlijenta;
-    }
-    if (!(kontaktSponzora == undefined || kontaktSponzora == "")) {
-      events.kontaktSponzora = kontaktSponzora;
-    }
-    if (!(napomena == undefined || napomena == "")) {
-      events.napomena = napomena;
-    }
-    events.datum = new Date(startDate).toISOString().split('T')[0];
-    
-    // Simple POST request with fetch - ZA DOGADJAJE
-    await fetch(`http://localhost:5149/api/Dogadjaj/${id}`, { 
-      method: 'POST', 
-      //body: '{"naziv": "neko ime"}',/      
-      body: JSON.stringify({
-        ...events, // Zadržava postojeće podatke iz events
-      }),
-      //mode: "cors",
-      //cache: "no-cache",
-      //credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      //redirect: "follow",
-      //referrerPolicy: "no-referrer",
-    }).then(() => console.log("POST za događaj gotov (spremljen)!!!"));
-
-    const finalGuests = gosti.map(guest => ({
-      imeIPrezime: guest.imeIPrezime ? guest.imeIPrezime : guest.imePrezime || "N/A", //ISPOSTAVILO SE da je nekad imePrezime a nekad imeIPrezime varijabla za ime i prezime gosta pa se ovdje to ispravlja
-      brojStola: guest.brojStola || 0,
-      idDogadjajaa: events.id,
-      statusDolaska: guest.statusDolaska || "nepoznato"
-    }));
-
-    //DELETE brisanje svih gostiju iz ovog dogadjaja u bazi
-    await fetch(`http://localhost:5149/api/Gost/Gosti/${events.id}`,{
-      method: 'DELETE',
-      headers: {'Content-Type': 'application/json'},
-    }).then(()=>console.log("Izbrisani svi gosti! (DELETE poslan)", {finalGuests}));
-
-    //POST REQUEST ZA GOSTE    
-    await fetch(`http://localhost:5149/api/Gost/Vise`,{
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(finalGuests),
-    }).then(() => {
-      console.log("Promjene gostiju spremljene! (POST za goste poslan)",{finalGuests});
-    });
 
 
-    const finalPartners = partneri.map(partner => ({
-      idPartnera: partner.idOdabranogPartnera,
-      idAranzmana: partner.OdabraniAranzmanId || 0,
-      idDogadjaja: events.id,
-      statusPartnera: partner.StatusPartnera || "nepoznato",
-      izmjena: partner.Izmjena || "",
-      konacnaCijena: Number(partner.KonacnaCijena) || 0,
-      dodatakNaProviziju: Number(partner.Provizija) || 0
-    }));
-
-    //DELETE brisanje svih partnera iz ovog dogadjaja u bazi
-    await fetch(`http://localhost:5149/api/Dogadjaj/Partnere/${events.id}`,{
-      method: 'DELETE',
-      headers: {'Content-Type': 'application/json'},
-    }).then(()=>console.log("Izbrisani svi partneri! (DELETE poslan)", {finalPartners}));
-
-    //POST REQUEST ZA PARTNERE    
-    await fetch(`http://localhost:5149/api/MedjutablicaPt1/Vise`,{
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(finalPartners),
-    }).then(() => {
-      console.log("Promjene partnera spremljene! (POST za partnere poslan)",{finalPartners});
-      setCurrentPage(pages['Events']);
-    });
-    
-  };
-
-    /* brise događaj iz baze */
-  const deleteEvent = () => {
-    // Simple DELETE request with fetch
-    fetch(`http://localhost:5149/api/Dogadjaj/${id}`, { method: 'DELETE' })
-    .then(() => {
-      console.log("Uspješno obrisano!!!");
-      setCurrentPage(pages['Events']);
-    });
-  };
   const handleDeleteGuest = (guestId) => {
     // brise gosta LOKALNO iz arraya gosti
     setGosti(prevGosti => prevGosti.filter(guest => guest.id !== guestId));
@@ -399,31 +307,88 @@ const EditEventPage = () => {
     setGosti(prevGosti => {
         const newId = brojGostiju + 1;
         setBrojGostiju(newId);
-        return [...prevGosti, { id: newId, imeIPrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1, idDogadjajaa: events.id, sendUpdateToParent: handeDataFromChildGuest}];
+        return [...prevGosti, { id: newId, imeIPrezime: "Novi Gost", statusDolaska: "Nepotvrđen", brojStola: 1, idDogadjajaa: events.id, sendUpdateToParent: handleDataFromChildGuest}];
     });
   };
 
   const addNewPartner = () => {
     SviPartneri.then((value) => {
       setPartneri(prevPartneri => {
-      setBrojPartnera(brojPartnera + 1);
-      return [...prevPartneri, { id: brojPartnera, NaziviPartnera: value, listaIdeva: IdeviPartnera, Tip: "Neki tip", listaProvizija: ProvizijePartnera, idDogadjajaa: events.id, sendUpdateToParent: handleDataFromChildPartner}];
+      const newId = brojPartnera + 1;
+      setBrojPartnera(newId);
+      return [...prevPartneri, { id: newId, NaziviPartnera: value, listaIdeva: IdeviPartnera, listaProvizija: ProvizijePartnera, idDogadjajaa: events.id, sendUpdateToParent: handleDataFromChildPartner}];
   });
     });
     
   };
   
+  const handleCreate = async () => {
+    setEvents({
+      startDate: startDate,
+      naziv: naziv,
+      svrha: svrha,
+      klijent: klijent,
+      kontaktKlijenta: kontaktKlijenta,
+      kontaktSponzora: kontaktSponzora,
+      napomena: napomena
+    });
+    const myresponse = await fetch(`http://localhost:5149/api/Dogadjaj/`, { 
+      method: 'POST',     
+      body: JSON.stringify({
+        naziv: naziv,
+        svrha: svrha,
+        klijent: klijent,
+        kontaktKlijenta: kontaktKlijenta,
+        kontaktSponzora: kontaktSponzora,
+        napomena: napomena,
+        datum: new Date(startDate).toISOString().split('T')[0],
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+    const mydata = await myresponse.json();
 
+    const finalGuests = gosti.map(guest => ({
+      imeIPrezime: guest.imeIPrezime ? guest.imeIPrezime : guest.imePrezime || "N/A", //ISPOSTAVILO SE da je nekad imePrezime a nekad imeIPrezime varijabla za ime i prezime gosta pa se ovdje to ispravlja
+      brojStola: guest.brojStola || 0,
+      idDogadjajaa: mydata.id,
+      statusDolaska: guest.statusDolaska || "nepoznato"
+    }));
+
+    fetch(`http://localhost:5149/api/Gost/Vise`,{
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(finalGuests),
+    }).then(() => {
+      console.log("Promjene gostiju spremljene! (POST za goste poslan)",{finalGuests});
+    });
+
+    const finalPartners = partneri.map(partner => ({
+      idPartnera: partner.idOdabranogPartnera,
+      idAranzmana: partner.OdabraniAranzmanId || 0,
+      idDogadjaja: mydata.id,
+      statusPartnera: partner.StatusPartnera || "nepoznato",
+      izmjena: partner.Izmjena || "",
+      konacnaCijena: Number(partner.KonacnaCijena) || 0,
+      dodatakNaProviziju: Number(partner.Provizija) || 0
+    }));
+
+    fetch(`http://localhost:5149/api/MedjutablicaPt1/Vise`,{
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(finalPartners),
+    }).then(() => {
+      console.log("Promjene partnera spremljene! (POST za partnere poslan)",{finalPartners});
+      setCurrentPage(pages['Events']);
+    });
+
+
+  }
 
   return (
       <Pozadina>
           <View style={styles.container}>
-              <Text style={styles.title}>Uredi događaj</Text> 
-              <Button title="Export to Excel" onPress={handleExportToExcel} />
-
-              <Text style={styles.headerText}>Id: {id}</Text>
-              
-              {events ? ( //ispis kada se dohvati podaci
+              <Text style={styles.title}>Stvori događaj</Text> 
+              <SmallButton title="Importiraj Excel" onPress={handleFileUpload} />
               <>
               <ScrollView style={styles.scrollView}>
                 {/* naziv i vrsta */}
@@ -467,11 +432,6 @@ const EditEventPage = () => {
 
                 {/* PARTNERI SADA SLIJEDE BOŽE POMOZI */}
                 <View style={styles.itemContainer}>
-                  <Text> </Text>
-                </View>
-
-                {/* PARTNERI SADA SLIJEDE BOŽE POMOZI */}
-                <View style={styles.itemContainer}>
                   <Text style={styles.categoryText}>Lista partnera:</Text>
                   <View style={styles.addGuestView}>
                     <Button title="+ Novi partner" onPress={addNewPartner}></Button>
@@ -482,6 +442,7 @@ const EditEventPage = () => {
                     <Text style={styles.categoryText}>Nema partnera</Text>
                   }
                 </View>
+
 
                 {/* Gosti*/}
                 <View style={styles.itemContainer}>
@@ -495,34 +456,22 @@ const EditEventPage = () => {
                     <Text style={styles.categoryText}>Nema gostiju</Text>
                   }
                 </View>
-
                 
                 <View style={styles.buttons}>
-                  <Button title="Spremi promjene" onPress={saveChanges}></Button>
-                  <Button title="Izbriši događaj" onPress={deleteEvent} bgColor="#b51010"></Button>
-                  <Button title="Prikaži nove podatke" onPress={showChanges} bgColor="blue"></Button>
+                  <Button title="Napravi događaj" onPress={handleCreate}></Button>
                 </View>
 
               </ScrollView>
               </>
-              ) : ( //ispis dok nema podataka
-              <Text style={styles.text}>Učitavam podatke...</Text>
-              )}
 
           </View>
       </Pozadina>
   );
 }
 
-export default EditEventPage;
+export default ExcelEvent;
 
 const styles = new StyleSheet.create({
-  deletePartnerButton: {
-    margin: "auto",
-    marginLeft: 0,
-    marginRight: 0,
-  },
-
   addGuestView:{
     marginBottom: 10,
   },

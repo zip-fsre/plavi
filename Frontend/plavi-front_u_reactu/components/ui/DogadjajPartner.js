@@ -24,6 +24,7 @@ const Partner = ({NaziviPartnera, Izmjena, KonacnaCijena, idPartnera, idOdabrano
     const [Aranzmani, setAranzmani] = useState(["Odaberite aranzman"]);
     const [IdAranzmana, setIdAranzmana] = useState([0]);
     const [CijeneAranzmana, setCijeneAranzmana] = useState([0]);
+    const [OpisiAranzmana, setOpisiAranzmana] = useState([0]);
     const [IzmjeneAranzmana, setIzmjeneAranzmana] = useState([0]);
 
     
@@ -47,16 +48,19 @@ const Partner = ({NaziviPartnera, Izmjena, KonacnaCijena, idPartnera, idOdabrano
         const listaAranzmana = pom2.map(element => element.naziv);
         const listaIdAranzmana = pom2.map(element => element.id);
         const listaCijenaAranzmana = pom2.map(element => element.cijena);
+        const listaOpisaAranzmana = pom2.map(element => element.opis);
         const listaIzmjenaAranzmana = pom2.map(element => element.izmjena);
         setAranzmani(["Odaberite aranzman", ...listaAranzmana]);
         setIdAranzmana([0, ...listaIdAranzmana]);
-        setCijeneAranzmana([0, ...listaCijenaAranzmana]);
+        setCijeneAranzmana(["", ...listaCijenaAranzmana]);
+        setOpisiAranzmana(["", ...listaOpisaAranzmana]);
         setIzmjeneAranzmana(["", ...listaIzmjenaAranzmana]);
       }
 
       const handleAranzmanChange = (value) => {
         handleChange("OdabraniAranzmanId", IdAranzmana[value]);
         handleChange("KonacnaCijena", CijeneAranzmana[value]);
+        handleChange("Izmjena", OpisiAranzmana[value]);
         setSelectedAranzman(value);
       };
 

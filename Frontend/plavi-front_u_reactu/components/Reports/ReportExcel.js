@@ -18,7 +18,7 @@ const ReportExcel = () => {
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [selectedPartner, setSelectedPartner] = useState('');
+  const [selectedPartner, setSelectedPartner] = useState(null);
   const [partners, setPartners] = useState([]);
   const [medjutablicaPt1, setMedjutablicaPt1] = useState([]);
   const [events, setEvents] = useState([]);
@@ -50,14 +50,38 @@ const ReportExcel = () => {
         const binaryString = e.target.result;
         const workbook = XLSX.read(binaryString, { type: 'binary' });
   
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
+        const sheetNames = workbook.SheetNames;
+        console.log('Nazivi listova u Excelu:', sheetNames);
   
-        const jsonData = XLSX.utils.sheet_to_json(sheet);
-        console.log('Podaci iz Excel-a:', jsonData);
+        const mainSheetName = sheetNames[0]; 
+        const mainSheet = workbook.Sheets[mainSheetName];
+        const jsonData = XLSX.utils.sheet_to_json(mainSheet);
+        console.log('Podaci iz glavnog lista:', jsonData);
+  
+        const partnerSheetName = sheetNames.find(name => name.toLowerCase().includes('partner'));
+        if (partnerSheetName) {
+          const partnerSheet = workbook.Sheets[partnerSheetName];
+          const partnerData = XLSX.utils.sheet_to_json(partnerSheet);
+          console.log('Podaci o partnerima iz lista:', partnerData);
+  
+          partnerData.forEach((item, index) => {
+            console.log(`Ključevi objekta ${index} iz lista partnera:`, Object.keys(item));
+          });
+  
+          if (partnerData.length > 0) {
+            setSelectedPartner(partnerData[0]['ID Partnera']); 
+            console.log('Odabrani partner ID:', partnerData[0]['ID Partnera']);
+          } else {
+            console.error('Greška: Nema partnera u listi.');
+          }
+        } else {
+          console.error('Greška: List s podacima o partnerima nije pronađen.');
+          return;
+        }
   
         if (jsonData.length > 0 && jsonData[0]) {
           console.log("JSON Podaci:", jsonData[0]); 
+          console.log('Ključevi prvog objekta iz JSON-a:', Object.keys(jsonData[0])); 
   
           setReportTitle(jsonData[0]['Naziv izvješća'] || '');
           setDescription(jsonData[0]['Opis izvješća'] || '');
@@ -95,31 +119,15 @@ const ReportExcel = () => {
   
           setStartDate(formattedStartDate || new Date());  
           setEndDate(formattedEndDate || new Date());
-  
-          setSelectedPartner(jsonData[0].PartnerID || null);  
-  
-          const partnerID = jsonData[0].PartnerID || null;
-          console.log("Partner ID:", partnerID);
-  
-          let filteredPartnerData = [];
-          if (partnerID !== null) {
-            filteredPartnerData = await fetch(`http://localhost:5149/api/MedjutablicaPt1/Partner/${partnerID}`);
-          } else {
-            filteredPartnerData = await fetch('http://localhost:5149/api/MedjutablicaPt1/Partner');  // Za sve podatke
-          }
-  
-          const partnerData = await filteredPartnerData.json();
-          console.log('Podaci partnera:', partnerData);
-  
         }
       };
+  
       reader.readAsBinaryString(blob);
     } catch (error) {
       console.error('Greška pri učitavanju datoteke:', error);
     }
   };
   
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -211,7 +219,7 @@ const ReportExcel = () => {
         opis: description,
         pocetak: startDate ? new Date(startDateTime).toISOString() : null,
         kraj: endDate ? new Date(endDateTime).toISOString() : null,
-        odabraniPartner: selectedPartner || undefined,
+        odabraniPartner: selectedPartner || null,
       };
   
       console.log("Slanje izvješća na backend:", reportData);
@@ -323,15 +331,17 @@ const ReportExcel = () => {
 
         {/* Picker za odabir partnera */}
         <Picker
-          selectedValue={selectedPartner}
-          onValueChange={setSelectedPartner}
-          style={styles.picker}
+        selectedValue={selectedPartner}
+        onValueChange={(value) => setSelectedPartner(value || null)}  // Ako nije odabrano, postavi na null
+        style={styles.picker}
         >
-          <Picker.Item label="Odaberite partnera" value="" />
-          {partners.map((partner) => (
-            <Picker.Item key={partner.id} label={partner.naziv} value={partner.id} />
-          ))}
+        <Picker.Item label="Odaberite partnera" value={null} />
+        {partners.map((partner) => (
+        <Picker.Item key={partner.id} label={partner.naziv} value={partner.id} />
+         ))}
         </Picker>
+
+
         <HoverButton title="Učitaj Excel" onPress={handleFileUpload} />
         <HoverButton title="Generiraj izvješće" onPress={handleGenerateReport} />
       </View>
