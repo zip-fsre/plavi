@@ -75,6 +75,7 @@ const ExcelEvent = () => {
           const sheetNames = workbook.SheetNames;
           console.log('Nazivi listova u Excelu:', sheetNames);
     
+          // Mapping event, guests, partners, and summary
           const eventSheet = sheetNames.includes('Događaj') ? workbook.Sheets['Događaj'] : null;
           const guestsSheet = sheetNames.includes('Gosti') ? workbook.Sheets['Gosti'] : null;
           const partnersSheet = sheetNames.includes('Partneri') ? workbook.Sheets['Partneri'] : null;
@@ -84,14 +85,14 @@ const ExcelEvent = () => {
             const eventData = XLSX.utils.sheet_to_json(eventSheet);
             console.log('Podaci iz lista Događaj:', eventData);
             if (eventData.length > 0) {
-              const event = eventData[0]; 
-              setNaziv(event.naziv || '');
-              setSvrha(event.svrha || '');
-              setKlijent(event.klijent || '');
-              setKontaktKlijenta(event.kontaktKlijenta || '');
-              setKontaktSponzora(event.kontaktSponzora || '');
-              setNapomena(event.napomena || '');
-              setStartDateInput(event.datum ? new Date(event.datum) : '');
+              const event = eventData[0]; // Assuming only one event
+              setNaziv(event["Naziv događaja"] || '');
+              setSvrha(event.Svrha || '');
+              setKlijent(event.Klijent || '');
+              setKontaktKlijenta(event["Kontakt klijenta"] || '');
+              setKontaktSponzora(event["Kontakt sponzora"] || '');
+              setNapomena(event.Napomena || '');
+              setStartDateInput(event.Datum ? new Date(event.Datum) : '');
             }
           }
     
@@ -99,23 +100,29 @@ const ExcelEvent = () => {
             const guestsData = XLSX.utils.sheet_to_json(guestsSheet);
             console.log('Podaci iz lista Gosti:', guestsData);
             setGosti(guestsData.map((guest, index) => ({
-              id: index + 1, 
-              imeIPrezime: guest.imeIPrezime || 'N/A',
-              brojStola: guest.brojStola || 0,
-              statusDolaska: guest.statusDolaska || 'Nepotvrđen',
+              id: index + 1, // Assuming new IDs for guests
+              imeIPrezime: guest["Ime i prezime"] || 'N/A',
+              brojStola: guest["Broj stola"] || 0,
+              statusDolaska: guest["Status dolaska"] || 'Nepotvrđen',
             })));
           }
-    
           if (partnersSheet) {
             const partnerData = XLSX.utils.sheet_to_json(partnersSheet);
             console.log('Podaci iz lista Partneri:', partnerData);
+            SviPartneri.then((value) => {
             setPartneri(partnerData.map((partner, index) => ({
-              id: index + 1, 
-              NaziviPartnera: partner.NazivPartnera || 'N/A',
-              Provizija: partner.provizija || 0,
-              StatusPartnera: partner.statusPartnera || 'Neaktivno',
-              KonacnaCijena: partner.konacnaCijena || 0,
-            })));
+              id: index + 1, // Assuming new IDs for partners
+              redniBroj: index + 1,
+              Izmjena: "partner.",
+              KonacnaCijena: partner["Konačna cijena"] || 0,
+              NaziviPartnera: value || 'N/A',
+              OdabraniAranzmanId: partner["ID Aranzmana"] || 0,
+              Provizija: partner.Provizija || 0,
+              StatusPartnera: partner["Status partnera"] || 'Neaktivno',
+              idOdabranogPartnera: partner["ID Partnera"] || 0,
+              listaIdeva: IdeviPartnera,
+              // Additional fields mapping as needed
+            })));});
           }
     
           if (summarySheet) {
