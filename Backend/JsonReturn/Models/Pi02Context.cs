@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using DotNetEnv;
 
 namespace JsonReturn.Models;
 
@@ -31,8 +32,20 @@ public partial class Pi02Context : DbContext
 
     public virtual DbSet<Partneri> Partneris { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=dosa.fer.hr,3000;Database=PI-02;User Id=PI02;Password=Poo.2-bear;Trusted_Connection=True;Trust Server Certificate=True;Integrated Security=False");
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder){
+        if (!optionsBuilder.IsConfigured){
+            Env.Load();
+
+            var connection = Env.GetString("CONNECTION_STRING");
+
+            if (string.IsNullOrEmpty(connection)){
+                throw new InvalidOperationException("Database connection string is missing from environment variables.");
+            }
+
+            optionsBuilder.UseSqlServer(connection);
+
+            }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
